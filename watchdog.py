@@ -3,6 +3,19 @@ from sys import exit
 import os
 import time
 import signal
+import time    
+from contextlib import contextmanager
+from multiprocessing.dummy import Pool as ThreadPool 
+from time import sleep
+
+stop = 1
+
+@contextmanager  
+def measureTime(title):
+    t1 = time.clock()
+    yield
+    t2 = time.clock()
+    print '%s: %f seconds elapsed' % (title, t2-t1)
 
 #ensures we can kill the script with ctrl-C for testing
 def signal_handler(signal, frame):
@@ -11,6 +24,9 @@ def signal_handler(signal, frame):
 
 signal.signal(signal.SIGINT, signal_handler)
 
+def call_scan(obj):
+    obj.scan ()
+    return obj
 
 class Arduino:
     
@@ -35,67 +51,67 @@ class Arduino:
         self.set_failstart = 0
         self.port_opened = 0
         self.textln = ""
+        self.ser = serial.Serial()
+
+    def openPort(self):
+        if (self.ser.isOpen() == False):
+            self.ser.baudrate = 9600
+            self.ser.port = self.port
+            self.ser.timeout = self.timeout
+            try:
+                self.ser.open() 
+            except Exception, e:
+                print "Failed to open port " + self.port + " : %s" % e
 
     def watchdog(self):
-        print("Watchdog called on port " + self.port + " Time since last dog: " + str(time.time() - self.wdtimerstart))
+        #print("Watchdog called on port " + self.port + " Time since last dog: " + str(time.time() - self.wdtimerstart))
         if (time.time() - self.wdtimerstart > self.dogtime):
             print("WATCHDOG ACTIVE^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
             #reset code goes here
             self.wdtimerstart = time.time();
 
     def scan(self):
-        try:
-            #try block creates, opens, and reads serial. if any failures, retry.
-            self.ser = serial.Serial(self.port, 9600)
-            self.ser.timeout = self.timeout
-            self.ser.open()
-            self.textln = self.ser.read(100)
-        except:
-            print "warning: SERIAL FAILURE!!"
-            if (self.set_failstart == 0):
-                self.failstart = time.time() # records time of failure
-                self.set_failstart = 1 
-    # ^ sets a failure code to keep from rewriting the failure time over & over
+        while 1:
+            sleep(0.005) #otherwise it eats every CPU :3
             try:
-                self.ser.open()
-            except:
-                print "warning: still can't re-open serial port. retrying..."
-            if (time.time() - self.failstart > self.wdtime):
-                # if it's been so long since serial failure, pop the watchdog
-                self.watchdog()
-        self.set_failstart = 0  # clears the failure code in case we failed earlier 
-        if (len(self.textln) != 0):
-            print "Got data on port " + self.port + " in sec:" + str(time.time() - self.start) + " " + self.textln
-            self.start = time.time()
-        else: 
-           # print "Warning! no data on port " + self.port + " in sec: " + str(time.time() - self.start)
-            if (time.time() - self.start > self.wdtime):
-               self.watchdog()
-        try:
-            self.ser.close()
-        except:
-            pass
+#try block creates, opens, and reads serial. if any failures, retry.
+                self.openPort()
+                self.textln = self.ser.read(1)
+            except Exception, e:
+                print "SERIAL FAILURE! %s" % e
+                self.ser.close()
+                if (self.set_failstart == 0):
+                    self.failstart = time.time() # records time of failure
+                    self.set_failstart = 1 
+                # ^ sets a failure code to keep from rewriting the failure time over & over
+                if (time.time() - self.failstart > self.wdtime):
+                    # if it's been so long since serial failure, pop the watchdog
+                    self.watchdog()
+                    break
+            #From here down, we got a read-success    
+            self.set_failstart = 0  # clears the failure code in case we failed earlier 
+            if (len(self.textln) != 0):
+                print "Got data on port " + self.port + " in sec:" + str(time.time() - self.start) + " " + self.textln
+                self.start = time.time()
+            else: 
+                # print "Warning! no data on port " + self.port + " in sec: " + str(time.time() - self.start)
+                if (time.time() - self.start > self.wdtime):
+                    self.watchdog()
 
 print "starting in 2 seconds..."
 time.sleep(2); # give arduinos time to start
 
  # build a list to step through the arduinos
-arduino1 = Arduino("/dev/arduino1", 1, 1.0, 10.0, 40.0)
-arduino2 = Arduino("/dev/arduino2", 2, 1.0, 10.0, 40.0)
-arduino3 = None
+arduino1 = Arduino("/dev/arduino1", 1, 0.0, 10.0, 40.0)
+arduino2 = Arduino("/dev/arduino2", 2, 0.0, 10.0, 40.0)
+#arduino3 = None
 arduinolist = []
 arduinolist.append(arduino1)
 arduinolist.append(arduino2)
-arduinolist.append(arduino3)
+#arduinolist.append(arduino3)
 
-while 1:
+for count in xrange(2): 
+    pool = ThreadPool(2)
+    arduinolist = pool.map(call_scan, arduinolist)
 
-    for count in xrange(3): 
-        if arduinolist[count] != None:
-            arduinolist[count].scan()
-
- #I didn't give each arduino its own thread, so each object blocks for the
- #given timeout during scan()... but given the amount of time before 
- #we'll want to reboot (minutes, most likely!) serial timeouts should be OK.
- #At 1 sec timeout it'll poll 3 Arduinos, each patting every 4 sec, etc... if we
- #decide we want to use large pat times (1 min or more), threads may be needed
+#second version. Added threads, tuned for speed, and cleaned up the code.
