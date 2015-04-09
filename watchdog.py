@@ -24,13 +24,14 @@ def signal_handler(signal, frame):
 
 signal.signal(signal.SIGINT, signal_handler)
 
-def call_scan(obj):
+#needed because pool() doesn't work over an object call
+def call_scan(obj): 
     obj.scan ()
     return obj
 
 class Arduino:
     
-    def __init__(self, port, pin, timeout, wdtime, dogtime):
+    def __init__(self, port, outport, pin, timeout, wdtime, dogtime):
 
  #port: portname string (i.e. "/dev/arduino1", "/dev/ttyACM0")
  #pin: GPIO output pin number to connect to Arduino reset (i.e. 1, 20)
@@ -41,6 +42,7 @@ class Arduino:
         print "new Arduino object with port: " + port + " pin: " + str(pin) + " serial timeout: " + str(timeout) 
         print "                        watchdog sec: " + str(wdtime) + " watchdog timeout: " + str(dogtime)
         self.port = port
+        self.outport = outport
         self.pin = pin
         self.timeout = timeout
         self.wdtime = wdtime
@@ -52,6 +54,17 @@ class Arduino:
         self.port_opened = 0
         self.textln = ""
         self.ser = serial.Serial()
+        self.outser = serial.Serial()
+
+    def openOutPort(self):
+        if (self.outser.isOpen() == False):
+            self.outser.baudrate = 9600
+            self.outser.port = self.outport
+            self.outser.timeout = self.timeout
+            try:
+                self.outser.open() 
+            except Exception, e:
+                print "Failed to open port " + self.outport + " : %s" % e       
 
     def openPort(self):
         if (self.ser.isOpen() == False):
@@ -76,7 +89,11 @@ class Arduino:
             try:
 #try block creates, opens, and reads serial. if any failures, retry.
                 self.openPort()
+                self.openOutPort()
                 self.textln = self.ser.read(1)
+                if (len(self.textln) != 0):
+                    print "write " + self.textln
+                    self.outser.write(self.textln)
             except Exception, e:
                 print "SERIAL FAILURE! %s" % e
                 self.ser.close()
@@ -102,8 +119,9 @@ print "starting in 2 seconds..."
 time.sleep(2); # give arduinos time to start
 
  # build a list to step through the arduinos
-arduino1 = Arduino("/dev/arduino1", 1, 0.0, 10.0, 40.0)
-arduino2 = Arduino("/dev/arduino2", 2, 0.0, 10.0, 40.0)
+# use "socat -d -d PTY: PTY:" twice, along with "cat /dev/pts/5" and "cat /dev/pts/7", to listen in on the other end of these virtual ports
+arduino1 = Arduino("/dev/arduino1", "/dev/pts/4", 1, 0.0, 10.0, 40.0)
+arduino2 = Arduino("/dev/arduino2", "/dev/pts/6", 2, 0.0, 10.0, 40.0)
 #arduino3 = None
 arduinolist = []
 arduinolist.append(arduino1)
@@ -114,4 +132,5 @@ for count in xrange(2):
     pool = ThreadPool(2)
     arduinolist = pool.map(call_scan, arduinolist)
 
-#second version. Added threads, tuned for speed, and cleaned up the code.
+#third version. Now it's a wrapper which writes input as soon as it arrives.
+
