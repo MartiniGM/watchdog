@@ -8,23 +8,18 @@ from contextlib import contextmanager
 from multiprocessing.dummy import Pool as ThreadPool 
 from time import sleep
 
-stop = 1
+# ensures we can kill the script with ctrl-C for testing
+# I took this out because once I added pool.map() it just WILL NOT DIE. 
+# kill -9 it...
 
-@contextmanager  
-def measureTime(title):
-    t1 = time.clock()
-    yield
-    t2 = time.clock()
-    print '%s: %f seconds elapsed' % (title, t2-t1)
+#def signal_handler(signal, frame):
+#    print('Exiting...')
+#    os._exit(0) 
 
-#ensures we can kill the script with ctrl-C for testing
-def signal_handler(signal, frame):
-    print('Exiting...')
-    os._exit(0) #dirty, but that gnarly try-except loop won't exit otherwise
+#signal.signal(signal.SIGINT, signal_handler)
 
-signal.signal(signal.SIGINT, signal_handler)
 
-#needed because pool() doesn't work over an object call
+#wrapper function to pass into pool.map()
 def call_scan(obj): 
     obj.scan ()
     return obj
@@ -33,11 +28,12 @@ class Arduino:
     
     def __init__(self, port, outport, pin, timeout, wdtime, dogtime):
 
- #port: portname string (i.e. "/dev/arduino1", "/dev/ttyACM0")
- #pin: GPIO output pin number to connect to Arduino reset (i.e. 1, 20)
- #timeout: seconds to serial timeout. set to 0 for non-blocking. 1 seems to work
- #wdtime: seconds to firing watchdog (i.e. 10.0)
- #dogtime: seconds between subsequent watchdogs, to prevent reset loops (60)
+ # port: input portname string, from Arduino (i.e. "/dev/arduino1", "/dev/ttyACM0", "/dev/pts/4")
+ # outport: output portname string, to Max etc (i.e. "/dev/arduino1", "/dev/ttyACM0", "/dev/pts/5")
+ # pin: GPIO output pin number to connect to Arduino reset (i.e. 1, 20)
+ # timeout: seconds to serial timeout. set to 0 for non-blocking.
+ # wdtime: seconds to firing watchdog (i.e. 10.0)
+ # dogtime: seconds between subsequent watchdogs, to prevent reset loops (60)
  
         print "new Arduino object with port: " + port + " pin: " + str(pin) + " serial timeout: " + str(timeout) 
         print "                        watchdog sec: " + str(wdtime) + " watchdog timeout: " + str(dogtime)
@@ -79,6 +75,8 @@ class Arduino:
     def watchdog(self):
         #print("Watchdog called on port " + self.port + " Time since last dog: " + str(time.time() - self.wdtimerstart))
         if (time.time() - self.wdtimerstart > self.dogtime):
+            #for now, all this does is print. In future it'll write out to a 
+            #Pi pin to cause the attached Arduino to reset.
             print("WATCHDOG ACTIVE^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
             #reset code goes here
             self.wdtimerstart = time.time();
@@ -86,8 +84,9 @@ class Arduino:
     def scan(self):
         while 1:
             sleep(0.005) #otherwise it eats every CPU :3
+                         #delete/tweak this if you're getting lag
             try:
-#try block creates, opens, and reads serial. if any failures, retry.
+#try block creates, opens, and reads serials. if any failures, retry.
                 self.openPort()
                 self.openOutPort()
                 self.textln = self.ser.read(1)
@@ -112,14 +111,20 @@ class Arduino:
                 self.start = time.time()
             else: 
                 # print "Warning! no data on port " + self.port + " in sec: " + str(time.time() - self.start)
+                #likewise, if it's been too long since we saw data, pop the watchdog
                 if (time.time() - self.start > self.wdtime):
                     self.watchdog()
+
 
 print "starting in 2 seconds..."
 time.sleep(2); # give arduinos time to start
 
- # build a list to step through the arduinos
-# use "socat -d -d PTY: PTY:" twice, along with "cat /dev/pts/5" and "cat /dev/pts/7", to listen in on the other end of these virtual ports
+# builds a list to step through the arduinos
+# use "socat -d -d PTY: PTY:" twice, then attach the other end to (or use cat)
+# "/dev/pts/5" and "/dev/pts/7" to listen in on the other end of these 
+# virtual ports. See attached "watch_serial.sh" script.
+
+#                  input port, output port, pin, timeout, wdtime, dogtime
 arduino1 = Arduino("/dev/arduino1", "/dev/pts/4", 1, 0.0, 10.0, 40.0)
 arduino2 = Arduino("/dev/arduino2", "/dev/pts/6", 2, 0.0, 10.0, 40.0)
 #arduino3 = None
@@ -128,9 +133,11 @@ arduinolist.append(arduino1)
 arduinolist.append(arduino2)
 #arduinolist.append(arduino3)
 
-for count in xrange(2): 
-    pool = ThreadPool(2)
-    arduinolist = pool.map(call_scan, arduinolist)
+# this creates a thread pool and assigns each working loop its own thread.
+print len(arduinolist)
+pool = ThreadPool(len(arduinolist))
+arduinolist = pool.map(call_scan, arduinolist)
 
-#third version. Now it's a wrapper which writes input as soon as it arrives.
+# fourth version. Now it's a wrapper which writes input as soon as it arrives.
+
 
