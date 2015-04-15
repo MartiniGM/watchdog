@@ -32,4 +32,4 @@ for i in $(ls $1*); do
   echo
 done
 
-echo "$((x-1)) arduino entries outputted to $2. Done."
+echo "$((x-1)) arduino entries outputted to $2. Done." 
