@@ -3,7 +3,7 @@ int pattime = 0;
 char pattime_str[200];
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   randomSeed(analogRead(0));
 }
 
