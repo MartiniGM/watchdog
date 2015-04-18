@@ -9,7 +9,7 @@ import select
 from contextlib import contextmanager
 from multiprocessing.dummy import Pool as ThreadPool 
 from time import sleep
-
+ 
 # ensures we can kill the script with ctrl-C for testing
 # I took this out because once I added pool.map() it just WILL NOT DIE. 
 # kill -9 it if using more than one Arduino...
