@@ -1,7 +1,0 @@
-socat -d -d PTY: PTY:
-2015/04/08 21:29:37 socat[7040] N PTY is /dev/pts/4
-2015/04/08 21:29:37 socat[7040] N PTY is /dev/pts/5
-2015/04/08 21:29:37 socat[7040] N starting data transfer loop with FDs [3,3] and [5,5]
-^C2015/04/08 21:31:30 socat[7040] N exiting on signal 2
-
-then connect one end to /dev/pts/4 and do "cat /dev/pts/5" to see serial output
