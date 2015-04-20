@@ -30,6 +30,7 @@
 // global for when we need to close
 int fda; FILE *fsa;
 int pipe1, pipe2;
+int num_ffs = 0;
 static void murder(int ignore) { 
   fclose(fsa); 
   close(fda); 
@@ -136,23 +137,15 @@ int main(void)
     }
 
     //for whatever reason, Arduino sends a flood of 0xFFs if you pull the USB cord out,
-    //not EOF. So, um, don't send more than 5 consecutive 0xFFs in your data...
+    //not EOF. So, um, don't send more than 10 consecutive 0xFFs in your data...
     if (tmp == 0xFF) {
-      tmp = getc(fsa);
-      if (tmp == 0xFF) {
-	 tmp = getc(fsa);
-	if (tmp == 0xFF) {
-	   tmp = getc(fsa);
-	   if (tmp == 0xFF) {
-	     tmp = getc(fsa);
-	     if (tmp == 0xFF) {
-  
-	       printf("SERIAL ERROR\n");
-	       open_ports();
-	     }
-	   }
-	}
-    }
+        num_ffs++;
+    } else
+    	num_ffs = 0;
+    
+    if (num_ffs >= 10) {
+	printf("SERIAL ERROR\n");
+	open_ports();
     }
 
     if (tmp >=32 && tmp <= 126) //don't print unicode etc as characters!
