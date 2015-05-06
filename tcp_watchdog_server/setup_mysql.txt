@@ -1,0 +1,28 @@
+To set up mysql for testing:
+
+sudo apt-get install mysql-server
+sudo apt-get install python-mysqldb
+
+mysql -u root -p
+enter password: raspberry
+
+mysql> CREATE DATABASE testdb;
+Query OK, 1 row affected (0.02 sec)
+
+mysql> CREATE USER 'testuser'@'localhost' IDENTIFIED BY 'test623';
+Query OK, 0 rows affected (0.00 sec) (NOTE: pass for testuser is test623!)
+
+mysql> USE testdb;
+Database changed
+
+mysql> GRANT ALL ON testdb.* TO 'testuser'@'localhost';
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> quit;
+Bye
+
+
+Then run mysqltest_create.py to create a sample test db...
+mysqltest_set.py to populate it...
+mysqltest_get.py to read the data back...
+tcp_watchdog_server.py to populate it with data from watchdog.py.
