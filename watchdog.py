@@ -19,8 +19,9 @@ if (USE_SOCKETS):
     #create an INET, STREAMing socket
     try:
         watchsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    except socket.error:
-        print 'Failed to create socket'
+    except socket.error as e:
+        print 'Failed to create socket: %s' % e
+        watchsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         #put retry here
     print "Socket created..."
 
@@ -62,36 +63,38 @@ class Arduino:
         self.textln = ""
         self.not_open = 1
         self.last_len = 0
-        self.send_ok = 0;
+        self.send_ok = 1;
         try:
             self.pipein = os.open(self.port, os.O_RDONLY | os.O_NONBLOCK)
         except Exception, e:
-            print "Failed to open %s!" % self.port
-        self.openPort()
-        self.watchdog()
-        self.scan()
-        self.send_ok_now()
+            print "Failed to open %s : %s!" % (self.port, e)
+#        self.openPort()
+#        self.watchdog()
+#        self.scan()
+#        self.send_ok_now()
 
     def openPort(self):
         if (self.not_open):
             try:
                 self.pipein = os.open(self.port, os.O_RDONLY | os.O_NONBLOCK)
             except Exception, e:
-                print "Failed to open %s!" % self.port
+                print "Failed to open %s : %s!" % (self.port, e)
             else:
                 self.not_open = 0;
 
     def send_ok_now(self):
          if (USE_SOCKETS):
              try:
-                 message = "WATCHDOG >>clear<< on: " + str(socket.gethostname()) + " " + self.port + " " + str(datetime.datetime.now())
-                 watchsock.sendall(message)
-             except socket.error:
-                 print "Send failed!"
-                 #put retry here
+                 message = "ERRDUINO_ACKCLEAR " + str(socket.gethostname()) + "/" + self.port + " " + str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
 
-    def watchdog(self):
-        print("Watchdog called on port " + self.port + " Time since last dog: " + str(time.time() - self.wdtimerstart))
+                 watchsock.sendall(message)
+             except socket.error as e:
+                 print "Send failed! %s" % e
+                 watchsock.sendall(message)
+                 #put retry here
+ 
+    def watchdog(self, errcode):
+#        print("Watchdog called on port " + self.port + " Time since last dog: " + str(time.time() - self.wdtimerstart))
         if (time.time() - self.wdtimerstart > self.dogtime):
             #for now, all this does is print. In future it'll write out to a 
             #Pi pin to cause the attached Arduino to reset.
@@ -99,13 +102,14 @@ class Arduino:
             #reset code goes here
             self.wdtimerstart = time.time();
             self.send_ok = 1;
-            print("WATCHDOG ACTIVE^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"+ self.port + " " + str(datetime.datetime.now()))
+            print("WATCHDOG ACTIVE^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"+ self.port + " " + str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S")))
             if (USE_SOCKETS):
                 try:
-                    message = "WATCHDOG ACTIVE on: " + str(socket.gethostname()) + " " + self.port + " " + str(datetime.datetime.now())
+                    message = errcode + " " + str(socket.gethostname()) + "/" + self.port + " " + str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
                     watchsock.sendall(message)
-                except socket.error:
-                    print "Send failed!"
+                except socket.error as e:
+                    print "Send failed! %s" % e
+                    watchsock.sendall(message)
                     #put retry here
 
     def scan(self):
@@ -141,21 +145,21 @@ class Arduino:
                 if (time.time() - self.failstart > self.wdtime):
                     # if it's been so long since serial failure, pop the watchdog
                     print "top dog on " + self.port
-                    self.watchdog()
+                    self.watchdog("ERRDUINO_DISCON")
                     #break
             #From here down, we got a read-success    
             self.set_failstart = 0  # clears the failure code in case we failed earlier 
             if (self.last_len != 0):
-                print "Got data on port " + self.port + " in sec:" + str(time.time() - self.start) + " " + self.textln + "at " + str(datetime.datetime.now())
+                print "Got data on port " + self.port + " in sec:" + str(time.time() - self.start) + "  " + self.textln 
                 self.start = time.time()
-                print "self.start reset to " + str(self.start) + "at " + str(datetime.datetime.now())
+ #               print "self.start reset to " + str(self.start) + "at " + str(datetime.datetime.now())
             else: 
                  #print "Warning! no data on port " + self.port + " in sec: " + str(time.time() - self.start)
                 #likewise, if it's been too long since we saw data, pop the watchdog
                  if (time.time() - self.start > self.wdtime):
 #                     print "start time was " + str(self.start)
 #                     print "bottom dog on " + self.port + " " + "at " + str(datetime.datetime.now())
-                     self.watchdog()
+                     self.watchdog("ERRDUINO_NOREPLY")
 
 
 print "starting in 2 seconds..."
@@ -170,9 +174,9 @@ if (USE_SOCKETS):
     try:
         remote_ip = socket.gethostbyname( host )
  
-    except socket.error:
+    except socket.error as e:
     #could not resolve
-        print 'Hostname could not be resolved. Try again later'
+        print "Gethostbyname error: %s" % e
         #put retry here
  
 #Connect to remote server
