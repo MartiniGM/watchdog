@@ -11,6 +11,36 @@ def disconnect():
         print "Disconnect detected!"
         connected = 0;
 
+def mysql_data(data, pi_or_arduino):
+    print "got data: " + data
+    data_list = data.split();
+    status = data_list[0]
+                        #print "err " + status
+    id_name = data_list[1]
+                        #print "id " + id_name
+    strr = " "
+    timestamp = strr.join(data_list[2:])
+                        #print "time " + timestamp
+    location = "Dad\'s room"
+                        #insert & commit, otherwise rollback
+    try:
+        query = """INSERT INTO %s(ID_NAME, LOCATION, TIMESTAMP, STATUS)  
+             VALUES (%%s, %%s, %%s, %%s)                                           
+             ON DUPLICATE KEY UPDATE                                           
+             TIMESTAMP = VALUES(TIMESTAMP),                                    
+             STATUS = VALUES(STATUS) ;                                         
+      """ % (pi_or_arduino)
+#        print query
+        cursor.execute(query, (id_name,location,timestamp,status))
+        db.commit()
+    except Exception, e:
+        print "mysql error: %s" % e
+        db.rollback()
+    else:
+        print "db_update okay!"
+        sock.send('OK ... ' + data)
+        
+
 if __name__ == "__main__":
       
     CONNECTION_LIST = []    # list of socket clients
@@ -60,31 +90,29 @@ if __name__ == "__main__":
                         print "No socket, popping an error"
                         disconnect()
                     else:
-                        print "got data: " + data
-                        data_list = data.split();
-                        status = data_list[0]
-                        #print "err " + status
-                        id_name = data_list[1]
-                        #print "id " + id_name
-                        strr = " "
-                        timestamp = strr.join(data_list[2:])
-                        #print "time " + timestamp
-                        location = "Dad\'s room"
+                   #     print "got data: " + data
+                   #     data_list = data.split();
+                   #     status = data_list[0]
+                   #     id_name = data_list[1]
+                   #     strr = " "
+                   #     timestamp = strr.join(data_list[2:])
+                   #     location = "Dad\'s room"
                         #insert & commit, otherwise rollback
-                        try:
-                            cursor.execute("""INSERT INTO ARDUINOS(ID_NAME, LOCATION, TIMESTAMP, STATUS)
-             VALUES (%s, %s, %s, %s)  
-             ON DUPLICATE KEY UPDATE
-             TIMESTAMP = VALUES(TIMESTAMP),
-             STATUS = VALUES(STATUS) ;
-      """, (id_name,location,timestamp,status))
-                            db.commit()
-                        except Exception, e:
-                            print "mysql error: %s" % e
-                            db.rollback()
-                        else:
-                            print "db_update okay!"
-                        sock.send('OK ... ' + data)
+                   #     try:
+                   #         cursor.execute("""INSERT INTO ARDUINOS(ID_NAME, LOCATION, TIMESTAMP, STATUS)
+           #  VALUES (%s, %s, %s, %s)  
+           #  ON DUPLICATE KEY UPDATE
+           #  TIMESTAMP = VALUES(TIMESTAMP),
+           #  STATUS = VALUES(STATUS) ;
+     # """, (id_name,location,timestamp,status))
+      #                      db.commit()
+       #                 except Exception, e:
+        #                    print "mysql error: %s" % e
+         #                   db.rollback()
+          #              else:
+           #                 print "db_update okay!"
+            #            sock.send('OK ... ' + data)
+                        mysql_data(data, "ARDUINOS")
                         connected = 1;
 
                 # client disconnected, so remove from socket list
