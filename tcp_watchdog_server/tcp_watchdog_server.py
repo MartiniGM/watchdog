@@ -1,36 +1,61 @@
 #!/usr/bin/python 
 import socket, select
 import MySQLdb
+import datetime
 #from Tkinter import * 
 
 connected = 1;
- 
+
+#reports disconnect, prepares for reconnect 
 def disconnect():
     global connected
     if (connected == 1):
         print "Disconnect detected!"
         connected = 0;
 
+#returns location/description string, given an id_name
+def get_location(id_name):
+    sql = """SELECT ID_NAME, LOCATION FROM LOCATIONS WHERE ID_NAME LIKE %s
+""" 
+    try:
+        cursor.execute(sql, (('%' + id_name + '%',)))
+        data = cursor.fetchall()
+        for row in data:
+            return row[1]
+    except Exception, e:
+        print "SQL error! %s" % e
+        return "" #blank location, will show as None in SQL
+
+#creates a Pi status update with current timestamp, sends it to mysql_data
+def pi_status_update(addr, status):
+    id_name = addr
+#    print "id_name " + id_name
+#    print "status " + status
+    timestamp = str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
+#    print "timestamp " + timestamp
+    data = status + " " + id_name + " " + timestamp
+    mysql_data(data, "PIS")
+    
+#writes Pi & Arduino status updates out to mysql
 def mysql_data(data, pi_or_arduino):
+    if len(data) == 0:
+        return
     print "got data: " + data
     data_list = data.split();
     status = data_list[0]
-                        #print "err " + status
     id_name = data_list[1]
-                        #print "id " + id_name
     strr = " "
     timestamp = strr.join(data_list[2:])
-                        #print "time " + timestamp
-    location = "Dad\'s room"
-                        #insert & commit, otherwise rollback
+    location = get_location(id_name)
+    #insert & commit, otherwise rollback
     try:
         query = """INSERT INTO %s(ID_NAME, LOCATION, TIMESTAMP, STATUS)  
              VALUES (%%s, %%s, %%s, %%s)                                           
              ON DUPLICATE KEY UPDATE                                           
-             TIMESTAMP = VALUES(TIMESTAMP),                                    
+             TIMESTAMP = VALUES(TIMESTAMP),
+             LOCATION = VALUES(LOCATION),
              STATUS = VALUES(STATUS) ;                                         
       """ % (pi_or_arduino)
-#        print query
         cursor.execute(query, (id_name,location,timestamp,status))
         db.commit()
     except Exception, e:
@@ -38,8 +63,6 @@ def mysql_data(data, pi_or_arduino):
         db.rollback()
     else:
         print "db_update okay!"
-        sock.send('OK ... ' + data)
-        
 
 if __name__ == "__main__":
       
@@ -55,7 +78,6 @@ if __name__ == "__main__":
         print "Can't connect to testdb! %s" % e
  
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    # this has no effect, why ?
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     server_socket.bind(("0.0.0.0", PORT))
     server_socket.listen(10)
@@ -63,64 +85,45 @@ if __name__ == "__main__":
     # Add server socket to the list of readable connections
     CONNECTION_LIST.append(server_socket)
  
-    print "Chat server started on port " + str(PORT)
+    print "Watchdog server started on port " + str(PORT)
  
     while 1:
-        # Get the list sockets which are ready to be read through select
+        # Get the list of sockets which are ready to be read through select
         read_sockets,write_sockets,error_sockets = select.select(CONNECTION_LIST,[],[])
 
         for sock in read_sockets:
              
-            #New connection
             if sock == server_socket:
                 # Handle the case in which there is a new connection recieved through server_socket
                 sockfd, addr = server_socket.accept()
                 CONNECTION_LIST.append(sockfd)
                 print "Client (%s, %s) connected" % addr
-                 
-            #Some incoming message from a client
+                addr_str = str(addr[0])
+                pi_status_update(addr_str, "ERRPI_ACKCLEAR")
+                
             else:
-                # Data recieved from client, process it
+                # Data recieved, process it
                 try:
                     #In Windows, sometimes when a TCP program closes abruptly,
                     # a "Connection reset by peer" exception will be thrown
                     data = sock.recv(RECV_BUFFER)
-                    # echo back the client message
                     if not sock:
                         print "No socket, popping an error"
                         disconnect()
+                        pi_status_update(addr_str, "ERRPI_DISCON")
                     else:
-                   #     print "got data: " + data
-                   #     data_list = data.split();
-                   #     status = data_list[0]
-                   #     id_name = data_list[1]
-                   #     strr = " "
-                   #     timestamp = strr.join(data_list[2:])
-                   #     location = "Dad\'s room"
-                        #insert & commit, otherwise rollback
-                   #     try:
-                   #         cursor.execute("""INSERT INTO ARDUINOS(ID_NAME, LOCATION, TIMESTAMP, STATUS)
-           #  VALUES (%s, %s, %s, %s)  
-           #  ON DUPLICATE KEY UPDATE
-           #  TIMESTAMP = VALUES(TIMESTAMP),
-           #  STATUS = VALUES(STATUS) ;
-     # """, (id_name,location,timestamp,status))
-      #                      db.commit()
-       #                 except Exception, e:
-        #                    print "mysql error: %s" % e
-         #                   db.rollback()
-          #              else:
-           #                 print "db_update okay!"
-            #            sock.send('OK ... ' + data)
+                        # at this point we got data, so log it
                         mysql_data(data, "ARDUINOS")
                         connected = 1;
 
-                # client disconnected, so remove from socket list
+                # client disconnected, so remove it from the socket list
                 except Exception, e:
                     print "Client (%s, %s) is offline" % addr
                     print "due to %s" % e
                     sock.close()
                     disconnect()
+                    addr_str = str(addr[0])
+                    pi_status_update(addr_str, "ERRPI_DISCON")
                     CONNECTION_LIST.remove(sock)
                     continue
 
