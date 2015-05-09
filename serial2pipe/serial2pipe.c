@@ -1,3 +1,6 @@
+#include <sys/time.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
 #include <termios.h>
 #include <stdio.h>
 #include <fcntl.h>
@@ -31,6 +34,12 @@
 int fda; FILE *fsa;
 int pipe1, pipe2;
 int num_ffs = 0;
+int pipe1_connected = 1;
+int pipe2_connected = 1;
+
+//TCP host details:
+#define PORT 6666
+#define HOST "127.0.0.1"
 
 static void murder(int ignore) { 
   fclose(fsa); 
@@ -41,6 +50,52 @@ static void murder(int ignore) {
     close(pipe2);
   exit(0);
 } 
+
+void build_error_str(char *dest, char *errcode_str, char* pipename) {
+  char            fmt[64], buf[64];
+  struct timeval  tv;
+  struct tm       *tm;
+  char hostname[1024];
+
+  gettimeofday(&tv, NULL);
+  if ((tm = localtime(&tv.tv_sec)) != NULL) {
+    strftime(fmt, sizeof fmt, "%b %d, %Y %H:%M:%S", tm);
+    snprintf(buf, sizeof buf, fmt, tv.tv_usec);
+    //    printf("'%s'\n", buf);
+  } else {
+    sprintf(buf, "%s", "None");
+  }
+  gethostname(hostname, 1024);
+  //printf("%s\n", hostname);
+  //  printf("make a dest\n");
+  sprintf(dest, "%s %s/serial2pipe/%s %s", errcode_str, hostname, pipename, buf);
+  printf("%s\n", dest);
+  //  char *message = "ERRSERIAL_BROKENPIPE 127.0.0.1 May 06, 2015 6:06:06";
+}
+
+void TCPSendMessage(char * message)
+{
+  int sd, ret;
+  struct sockaddr_in server;
+  struct in_addr ipv4addr;
+  struct hostent *hp;
+
+  sd = socket(AF_INET,SOCK_STREAM,0);
+  server.sin_family = AF_INET;
+
+  inet_pton(AF_INET, HOST, &ipv4addr);
+  hp = gethostbyaddr(&ipv4addr, sizeof ipv4addr, AF_INET);
+  //hp = gethostbyname(HOST);
+
+  bcopy(hp->h_addr, &(server.sin_addr.s_addr), hp->h_length);
+  server.sin_port = htons(PORT);
+
+  connect(sd, (struct sockaddr *)&server, sizeof(server));
+  if (sd) {
+    send(sd, (char *)message, strlen((char *)message), 0);
+    close(sd);
+  }
+}
 
 void open_ports() {
   fda = -1;
@@ -161,15 +216,39 @@ int main(void)
       if (stat1 < 0) {
 	//put error reporting to the watchdog here -- we want to know if the pipe breaks 
 	char error_str[2000];
+	char *error_str2 = (char *)malloc(2000);
 	sprintf(error_str, "Write error on %s:", PIPE_1);
 	perror(error_str);
+	build_error_str(error_str2, "ERRSERIAL_BROKENPIPE", PIPE_1);
+	TCPSendMessage(error_str2);
+	if (pipe1_connected == 1)
+	  pipe1_connected = 0;
+      } else {
+	if (pipe1_connected == 0) {
+	  char *error_str2 = (char *)malloc(2000);
+	  build_error_str(error_str2, "ERRSERIAL_ACKCLEAR", PIPE_1);
+	  TCPSendMessage(error_str2);
+          pipe1_connected = 1;
+	}
       }
       
       if (stat2 < 0) {
 	//put error reporting to the watchdog here -- we want to know if the pipe breaks 
 	char error_str[2000];
+	char *error_str2 = (char *)malloc(2000);
 	sprintf(error_str, "Write error on %s:", PIPE_2);
 	perror(error_str);
+	build_error_str(error_str2, "ERRSERIAL_BROKENPIPE", PIPE_2);
+	TCPSendMessage(error_str2);
+	if (pipe2_connected == 1)
+	  pipe2_connected = 0;
+      } else {
+	if (pipe2_connected == 0) {
+	  char *error_str2 = (char *)malloc(2000);
+	  build_error_str(error_str2, "ERRSERIAL_ACKCLEAR", PIPE_2);
+	  TCPSendMessage(error_str2);
+          pipe2_connected = 1;
+	}
       }
       
     } 
