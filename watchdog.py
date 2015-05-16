@@ -8,27 +8,57 @@ import signal
 import time    
 import select
 import datetime
+import struct
 from contextlib import contextmanager
 from multiprocessing.dummy import Pool as ThreadPool 
 from time import sleep
  
+send_ok_period = 120 #sends ERRPI_ACKCLEAR every 2 minutes
+send_ok_timer = time.time()
+
 #comment this to turn socket messages (to the TCP watchdog server) off 
 USE_SOCKETS = 1
 
+#set TCP watchdog IP and port here
+host = '192.168.1.66';
+port = 6666;
+
+#creates a socket up-front, just to initialize it 
 if (USE_SOCKETS):
     #create an INET, STREAMing socket
     try:
-        watchsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            watchsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     except socket.error as e:
-        print 'Failed to create socket: %s' % e
-        watchsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        #put retry here
-    print "Socket created..."
+            print 'Failed to create socket: %s' % e
+
+#gets IP address of eth0 as a string
+def get_ip_address(ifname):
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    return socket.inet_ntoa(fcntl.ioctl(
+        s.fileno(),
+        0x8915,  # SIOCGIFADDR
+        struct.pack('256s', ifname[:15])
+    )[20:24])
+
+#connects to the TCP watchdog. See host/port above. Run in a loop to retry
+def socket_connect():
+    global watchsock
+    global host
+    global port
+    if (USE_SOCKETS):
+        try:
+            watchsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
+            remote_ip = socket.gethostbyname( host )
+            watchsock.connect((remote_ip , port))
+ 
+        except socket.error as e:
+            print 'Failed to create socket: %s' % e
+            return 0
+        else:
+            print 'Socket Connected to ' + host + ' on ip ' + remote_ip
+            return 1
 
 # ensures we can kill the script with ctrl-C for testing
-# I took this out because once I added pool.map() it just WILL NOT DIE. 
-# kill -9 it if using more than one Arduino...
-
 def signal_handler(signal, frame):
     print('Exiting...')
     os._exit(0) 
@@ -36,10 +66,11 @@ def signal_handler(signal, frame):
 signal.signal(signal.SIGINT, signal_handler)
 
 #wrapper function to pass into pool.map()
-def call_scan(obj): 
-    obj.scan ()
-    return obj
+#def call_scan(obj): 
+#    obj.scan ()
+#    return obj
 
+#class with all internal variables & its own named pipe for each Arduino
 class Arduino:
     
     def __init__(self, port, pin, timeout, wdtime, dogtime):
@@ -68,11 +99,8 @@ class Arduino:
             self.pipein = os.open(self.port, os.O_RDONLY | os.O_NONBLOCK)
         except Exception, e:
             print "Failed to open %s : %s!" % (self.port, e)
-#        self.openPort()
-#        self.watchdog()
-#        self.scan()
-#        self.send_ok_now()
 
+#this opens the named pipe
     def openPort(self):
         if (self.not_open):
             try:
@@ -82,38 +110,52 @@ class Arduino:
             else:
                 self.not_open = 0;
 
-    def send_ok_now(self):
+#this sends an OK message (ERRDUINO_ACKCLEAR or ERRPI_ACKCLEAR) via TCP
+    def send_ok_now(self, pi_or_arduino):
          if (USE_SOCKETS):
              try:
-                 message = "ERRDUINO_ACKCLEAR " + str(socket.gethostname()) + "/" + self.port + " " + str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
+                 if (pi_or_arduino == "PI"):
+                     ip = get_ip_address('eth0')
+
+                     message = "ERRPI_ACKCLEAR " + ip + " " + str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))   
+                 else:
+                     message = "ERRDUINO_ACKCLEAR " + str(socket.gethostname()) + "/" + self.port + " " + str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
 
                  watchsock.sendall(message)
              except socket.error as e:
                  print "Send failed! %s" % e
-                 watchsock.sendall(message)
+                 status = socket_connect()
+                 if (status == 1):
+                     watchsock.sendall(message)
+                 else:
+                     print "failed to send " + message
                  #put retry here
  
+#this sends the watchdog message (errcode) via TCP
     def watchdog(self, errcode):
 #        print("Watchdog called on port " + self.port + " Time since last dog: " + str(time.time() - self.wdtimerstart))
         if (time.time() - self.wdtimerstart > self.dogtime):
-            #for now, all this does is print. In future it'll write out to a 
-            #Pi pin to cause the attached Arduino to reset.
-            
-            #reset code goes here
             self.wdtimerstart = time.time();
-            self.send_ok = 1;
+            self.send_ok = 1; #this tells the watchdog to send an ACKCLEAR
+                              #on the next good read
             print("WATCHDOG ACTIVE^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"+ self.port + " " + str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S")))
             if (USE_SOCKETS):
                 try:
                     message = errcode + " " + str(socket.gethostname()) + "/" + self.port + " " + str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
                     watchsock.sendall(message)
                 except socket.error as e:
+                    # tries to reconnect every time round the loop
                     print "Send failed! %s" % e
-                    watchsock.sendall(message)
-                    #put retry here
+                    status = socket_connect() 
+                    if (status == 1):
+                        watchsock.sendall(message)
+                    else:
+                        print "failed to send " + message
 
+#this is the main scan loop for each arduino. Gets data over the pipe, and 
+#either resets the watchdog timer due to good data, or waits til it expires
+#and triggers the watchdog.
     def scan(self):
-        #while 1:
             sleep(0.005) #otherwise it eats every CPU :3
                          #delete/tweak this if you're getting lag
             try:
@@ -129,8 +171,9 @@ class Arduino:
                         print "Ignoring 0xFF"
                         self.last_len = 0
                     else:
+                        #sends the OK message for the connected Arduino
                         if (self.send_ok == 1):
-                            self.send_ok_now()
+                            self.send_ok_now("ARDUINO")
                             self.send_ok = 0;
                         self.last_len = len(self.textln)
                 else:
@@ -146,44 +189,40 @@ class Arduino:
                     # if it's been so long since serial failure, pop the watchdog
                     print "top dog on " + self.port
                     self.watchdog("ERRDUINO_DISCON")
-                    #break
+
             #From here down, we got a read-success    
             self.set_failstart = 0  # clears the failure code in case we failed earlier 
             if (self.last_len != 0):
                 print "Got data on port " + self.port + " in sec:" + str(time.time() - self.start) + "  " + self.textln 
                 self.start = time.time()
+                if (USE_SOCKETS):
+                #sends ERRPI_ACKCLEAR every X seconds
+                    global send_ok_timer
+                    global send_ok_period
+                    #print "timer " + str(time.time() - send_ok_timer) + " period " + str(send_ok_period)
+                    if (time.time() - send_ok_timer > send_ok_period):
+                        print "time's up, send update"
+                        self.send_ok_now("PI")
+                        send_ok_timer = time.time()
  #               print "self.start reset to " + str(self.start) + "at " + str(datetime.datetime.now())
             else: 
                  #print "Warning! no data on port " + self.port + " in sec: " + str(time.time() - self.start)
                 #likewise, if it's been too long since we saw data, pop the watchdog
                  if (time.time() - self.start > self.wdtime):
-#                     print "start time was " + str(self.start)
-#                     print "bottom dog on " + self.port + " " + "at " + str(datetime.datetime.now())
                      self.watchdog("ERRDUINO_NOREPLY")
 
+
+#main starts here
 
 print "starting in 2 seconds..."
 time.sleep(2); # give arduinos time to start
 
 #set up serial connection...
 if (USE_SOCKETS):
- 
-    host = 'localhost';
-    port = 6666;
- 
-    try:
-        remote_ip = socket.gethostbyname( host )
- 
-    except socket.error as e:
-    #could not resolve
-        print "Gethostbyname error: %s" % e
-        #put retry here
- 
-#Connect to remote server
-    watchsock.connect((remote_ip , port))
- 
-    print 'Socket Connected to ' + host + ' on ip ' + remote_ip
-
+    status = 0
+    while (status == 0):
+        status = socket_connect()
+    
 #use serial2pipe to split the Arduino output into two named pipes, then attach
 #the following to one of the pipes, and the other to the program to be 
 #monitored!
@@ -200,7 +239,6 @@ arduinolist.append(arduino1)
 arduinolist.append(arduino2)
 #arduinolist.append(arduino3)
 
-# this creates a thread pool and assigns each working loop its own thread.
 print len(arduinolist)
 
 while 1:
@@ -209,9 +247,6 @@ while 1:
     else:
         for l in arduinolist:
             l.scan()
-
-#    pool = ThreadPool(len(arduinolist))
-#    arduinolist = pool.map(call_scan, arduinolist)
 
 # fifth version. Uses named pipes rather than serial comms!
 
