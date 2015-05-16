@@ -2,7 +2,6 @@
 import socket, select
 import MySQLdb
 import datetime
-#from Tkinter import * 
 
 connected = 1;
 
@@ -78,6 +77,21 @@ if __name__ == "__main__":
         print "Can't connect to testdb! %s" % e
  
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.settimeout(5.0) 
+ 
+    # check and turn on TCP keepalive -- this ensures that we'll get 
+    # disconnect errors from clients that go away
+    x = server_socket.getsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE)
+    if (x == 0):
+        x = server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+        #60 secs to 1st timeout, 4 retries @ 15 secs per = 2 mins til timeout
+
+        # overrides value (in seconds) shown by sysctl net.ipv4.tcp_keepalive_time
+        server_socket.setsockopt(socket.SOL_TCP, socket.TCP_KEEPIDLE, 60)
+        # overrides value shown by sysctl net.ipv4.tcp_keepalive_probes
+        server_socket.setsockopt(socket.SOL_TCP, socket.TCP_KEEPCNT, 4)
+        # overrides value shown by sysctl net.ipv4.tcp_keepalive_intvl
+        server_socket.setsockopt(socket.SOL_TCP, socket.TCP_KEEPINTVL, 15)
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     server_socket.bind(("0.0.0.0", PORT))
     server_socket.listen(10)
@@ -112,11 +126,23 @@ if __name__ == "__main__":
                         disconnect()
                         pi_status_update(addr_str, "ERRPI_DISCON")
                     else:
+                        if data == '':
+                            print "Client (%s, %s) is offline" % addr
+                            print "due to client disconnected / watchdog closed."
+                            sock.close()
+                            disconnect()
+                            addr_str = str(addr[0])
+                            pi_status_update(addr_str, "ERRPI_DISCON")
+                            CONNECTION_LIST.remove(sock)
+                        else:
                         # at this point we got data, so log it
-                        mysql_data(data, "ARDUINOS")
-                        connected = 1;
+                            mysql_data(data, "ARDUINOS")
+                            connected = 1;
 
                 # client disconnected, so remove it from the socket list
+                except socket.timeout:
+                    print "socket timeout!"
+                    continue
                 except Exception, e:
                     print "Client (%s, %s) is offline" % addr
                     print "due to %s" % e
