@@ -39,14 +39,19 @@ def pi_status_update(addr, status):
 def mysql_data(data, pi_or_arduino):
     if len(data) == 0:
         return
+
     print "got data: " + data
     data_list = data.split();
+    print data_list
     status = data_list[0]
     id_name = data_list[1]
     strr = " "
     timestamp = strr.join(data_list[2:])
+    if (len(timestamp) == 0):
+        timestamp = str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
+        pi_or_arduino = "ARDUINOS" #for now only loneduinos fail to send time
     location = get_location(id_name)
-    #insert & commit, otherwise rollback
+#insert & commit, otherwise rollback
     try:
         query = """INSERT INTO %s(ID_NAME, LOCATION, TIMESTAMP, STATUS)  
              VALUES (%%s, %%s, %%s, %%s)                                           
@@ -113,7 +118,8 @@ if __name__ == "__main__":
                 CONNECTION_LIST.append(sockfd)
                 print "Client (%s, %s) connected" % addr
                 addr_str = str(addr[0])
-                pi_status_update(addr_str, "ERRPI_ACKCLEAR")
+                #took this out now that pis & arduinos send their own OK msgs
+                #pi_status_update(addr_str, "ERRPI_ACKCLEAR")
                 
             else:
                 # Data recieved, process it
