@@ -90,6 +90,7 @@ class Arduino:
         self.start = time.time()
         self.failstart = time.time()
         self.wdtimerstart = time.time()
+        self.send_ok_timer = time.time()
         self.set_failstart = 0
         self.textln = ""
         self.not_open = 1
@@ -204,6 +205,11 @@ class Arduino:
                         print "time's up, send update"
                         self.send_ok_now("PI")
                         send_ok_timer = time.time()
+                    if (time.time() - self.send_ok_timer > send_ok_period):
+                        print "time's up, send update"
+                        self.send_ok_now("ARDUINO")
+                        self.send_ok_timer = time.time()
+
  #               print "self.start reset to " + str(self.start) + "at " + str(datetime.datetime.now())
             else: 
                  #print "Warning! no data on port " + self.port + " in sec: " + str(time.time() - self.start)
