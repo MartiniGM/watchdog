@@ -2,7 +2,7 @@
 import socket, select
 import MySQLdb
 import datetime
-
+ 
 connected = 1;
 
 #reports disconnect, prepares for reconnect 
