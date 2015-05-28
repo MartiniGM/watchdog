@@ -12,7 +12,7 @@ import struct
 from contextlib import contextmanager
 from multiprocessing.dummy import Pool as ThreadPool 
 from time import sleep
- 
+  
 send_ok_period = 120 #sends ERRPI_ACKCLEAR every 2 minutes
 send_ok_timer = time.time()
 
