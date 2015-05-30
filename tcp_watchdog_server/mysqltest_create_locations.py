@@ -8,20 +8,18 @@ db = MySQLdb.connect("localhost","testuser","test623","testdb" )
 # prepare a cursor object using cursor() method
 cursor = db.cursor()
 
-# Drop table if it already exist using execute() method. Uncomment to delete/recreate entire table.
-cursor.execute("DROP TABLE IF EXISTS ARDUINOS")
+# Drop table if it already exists using execute() method. Uncomment to delete/recreate entire table.
+#cursor.execute("DROP TABLE IF EXISTS LOCATIONS")
 
 # Create table as below
-sql = """CREATE TABLE ARDUINOS (
+sql = """CREATE TABLE LOCATIONS (
          ID_NAME  CHAR(50) NOT NULL,
-         LOCATION  CHAR(50),
-         TIMESTAMP  CHAR(100),
-         STATUS CHAR(20) )"""
+         LOCATION  CHAR(50))"""
 
 cursor.execute(sql)
 
 #then set ID_NAME as primary so that the UPDATE statement works later
-sql= """ALTER TABLE ARDUINOS ADD PRIMARY KEY(ID_NAME)"""
+sql= """ALTER TABLE LOCATIONS ADD PRIMARY KEY(ID_NAME)"""
 cursor.execute(sql)
 
 # disconnect from server

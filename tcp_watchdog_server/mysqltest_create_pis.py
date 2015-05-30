@@ -9,7 +9,7 @@ db = MySQLdb.connect("localhost","testuser","test623","testdb" )
 cursor = db.cursor()
 
 # Drop table if it already exists using execute() method. Uncomment to delete/recreate entire table.
-#cursor.execute("DROP TABLE IF EXISTS ARDUINOS")
+cursor.execute("DROP TABLE IF EXISTS PIS")
 
 # Create table as below
 sql = """CREATE TABLE PIS (
