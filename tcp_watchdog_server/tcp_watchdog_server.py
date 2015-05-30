@@ -2,8 +2,11 @@
 import socket, select
 import MySQLdb
 import datetime
+import time
  
 connected = 1;
+periodic_timer = time.time()
+periodic_period = 240 #check for NOREPLY every 4 minutes
 
 #reports disconnect, prepares for reconnect 
 def disconnect():
@@ -11,6 +14,66 @@ def disconnect():
     if (connected == 1):
         print "Disconnect detected!"
         connected = 0;
+
+#returns data from arduinos and pis
+def get_pis(pi_or_arduino):
+    global cursor
+    sql = """SELECT ID_NAME, TIMESTAMP, STATUS FROM %s""" % pi_or_arduino
+    try:
+        cursor.execute(sql)
+        data = cursor.fetchall()
+#        for row in data:
+#            print "EEEEEEEE " + row[0] + " " + row[1] + " " + row[2]
+        return data
+    except Exception, e:
+        print "SQL error! %s" % e
+        return "" #blank location, will show as None in SQL
+
+def parse_data(data):
+    for row in data:
+        print row[0] + " " + row[1] + " " + row[2]
+        id_name = row[0]
+        timestamp = row[1]
+        status = row[2]
+        location = get_location(id_name)
+        if ("DISCON" not in status):
+ #           print "didn't find discon, compare times"
+            time_cur = datetime.datetime.now()
+            print ("cur time " + datetime.datetime.now().strftime("%b %d, %\
+Y %H:%M:%S"))
+            time_ts = datetime.datetime.strptime(timestamp, "%b %d, %Y %H:%\
+M:%S")
+            total_seconds = ((time_cur-time_ts).seconds)
+            print "total seconds between times: " + str(total_seconds)
+            if (total_seconds > periodic_period):
+                    #more than X minutes
+                print "More than %d minutes for %s" % (periodic_period / 60, id_name)
+                timestamp = str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
+                if ("PI" in status):
+                    status = "ERRPI_NOREPLY"
+                    table = "PIS"
+                else:
+                    status = "ERRDUINO_NOREPLY"
+                    table = "ARDUINOS"
+                try:
+                    query = """INSERT INTO %s(ID_NAME, LOCATION, TIMESTAMP, STATUS)
+             VALUES (%%s, %%s, %%s, %%s)                                       \
+
+             ON DUPLICATE KEY UPDATE
+             TIMESTAMP = VALUES(TIMESTAMP),
+             LOCATION = VALUES(LOCATION),
+             STATUS = VALUES(STATUS) ;
+      """ % (table)
+                    cursor.execute(query, (id_name,location,timestamp,status))
+                    db.commit()
+                except Exception, e:
+                    print "mysql error: %s" % e
+                    db.rollback()
+                else:
+                    print "db_update okay!"
+        else:
+            print "DISCON found, skipping" + str(row)
+
 
 #returns location/description string, given an id_name
 def get_location(id_name):
@@ -40,17 +103,28 @@ def mysql_data(data, pi_or_arduino):
     if len(data) == 0:
         return
 
-    print "got data: " + data
+   # print "got data: " + data
     data_list = data.split();
-    print data_list
+#    print data_list
     status = data_list[0]
     id_name = data_list[1]
     strr = " "
     timestamp = strr.join(data_list[2:])
     if (len(timestamp) == 0):
-        timestamp = str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
-        pi_or_arduino = "ARDUINOS" #for now only loneduinos fail to send time
+#    if (len(timestamp) == 0):
+        pi_or_arduino = "PIS" #for now only loneduinos fail to send time
+#        if (status == "ERRPI_DISCON"):
+#            status = "ERRDUINO_DISCON"
+    if ("PI" in status):
+        pi_or_arduino = "PIS"
+    else:
+        pi_or_arduino = "ARDUINOS"
+
+    timestamp = str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
     location = get_location(id_name)
+
+    print "got data: " + status + " " + id_name + " " + timestamp
+
 #insert & commit, otherwise rollback
     try:
         query = """INSERT INTO %s(ID_NAME, LOCATION, TIMESTAMP, STATUS)  
@@ -65,8 +139,8 @@ def mysql_data(data, pi_or_arduino):
     except Exception, e:
         print "mysql error: %s" % e
         db.rollback()
-    else:
-        print "db_update okay!"
+#    else:
+#        print "db_update okay!"
 
 if __name__ == "__main__":
       
@@ -107,6 +181,14 @@ if __name__ == "__main__":
     print "Watchdog server started on port " + str(PORT)
  
     while 1:
+        #new stuff for periodic data check
+        if (time.time() - periodic_timer > periodic_period):
+            data = get_pis("PIS")
+            parse_data(data)
+            data2 = get_pis("ARDUINOS")
+            parse_data(data2)
+            periodic_timer = time.time()
+
         # Get the list of sockets which are ready to be read through select
         read_sockets,write_sockets,error_sockets = select.select(CONNECTION_LIST,[],[])
 
