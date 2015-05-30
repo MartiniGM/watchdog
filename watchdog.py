@@ -201,7 +201,7 @@ class Arduino:
                     global send_ok_timer
                     global send_ok_period
                     #print "timer " + str(time.time() - send_ok_timer) + " period " + str(send_ok_period)
-                    if (time.time() - send_ok_timer > send_ok_period):
+                    if (time.time() - send_ok_timer > send_ok_period + 30):
                         print "time's up, send update"
                         self.send_ok_now("PI")
                         send_ok_timer = time.time()
