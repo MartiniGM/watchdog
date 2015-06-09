@@ -3,7 +3,7 @@ import socket, select
 import MySQLdb
 import datetime
 import time
- 
+import os
 connected = 1;
 periodic_timer = time.time()
 periodic_period = 240 #check for NOREPLY every 4 minutes
@@ -150,7 +150,7 @@ if __name__ == "__main__":
 
     try:
 # Open database connection, create cursor
-        db = MySQLdb.connect("localhost","testuser","test623","testdb" )
+        db = MySQLdb.connect("localhost","demo-user","plaintext","demosdb" )
         cursor = db.cursor()
     except Exception, e:
         print "Can't connect to testdb! %s" % e
@@ -165,12 +165,15 @@ if __name__ == "__main__":
         x = server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
         #60 secs to 1st timeout, 4 retries @ 15 secs per = 2 mins til timeout
 
-        # overrides value (in seconds) shown by sysctl net.ipv4.tcp_keepalive_time
-        server_socket.setsockopt(socket.SOL_TCP, socket.TCP_KEEPIDLE, 60)
-        # overrides value shown by sysctl net.ipv4.tcp_keepalive_probes
-        server_socket.setsockopt(socket.SOL_TCP, socket.TCP_KEEPCNT, 4)
-        # overrides value shown by sysctl net.ipv4.tcp_keepalive_intvl
-        server_socket.setsockopt(socket.SOL_TCP, socket.TCP_KEEPINTVL, 15)
+        # overrides value (in seconds) shown by sysctl net.ipv4.tcp_keepalive_time. Only works on linux, not on windows
+
+        if (os.name == 'linux'):
+            server_socket.setsockopt(socket.SOL_TCP, socket.TCP_KEEPIDLE, 60)
+            # overrides value shown by sysctl net.ipv4.tcp_keepalive_probes
+            server_socket.setsockopt(socket.SOL_TCP, socket.TCP_KEEPCNT, 4)
+            # overrides value shown by sysctl net.ipv4.tcp_keepalive_intvl
+            server_socket.setsockopt(socket.SOL_TCP, socket.TCP_KEEPINTVL, 15)
+    
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     server_socket.bind(("0.0.0.0", PORT))
     server_socket.listen(10)
