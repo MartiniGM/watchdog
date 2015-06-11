@@ -15,13 +15,14 @@ from time import sleep
  
 send_ok_period = 120 #sends ERRPI_ACKCLEAR every 2 minutes
 send_ok_timer = time.time()
+send_ok_timer_pi = time.time()
 
 #comment this to turn socket messages (to the TCP watchdog server) off 
 USE_SOCKETS = 1
 
 #set TCP watchdog IP and port here
-#host = '192.168.1.66';
-host = '192.168.1.17';
+host = '192.168.1.66';
+#host = '192.168.1.17';
 port = 6666;
 
 #creates a socket up-front, just to initialize it 
@@ -124,11 +125,11 @@ class Arduino:
                      ip = get_ip_address('eth0')
 
                      uptime_string , uptime_seconds = self.get_uptime()
-
-                     message = "ERRPI_ACKCLEAR " + ip + " " + str(uptime_seconds) + " " + uptime_str
+                     message = "ERRPI_ACKCLEAR " + ip + " " + str(uptime_seconds) + " " + uptime_string
 #str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))   
                  else:
-                     message = "ERRDUINO_ACKCLEAR " + str(socket.gethostname()) + "/" + self.port + " " + str(uptime_seconds) + " " + uptime_str
+                     uptime_string , uptime_seconds = self.get_uptime()
+                     message = "ERRDUINO_ACKCLEAR " + str(socket.gethostname()) + "/" + self.port + " " + str(uptime_seconds) + " " + uptime_string
 # str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
 
                  watchsock.sendall(message)
@@ -211,12 +212,13 @@ class Arduino:
                 if (USE_SOCKETS):
                 #sends ERRPI_ACKCLEAR every X seconds
                     global send_ok_timer
+                    global send_ok_timer_pi
                     global send_ok_period
                     #print "timer " + str(time.time() - send_ok_timer) + " period " + str(send_ok_period)
-                    if (time.time() - send_ok_timer > send_ok_period + 30):
+                    if (time.time() - send_ok_timer_pi > send_ok_period + 30):
                         print "time's up, send update"
                         self.send_ok_now("PI")
-                        send_ok_timer = time.time()
+                        send_ok_timer_pi = time.time()
                     if (time.time() - self.send_ok_timer > send_ok_period):
                         print "time's up, send update"
                         self.send_ok_now("ARDUINO")
@@ -224,12 +226,15 @@ class Arduino:
 
  #               print "self.start reset to " + str(self.start) + "at " + str(datetime.datetime.now())
             else: 
+                    #because the Pi itself is still up even when its arduinos are not, we need to duplicate this here or we will never hear back from the pi is all arduinos are down
+                if (time.time() - send_ok_timer_pi > send_ok_period + 30):
+                    print "time's up, send update"
+                    self.send_ok_now("PI")
+                    send_ok_timer_pi = time.time()
                  #print "Warning! no data on port " + self.port + " in sec: " + str(time.time() - self.start)
                 #likewise, if it's been too long since we saw data, pop the watchdog
-                 if (time.time() - self.start > self.wdtime):
-                     self.watchdog("ERRDUINO_NOREPLY")
-
-
+                if (time.time() - self.start > self.wdtime):
+                    self.watchdog("ERRDUINO_NOREPLY")
 #main starts here
 
 print "starting in 2 seconds..."

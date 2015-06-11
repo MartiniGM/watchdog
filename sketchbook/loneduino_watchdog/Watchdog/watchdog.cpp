@@ -61,6 +61,12 @@ void Watchdog::sendMsg(char *msg) {
 	Serial.println(_message);
       _watchdog_millis = millis();
     }
+  } else {
+    _curmillis = millis();
+    if (_curmillis - _watchdog_millis > 60000) {
+      _uptime += 60000;
+      _watchdog_millis = millis();
+    }
   }
   
   // if the server's disconnected, loop to reconnect
