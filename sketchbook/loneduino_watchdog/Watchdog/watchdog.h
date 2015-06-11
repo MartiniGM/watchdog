@@ -20,8 +20,7 @@ class Watchdog
   byte _arduino_mac[]; //mac address for the arduino
   IPAddress _server_ip; //IPAddress for the server
   int _server_port; //port number for the server
-  char _message[200]; //global var for msgSend
-  
-};
+  char _message[300]; //global var for msgSend
+}; 
 
 #endif

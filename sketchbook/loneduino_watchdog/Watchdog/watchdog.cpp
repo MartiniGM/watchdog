@@ -51,14 +51,15 @@ void Watchdog::sendMsg(char *msg) {
       Serial.println(_curmillis - _watchdog_millis);
     }
     */
-    if (_curmillis - _watchdog_millis > 120000) {
-      sprintf(_message, "%s %d.%d.%d.%d %d", msg, _arduino_ip[0], _arduino_ip[1],
-	      _arduino_ip[2], _arduino_ip[3], _uptime);  
+    if (_curmillis - _watchdog_millis > 60000) {
+      _uptime += 60000;
+      sprintf(_message, "%s %d.%d.%d.%d %lu ", msg, _arduino_ip[0], _arduino_ip[1],
+	      _arduino_ip[2], _arduino_ip[3], _uptime/1000);
+      
       _client.write(_message);
       if (Serial)
 	Serial.println(_message);
       _watchdog_millis = millis();
-      _uptime += 120000;
     }
   }
   

@@ -12,7 +12,7 @@ import struct
 from contextlib import contextmanager
 from multiprocessing.dummy import Pool as ThreadPool 
 from time import sleep
-  
+ 
 send_ok_period = 120 #sends ERRPI_ACKCLEAR every 2 minutes
 send_ok_timer = time.time()
 
@@ -21,6 +21,7 @@ USE_SOCKETS = 1
 
 #set TCP watchdog IP and port here
 host = '192.168.1.66';
+#host = '192.168.1.17';
 port = 6666;
 
 #creates a socket up-front, just to initialize it 
@@ -65,11 +66,6 @@ def signal_handler(signal, frame):
 
 signal.signal(signal.SIGINT, signal_handler)
 
-#wrapper function to pass into pool.map()
-#def call_scan(obj): 
-#    obj.scan ()
-#    return obj
-
 #class with all internal variables & its own named pipe for each Arduino
 class Arduino:
     
@@ -111,6 +107,15 @@ class Arduino:
             else:
                 self.not_open = 0;
 
+    def get_uptime(self):
+
+        with open('/proc/uptime', 'r') as f:
+            uptime_seconds = float(f.readline().split()[0])
+            uptime_string = str(datetime.timedelta(seconds = uptime_seconds))
+
+            print(uptime_string)
+            return (uptime_string, uptime_seconds)
+
 #this sends an OK message (ERRDUINO_ACKCLEAR or ERRPI_ACKCLEAR) via TCP
     def send_ok_now(self, pi_or_arduino):
          if (USE_SOCKETS):
@@ -118,9 +123,13 @@ class Arduino:
                  if (pi_or_arduino == "PI"):
                      ip = get_ip_address('eth0')
 
-                     message = "ERRPI_ACKCLEAR " + ip + " " + str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))   
+                     uptime_string , uptime_seconds = self.get_uptime()
+
+                     message = "ERRPI_ACKCLEAR " + ip + " " + str(uptime_seconds) + " " + uptime_str
+#str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))   
                  else:
-                     message = "ERRDUINO_ACKCLEAR " + str(socket.gethostname()) + "/" + self.port + " " + str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
+                     message = "ERRDUINO_ACKCLEAR " + str(socket.gethostname()) + "/" + self.port + " " + str(uptime_seconds) + " " + uptime_str
+# str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
 
                  watchsock.sendall(message)
              except socket.error as e:
@@ -139,10 +148,13 @@ class Arduino:
             self.wdtimerstart = time.time();
             self.send_ok = 1; #this tells the watchdog to send an ACKCLEAR
                               #on the next good read
-            print("WATCHDOG ACTIVE^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"+ self.port + " " + str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S")))
+            uptime_string, uptime_seconds = self.get_uptime()
+            print("WATCHDOG ACTIVE^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"+ self.port + " " + str(uptime_seconds) + " " + uptime_string)
+#str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S")))
             if (USE_SOCKETS):
                 try:
-                    message = errcode + " " + str(socket.gethostname()) + "/" + self.port + " " + str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
+                    message = errcode + " " + str(socket.gethostname()) + "/" + self.port + " " + str(uptime_seconds) + " " + uptime_string
+#str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
                     watchsock.sendall(message)
                 except socket.error as e:
                     # tries to reconnect every time round the loop
