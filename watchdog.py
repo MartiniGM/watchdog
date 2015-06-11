@@ -20,8 +20,8 @@ send_ok_timer = time.time()
 USE_SOCKETS = 1
 
 #set TCP watchdog IP and port here
-host = '192.168.1.66';
-#host = '192.168.1.17';
+#host = '192.168.1.66';
+host = '192.168.1.17';
 port = 6666;
 
 #creates a socket up-front, just to initialize it 
