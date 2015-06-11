@@ -26,13 +26,13 @@ print "\n"
 print "ARDUINOS:"
 
 #dumps entire table for testing
-sql = """SELECT ID_NAME, LOCATION, TIMESTAMP, STATUS FROM ARDUINOS
+sql = """SELECT ID_NAME, LOCATION, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME FROM ARDUINOS
       """
 try:
     cursor.execute(sql)
     data = cursor.fetchall()
     for row in data:
-        print row[0], row[1], row[2], row[3]
+        print row[0], row[1], row[2], row[3], row[4], row[5]
 except Exception, e:
     print "Error! %s" % e
 
@@ -40,13 +40,13 @@ print "\n"
 print "PIS:"
 
 #dumps entire table for testing
-sql = """SELECT ID_NAME, LOCATION, TIMESTAMP, STATUS FROM PIS
+sql = """SELECT ID_NAME, LOCATION, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME FROM PIS
       """
 try:
     cursor.execute(sql)
     data = cursor.fetchall()
     for row in data:
-        print row[0], row[1], row[2], row[3]
+        print row[0], row[1], row[2], row[3], row[4], row[5]
 except Exception, e:
     print "Error! %s" % e
 

@@ -16,6 +16,8 @@ sql = """CREATE TABLE ARDUINOS (
          ID_NAME  CHAR(50) NOT NULL,
          LOCATION  CHAR(50),
          TIMESTAMP  CHAR(100),
+         UPTIME CHAR(100),
+         UPTIME_SEC BIGINT UNSIGNED,
          STATUS CHAR(20) )"""
 
 cursor.execute(sql)

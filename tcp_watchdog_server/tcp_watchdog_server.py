@@ -18,7 +18,7 @@ def disconnect():
 #returns data from arduinos and pis
 def get_pis(pi_or_arduino):
     global cursor
-    sql = """SELECT ID_NAME, TIMESTAMP, STATUS FROM %s""" % pi_or_arduino
+    sql = """SELECT ID_NAME, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME FROM %s""" % pi_or_arduino
     try:
         cursor.execute(sql)
         data = cursor.fetchall()
@@ -31,11 +31,13 @@ def get_pis(pi_or_arduino):
 
 def parse_data(data):
     for row in data:
-        print row[0] + " " + row[1] + " " + row[2]
+        print row[0] + " " + row[1] + " " + row[2] + " " + str(row[3]) + " " + row[4]
         id_name = row[0]
         timestamp = row[1]
         status = row[2]
         location = get_location(id_name)
+        uptime_sec = row[3]
+        uptime = row[4]
         if ("DISCON" not in status):
  #           print "didn't find discon, compare times"
             time_cur = datetime.datetime.now()
@@ -56,15 +58,17 @@ M:%S")
                     status = "ERRDUINO_NOREPLY"
                     table = "ARDUINOS"
                 try:
-                    query = """INSERT INTO %s(ID_NAME, LOCATION, TIMESTAMP, STATUS)
-             VALUES (%%s, %%s, %%s, %%s)                                       \
+                    query = """INSERT INTO %s(ID_NAME, LOCATION, TIMESTAMP, STATUS, UPTIME, UPTIME_SEC)
+             VALUES (%%s, %%s, %%s, %%s, %%s, %%s)                                       \
 
              ON DUPLICATE KEY UPDATE
              TIMESTAMP = VALUES(TIMESTAMP),
              LOCATION = VALUES(LOCATION),
+             UPTIME = VALUES(UPTIME),
+             UPTIME_SEC = VALUES(UPTIME_SEC),
              STATUS = VALUES(STATUS) ;
       """ % (table)
-                    cursor.execute(query, (id_name,location,timestamp,status))
+                    cursor.execute(query, (id_name,location,timestamp,status, uptime, uptime_sec))
                     db.commit()
                 except Exception, e:
                     print "mysql error: %s" % e
@@ -95,7 +99,7 @@ def pi_status_update(addr, status):
 #    print "status " + status
     timestamp = str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
 #    print "timestamp " + timestamp
-    data = status + " " + id_name + " " + timestamp
+    data = status + " " + id_name + " " + "0 unknown"
     mysql_data(data, "PIS")
     
 #writes Pi & Arduino status updates out to mysql
@@ -108,13 +112,24 @@ def mysql_data(data, pi_or_arduino):
 #    print data_list
     status = data_list[0]
     id_name = data_list[1]
+    uptime_sec = data_list[2]
     strr = " "
-    timestamp = strr.join(data_list[2:])
-    if (len(timestamp) == 0):
-#    if (len(timestamp) == 0):
-        pi_or_arduino = "PIS" #for now only loneduinos fail to send time
-#        if (status == "ERRPI_DISCON"):
-#            status = "ERRDUINO_DISCON"
+    uptime = strr.join(data_list[3:])
+    if (len(uptime) == 0):
+#for now only loneduinos fail to send time
+        sec = int(uptime_sec);
+        mins = sec/60;
+        hours = mins/60;
+        days = hours / 24;
+        
+        sec=sec-(mins*60); #subtract the coverted seconds to minutes in order to display 59 secs max
+        mins=mins-(hours*60); #subtract the coverted minutes to hours in order to display 59 minutes max
+        hours=hours-(days*24); #subtract the coverted hours to days in order to display 23 hours max
+        if (days == 0):
+            uptime = "%02d:%02d:%02d" % (hours, mins, sec) 
+        else:
+            uptime = "%d days, %02d:%02d:%02d" % (days, hours, mins, sec)
+
     if ("PI" in status):
         pi_or_arduino = "PIS"
     else:
@@ -123,18 +138,20 @@ def mysql_data(data, pi_or_arduino):
     timestamp = str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
     location = get_location(id_name)
 
-    print "got data: " + status + " " + id_name + " " + timestamp
+    print "got data: " + status + " " + id_name + " " + timestamp + " Uptime: " + uptime_sec + ", " + uptime
 
 #insert & commit, otherwise rollback
     try:
-        query = """INSERT INTO %s(ID_NAME, LOCATION, TIMESTAMP, STATUS)  
-             VALUES (%%s, %%s, %%s, %%s)                                           
+        query = """INSERT INTO %s(ID_NAME, LOCATION, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME)  
+             VALUES (%%s, %%s, %%s, %%s, %%s, %%s)                                           
              ON DUPLICATE KEY UPDATE                                           
              TIMESTAMP = VALUES(TIMESTAMP),
              LOCATION = VALUES(LOCATION),
+             UPTIME = VALUES(UPTIME),
+             UPTIME_SEC = VALUES(UPTIME_SEC),
              STATUS = VALUES(STATUS) ;                                         
       """ % (pi_or_arduino)
-        cursor.execute(query, (id_name,location,timestamp,status))
+        cursor.execute(query, (id_name,location,timestamp,status, uptime_sec,uptime))
         db.commit()
     except Exception, e:
         print "mysql error: %s" % e
