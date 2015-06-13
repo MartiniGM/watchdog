@@ -13,7 +13,7 @@ from contextlib import contextmanager
 from multiprocessing.dummy import Pool as ThreadPool 
 from time import sleep
  
-send_ok_period = 120 #sends ERRPI_ACKCLEAR every 2 minutes
+send_ok_period = 30 #sends ERRPI_ACKCLEAR every 30s
 send_ok_timer = time.time()
 send_ok_timer_pi = time.time()
 
@@ -21,8 +21,8 @@ send_ok_timer_pi = time.time()
 USE_SOCKETS = 1
 
 #set TCP watchdog IP and port here
-#host = '192.168.1.66';
-host = '192.168.1.17';
+host = '192.168.1.66';
+#host = '192.168.1.17';
 port = 6666;
 
 #creates a socket up-front, just to initialize it 
@@ -113,25 +113,26 @@ class Arduino:
         with open('/proc/uptime', 'r') as f:
             uptime_seconds = float(f.readline().split()[0])
             uptime_string = str(datetime.timedelta(seconds = uptime_seconds))
-
-            print(uptime_string)
+            uptime_string = uptime_string.split('.')[0]
+#            print "UPTIME STR: " + uptime_string
             return (uptime_string, uptime_seconds)
 
 #this sends an OK message (ERRDUINO_ACKCLEAR or ERRPI_ACKCLEAR) via TCP
     def send_ok_now(self, pi_or_arduino):
-         if (USE_SOCKETS):
+        if (USE_SOCKETS):
              try:
                  if (pi_or_arduino == "PI"):
                      ip = get_ip_address('eth0')
 
                      uptime_string , uptime_seconds = self.get_uptime()
                      message = "ERRPI_ACKCLEAR " + ip + " " + str(uptime_seconds) + " " + uptime_string
+#                     print message
 #str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))   
                  else:
                      uptime_string , uptime_seconds = self.get_uptime()
                      message = "ERRDUINO_ACKCLEAR " + str(socket.gethostname()) + "/" + self.port + " " + str(uptime_seconds) + " " + uptime_string
 # str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
-
+#                     print message
                  watchsock.sendall(message)
              except socket.error as e:
                  print "Send failed! %s" % e
@@ -150,7 +151,7 @@ class Arduino:
             self.send_ok = 1; #this tells the watchdog to send an ACKCLEAR
                               #on the next good read
             uptime_string, uptime_seconds = self.get_uptime()
-            print("WATCHDOG ACTIVE^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"+ self.port + " " + str(uptime_seconds) + " " + uptime_string)
+            print("^^^^^WATCHDOG ACTIVE^^^^^:"+ self.port + " " + str(uptime_seconds) + " " + uptime_string)
 #str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S")))
             if (USE_SOCKETS):
                 try:
@@ -185,11 +186,14 @@ class Arduino:
                         print "Ignoring 0xFF"
                         self.last_len = 0
                     else:
+                        if (len(self.textln) != 0):
                         #sends the OK message for the connected Arduino
-                        if (self.send_ok == 1):
-                            self.send_ok_now("ARDUINO")
-                            self.send_ok = 0;
-                        self.last_len = len(self.textln)
+                            if (self.send_ok == 1):
+                                self.send_ok_now("ARDUINO")
+                                self.send_ok = 0;
+                            self.last_len = len(self.textln)
+                        else:
+                            self.last_len = 0
                 else:
                     self.last_len = 0
             except Exception, e:
@@ -207,7 +211,7 @@ class Arduino:
             #From here down, we got a read-success    
             self.set_failstart = 0  # clears the failure code in case we failed earlier 
             if (self.last_len != 0):
-                print "Got data on port " + self.port + " in sec:" + str(time.time() - self.start) + "  " + self.textln 
+                print "Got data on port " + self.port + " in sec:" + str(time.time() - self.start).split('.')[0] + "  " + self.textln 
                 self.start = time.time()
                 if (USE_SOCKETS):
                 #sends ERRPI_ACKCLEAR every X seconds
@@ -216,11 +220,9 @@ class Arduino:
                     global send_ok_period
                     #print "timer " + str(time.time() - send_ok_timer) + " period " + str(send_ok_period)
                     if (time.time() - send_ok_timer_pi > send_ok_period + 30):
-                        print "time's up, send update"
                         self.send_ok_now("PI")
                         send_ok_timer_pi = time.time()
                     if (time.time() - self.send_ok_timer > send_ok_period):
-                        print "time's up, send update"
                         self.send_ok_now("ARDUINO")
                         self.send_ok_timer = time.time()
 
@@ -228,7 +230,6 @@ class Arduino:
             else: 
                     #because the Pi itself is still up even when its arduinos are not, we need to duplicate this here or we will never hear back from the pi is all arduinos are down
                 if (time.time() - send_ok_timer_pi > send_ok_period + 30):
-                    print "time's up, send update"
                     self.send_ok_now("PI")
                     send_ok_timer_pi = time.time()
                  #print "Warning! no data on port " + self.port + " in sec: " + str(time.time() - self.start)

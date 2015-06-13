@@ -12,7 +12,7 @@ periodic_period = 240 #check for NOREPLY every 4 minutes
 def disconnect():
     global connected
     if (connected == 1):
-        print "Disconnect detected!"
+#        print "Disconnect detected!"
         connected = 0;
 
 #returns data from arduinos and pis
@@ -22,8 +22,6 @@ def get_pis(pi_or_arduino):
     try:
         cursor.execute(sql)
         data = cursor.fetchall()
-#        for row in data:
-#            print "EEEEEEEE " + row[0] + " " + row[1] + " " + row[2]
         return data
     except Exception, e:
         print "SQL error! %s" % e
@@ -107,9 +105,8 @@ def mysql_data(data, pi_or_arduino):
     if len(data) == 0:
         return
 
-   # print "got data: " + data
+#    print "got data mysql_data: " + data
     data_list = data.split();
-#    print data_list
     status = data_list[0]
     id_name = data_list[1]
     uptime_sec = data_list[2]
@@ -117,20 +114,23 @@ def mysql_data(data, pi_or_arduino):
     uptime = strr.join(data_list[3:])
     if (len(uptime) == 0):
 #for now only loneduinos fail to send time
-        sec = int(uptime_sec);
-        mins = sec/60;
-        hours = mins/60;
-        days = hours / 24;
+        sec = int(uptime_sec)
+        mins = sec/60
+        hours = mins/60
+        days = hours / 24
         
-        sec=sec-(mins*60); #subtract the coverted seconds to minutes in order to display 59 secs max
-        mins=mins-(hours*60); #subtract the coverted minutes to hours in order to display 59 minutes max
-        hours=hours-(days*24); #subtract the coverted hours to days in order to display 23 hours max
+        sec=sec-(mins*60) #subtract the coverted seconds to minutes in order to display 59 secs max
+        mins=mins-(hours*60) #subtract the coverted minutes to hours in order to display 59 minutes max
+        hours=hours-(days*24) #subtract the coverted hours to days in order to display 23 hours max
         if (days == 0):
             uptime = "%02d:%02d:%02d" % (hours, mins, sec) 
         else:
-            uptime = "%d days, %02d:%02d:%02d" % (days, hours, mins, sec)
+            if (days == 1):
+                uptime = "%d day, %02d:%02d:%02d" % (days, hours, mins, sec)
+            else:
+                uptime = "%d days, %02d:%02d:%02d" % (days, hours, mins, sec)
 
-    if ("PI" in status):
+    if ("PI_" in status):
         pi_or_arduino = "PIS"
     else:
         pi_or_arduino = "ARDUINOS"
@@ -170,7 +170,7 @@ if __name__ == "__main__":
         db = MySQLdb.connect("localhost","demo-user","plaintext","demosdb" )
         cursor = db.cursor()
     except Exception, e:
-        print "Can't connect to testdb! %s" % e
+        print "Can't connect to demosdb! %s" % e
  
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.settimeout(5.0) 
@@ -215,10 +215,10 @@ if __name__ == "__main__":
         for sock in read_sockets:
              
             if sock == server_socket:
-                # Handle the case in which there is a new connection recieved through server_socket
+                # Handle the case in which there is a new connection received through server_socket
                 sockfd, addr = server_socket.accept()
                 CONNECTION_LIST.append(sockfd)
-                print "Client (%s, %s) connected" % addr
+                print "-----Client (%s, %s) connected" % addr
                 addr_str = str(addr[0])
                 #took this out now that pis & arduinos send their own OK msgs
                 #pi_status_update(addr_str, "ERRPI_ACKCLEAR")
@@ -232,15 +232,15 @@ if __name__ == "__main__":
                     if not sock:
                         print "No socket, popping an error"
                         disconnect()
-                        pi_status_update(addr_str, "ERRPI_DISCON")
+                        #pi_status_update(addr_str, "ERRPI_DISCON")
                     else:
                         if data == '':
-                            print "Client (%s, %s) is offline" % addr
-                            print "due to client disconnected / watchdog closed."
+                            print "-----Client (%s, %s) is offline" % addr
+                            print "-----due to client disconnected / closed."
                             sock.close()
                             disconnect()
                             addr_str = str(addr[0])
-                            pi_status_update(addr_str, "ERRPI_DISCON")
+                         #   pi_status_update(addr_str, "ERRPI_DISCON")
                             CONNECTION_LIST.remove(sock)
                         else:
                         # at this point we got data, so log it
@@ -252,12 +252,12 @@ if __name__ == "__main__":
                     print "socket timeout!"
                     continue
                 except Exception, e:
-                    print "Client (%s, %s) is offline" % addr
-                    print "due to %s" % e
+                    print "-----Client (%s, %s) is offline" % addr
+                    print "-----due to %s" % e
                     sock.close()
                     disconnect()
                     addr_str = str(addr[0])
-                    pi_status_update(addr_str, "ERRPI_DISCON")
+#                    pi_status_update(addr_str, "ERRPI_DISCON")
                     CONNECTION_LIST.remove(sock)
                     continue
 
