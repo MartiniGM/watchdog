@@ -206,7 +206,9 @@ class Arduino:
                 if (time.time() - self.failstart > self.wdtime):
                     # if it's been so long since serial failure, pop the watchdog
                     print "top dog on " + self.port
-                    self.watchdog("ERRDUINO_DISCON")
+#                    self.watchdog("ERRDUINO_DISCON")
+#                    DISCON isn't used now so change this to BROKENPIPE
+                    self.watchdog("ERRDUINO_BROKENPIPE")
 
             #From here down, we got a read-success    
             self.set_failstart = 0  # clears the failure code in case we failed earlier 
