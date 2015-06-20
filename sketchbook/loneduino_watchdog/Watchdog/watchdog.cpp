@@ -23,14 +23,59 @@ Watchdog::Watchdog(IPAddress arduino_ip, byte arduino_mac[], IPAddress server_ip
 
 }
 
+/* Because the arduino pins stay in the LAST state we need to make sure that
+   the watchdog never gets out of sendMsg() with the pin low (i.e. draining
+   the capacitor), or there's a chance that the arduino will crash in the 
+   mainloop, the capacitor will never re-fill (because the pin is stuck low) 
+   and the watchdog will fail to reset the arduino -- ever.
+
+   This is why the pet is split into pet() and pet2(). One happens at the 
+   beginning of sendMsg() to drop the pin low, one at the end to reset it high.
+*/
+
+void Watchdog:: pet()
+{
+  tmpmillis = millis();
+  if( tmpmillis - last_pet > HW_TIME_TILPAT )
+    {
+      if (Serial) {
+	char tmp[100];
+	sprintf(tmp, "Pet! %lu uptime\n", millis() / 1000);
+	Serial.println(tmp);
+      }
+	last_pet = millis();
+      if(!pin_low)
+	{
+	  // bring it low
+	  pinMode(HW_WATCHDOG_PIN, OUTPUT);
+	  digitalWrite(HW_WATCHDOG_PIN, LOW);
+	  pin_low = true; //pin is now low
+	}
+    }
+}
+
+void Watchdog::pet2()
+{
+  if (pin_low)
+    {
+      if (Serial)
+	Serial.println("Pet2!\n");
+      //if the pin is low we have NOT reset it to high, so do so.
+      //otherwise nothing.
+      // set to HIGH-Z
+      pinMode(HW_WATCHDOG_PIN, INPUT);
+      pin_low = false; //pin is now high
+    }
+}
+
 /* Tries to make the initial connection to the server */ 
-/* Needs to be called in the SETUP loop of your function. Note that it calls
-   Ethernet.begin() (as there's no way to check if it's been called), so call 
-   this BEFORE you do anything with the internet, otherwise what you do may 
-   get overwritten by the second begin() call... */
-void Watchdog::setup() {
+/* Needs to be called in the SETUP loop of your function. */
+void Watchdog::setup() 
+{
+  last_pet = millis();
+  pin_low = true;
+  _reconnect_millis = 0;
   
-  Ethernet.begin(_arduino_mac, _arduino_ip);
   if (_client.connect(_server_ip, _server_port)) {
     // if you get a connection, report back via serial:
     if (Serial)
@@ -44,8 +89,14 @@ void Watchdog::setup() {
 
 /* Checks to see if the Ethernet client is connected. If so, sends a message over the wire if at least 120 seconds have passed since last send. If not, tries to reconnect. Also increases uptime by 120 seconds. */
 
-void Watchdog::sendMsg(char *msg) {
-  if (_client.connected()) {
+void Watchdog::sendMsg(char *msg) 
+{
+  Serial.println("sendmsg\n");
+  // pet HW watchdog
+  pet();
+
+  if (_client.connected()) 
+  {
     _curmillis = millis();
     /*    if (Serial) {
       Serial.println(_curmillis - _watchdog_millis);
@@ -68,24 +119,33 @@ void Watchdog::sendMsg(char *msg) {
       _watchdog_millis = millis();
     }
   }
-  
+
   // if the server's disconnected, loop to reconnect
   if (!_client.connected()) {
-    _client.stop();
-    if (Serial)
-      Serial.println("Reconnecting...");
-    if (_client.connect(_server_ip, _server_port)) {
+    if (millis() - _reconnect_millis > HW_RECONNECT_TIME) {
+      _reconnect_millis = millis();
+      _client.stop();
       if (Serial)
-	Serial.println("Connected");
-    }
-    else {
-      // if you didn't get a connection to the server:
-      if (Serial)
-	Serial.println("Failed connection");
+	Serial.println("Reconnecting, v2...");
+      if (_client.connect(_server_ip, _server_port)) {
+	if (Serial)
+	  Serial.println("Connected");
+      }
+      else {
+	// if you didn't get a connection to the server:
+	if (Serial)
+	  Serial.println("Failed connection");
+      }
     }
   }
+  //pet HW watchdog, part 2
+  pet2();
+  /*  if (Serial) {
+  if (pin_low == true)
+    Serial.println("pin low\n");
+  else
+    Serial.println("pin high:\n");
+    }*/
 }
   
-
-
 
