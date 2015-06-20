@@ -1,0 +1,7 @@
+sqlite3 demosdb.db
+sqlite> .tables
+sqlite> .exit
+$ ls
+[...]
+demosdb.db
+Then run sqlite_create.py
