@@ -1,13 +1,13 @@
 #!/usr/bin/python 
 import socket, select
-import MySQLdb
+#import MySQLdb
 import sqlite3 as lite
 import datetime
 import time
 import os
 connected = 1;
 periodic_timer = time.time()
-periodic_period = 240 #check for NOREPLY every 4 minutes
+periodic_period = 120 #check for NOREPLY every 4 minutes
 
 #reports disconnect, prepares for reconnect 
 def disconnect():
@@ -135,7 +135,6 @@ Y %H:%M:%S"))
 M:%S")
             total_seconds = ((time_cur-time_ts).seconds)
             print "total seconds between times: " + str(total_seconds)
-            total_seconds = 400
             if (total_seconds > periodic_period):
                     #more than X minutes
                 print "More than %d minutes for %s" % (periodic_period / 60, id_name)

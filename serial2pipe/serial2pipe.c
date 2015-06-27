@@ -37,10 +37,13 @@ int pipe1, pipe2;
 int num_ffs = 0;
 int pipe1_connected = 0;
 int pipe2_connected = 0;
+time_t start, end; //timer for ACKCLEAR messages for pipe1
+time_t start2, end2; //timer for ACKCLEAR messages for pipe2
+time_t start3, end3; //timer to keep "can't open" messages from overflow
 
 //TCP host details:
 #define PORT 6666
-#define HOST "192.168.1.66"
+#define HOST "192.168.1.17"
 
 static void murder(int ignore) { 
   fclose(fsa); 
@@ -122,14 +125,24 @@ void TCPSendMessage(char * message)
 
 void open_ports() {
   fda = -1;
+  time(&start);
+  time(&start2);
+  time(&start3);
   //this loop should allow you to start serial2pipe while the Arduino isn't 
   //connected. Also allows reconnect on serial errors.
   while(fda < 0) {
     // get descriptor for serial port to arduino
     fda = open(SERIAL_DEVICE_A, O_RDONLY | O_NOCTTY );
-    if (fda < 0) 
-      printf("[ERROR] cannot open file %s\n", 
-	     SERIAL_DEVICE_A);
+    if (fda < 0) { 
+      double diff;
+      time(&end3);
+      diff = difftime(end3,start3);
+      if (diff > 30) {
+	printf("[ERROR] cannot open file %s\n", 
+	       SERIAL_DEVICE_A);
+	time(&start3);
+      }
+    }
   }
   
   // get file stream pointer for serial port to arduino
@@ -241,19 +254,24 @@ int main(void)
 	char error_str[2000];
 	char *error_str2 = (char *)malloc(2000);
 	//	printf("pipe1_connected %d\n", pipe1_connected);
-	if (pipe1_connected == 1) {
 	  sprintf(error_str, "Write error on %s:", PIPE_1);
 	  perror(error_str);
 	  build_error_str(error_str2, "ERRDUINO_BROKENPIPE", PIPE_1);
 	  TCPSendMessage(error_str2);
+	if (pipe1_connected == 1) {
 	  pipe1_connected = 0;
 	}
       } else {
-	if (pipe1_connected == 0) {
+	double diff;
+	time(&end);
+	diff = difftime(end,start);
+	//	printf("Seconds since last send %.2lf\n", diff);
+	if (diff > 30) {
 	  char *error_str2 = (char *)malloc(2000);
 	  build_error_str(error_str2, "ERRDUINO_ACKCLEAR", PIPE_1);
 	  TCPSendMessage(error_str2);
           pipe1_connected = 1;
+	  time(&start);
 	}
       }
       
@@ -268,11 +286,16 @@ int main(void)
 	if (pipe2_connected == 1)
 	  pipe2_connected = 0;
       } else {
-	if (pipe2_connected == 0) {
+	double diff;
+	time(&end2);
+	diff = difftime(end2,start2);
+	//	printf("Seconds since last send %.2lf\n", diff);
+	if (diff > 30) {
 	  char *error_str2 = (char *)malloc(2000);
 	  build_error_str(error_str2, "ERRDUINO_ACKCLEAR", PIPE_2);
 	  TCPSendMessage(error_str2);
           pipe2_connected = 1;
+	  time(&start2);
 	}
       }
       
