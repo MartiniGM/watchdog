@@ -1,6 +1,7 @@
 #!/usr/bin/python 
 import socket, select
 import MySQLdb
+import sqlite3 as lite
 import datetime
 import time
 import os
@@ -16,24 +17,113 @@ def disconnect():
         connected = 0;
 
 #returns data from arduinos and pis
-def get_pis(pi_or_arduino):
-    global cursor
-    sql = """SELECT ID_NAME, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME FROM %s""" % pi_or_arduino
-    try:
-        cursor.execute(sql)
-        data = cursor.fetchall()
+def get_pis_sqlite(pi_or_arduino):
+    global con
+    with con:
+        cur = con.cursor()
+        sql = """SELECT ID_NAME, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME FROM %s""" % pi_or_arduino
+        cur.execute(sql)
+        data = cur.fetchall()
         return data
-    except Exception, e:
+
+#returns location/description string, given an id_name
+def get_location_sqlite(id_name):
+    global con
+    try:
+        cur = con.cursor()
+        cur.execute("SELECT ID_NAME, LOCATION FROM LOCATIONS WHERE ID_NAME LIKE\
+ ?", ('%'+id_name+'%',))
+        data = cur.fetchall()
+        for row in data:
+            return row[1]
+    except lite.Error, e:
+        if con:
+            con.rollback()
         print "SQL error! %s" % e
         return "" #blank location, will show as None in SQL
 
-def parse_data(data):
+#creates a Pi status update with current timestamp, sends it to sql_data_sqlite
+def pi_status_update_sqlite(addr, status):
+    id_name = addr
+
+#    print "id_name " + id_name
+#    print "status " + status
+    timestamp = str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
+#    print "timestamp " + timestamp
+    data = [(id_name, timestamp, status, 0, "unknown")]
+    sql_data_sqlite(data, "DEVICES")
+ 
+#splits string input into a list and passes it on 
+def listify_data(data):
+    if len(data) == 0:
+        return
+#    print "got data sql_data: " + data
+    data_list = data.split();
+    status = data_list[0]
+    id_name = data_list[1]
+    uptime_sec = data_list[2]
+    timestamp = str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
+    strr = " "
+    uptime = strr.join(data_list[3:])
+    return [(id_name, timestamp, status, uptime_sec, uptime)]
+
+def sql_data_sqlite(data, pi_or_arduino):
+    global con
+    if len(data) == 0:
+        return
+#[(u'berry5/serial2pipe/arduino_pipe1', u'Jun 19, 2015 23:28:02', u'ERRDUINO_BROKENPIPE', 0, u'unknown')]
+    print data
+    datalist = data[0]
+#    print "got data sql_data: " + str(data)
+    id_name = datalist[0]
+    timestamp = datalist[1]
+    status = datalist[2]
+    uptime_sec = datalist[3]
+    uptime = datalist[4]
+    if (len(uptime) == 0):
+#for now only loneduinos fail to send time
+        sec = int(uptime_sec)
+        mins = sec/60
+        hours = mins/60
+        days = hours / 24
+
+        sec=sec-(mins*60) #subtract the coverted seconds to minutes 
+        mins=mins-(hours*60) #subtract the coverted minutes to hours 
+        hours=hours-(days*24) #subtract the coverted hours to days 
+        if (days == 0):
+            uptime = "%02d:%02d:%02d" % (hours, mins, sec)
+        else:
+            if (days == 1):
+                uptime = "%d day, %02d:%02d:%02d" % (days, hours, mins, sec)
+            else:
+                uptime = "%d days, %02d:%02d:%02d" % (days, hours, mins, sec)
+
+        pi_or_arduino = "DEVICES"
+
+    timestamp = str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
+    location = get_location_sqlite(id_name)
+
+    print "got data: " + status + " " + id_name + " " + timestamp + " Uptime: " + str(uptime_sec) + ", " + uptime
+
+#insert & commit, otherwise rollback
+    try:
+        cur = con.cursor()
+        cur.execute("INSERT OR REPLACE INTO DEVICES(ID_NAME, LOCATION, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME) values (?, ?, ?, ?, ?, ?)",  (id_name,location,timestamp,status, uptime_sec,uptime))
+        con.commit()
+    except lite.Error, e:
+        print "mysql error: %s" % e
+        con.rollback()
+    else:
+        print "db_update okay!"
+
+#parses data
+def parse_data_sqlite(data):
     for row in data:
         print row[0] + " " + row[1] + " " + row[2] + " " + str(row[3]) + " " + row[4]
         id_name = row[0]
         timestamp = row[1]
         status = row[2]
-        location = get_location(id_name)
+        location = get_location_sqlite(id_name)
         uptime_sec = row[3]
         uptime = row[4]
         if ("DISCON" not in status):
@@ -45,119 +135,25 @@ Y %H:%M:%S"))
 M:%S")
             total_seconds = ((time_cur-time_ts).seconds)
             print "total seconds between times: " + str(total_seconds)
+            total_seconds = 400
             if (total_seconds > periodic_period):
                     #more than X minutes
                 print "More than %d minutes for %s" % (periodic_period / 60, id_name)
                 timestamp = str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
-                if ("PI" in status):
-                    status = "ERRPI_NOREPLY"
-                    table = "PIS"
-                else:
-                    status = "ERRDUINO_NOREPLY"
-                    table = "ARDUINOS"
-                try:
-                    query = """INSERT INTO %s(ID_NAME, LOCATION, TIMESTAMP, STATUS, UPTIME, UPTIME_SEC)
-             VALUES (%%s, %%s, %%s, %%s, %%s, %%s)                                       \
 
-             ON DUPLICATE KEY UPDATE
-             TIMESTAMP = VALUES(TIMESTAMP),
-             LOCATION = VALUES(LOCATION),
-             UPTIME = VALUES(UPTIME),
-             UPTIME_SEC = VALUES(UPTIME_SEC),
-             STATUS = VALUES(STATUS) ;
-      """ % (table)
-                    cursor.execute(query, (id_name,location,timestamp,status, uptime, uptime_sec))
-                    db.commit()
-                except Exception, e:
+                status = "ERRDUINO_NOREPLY"
+                table = "DEVICES"
+                try:
+                    cur = con.cursor()
+                    cur.execute("INSERT OR REPLACE INTO DEVICES(ID_NAME, LOCATION, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME) values (?, ?, ?, ?, ?, ?)",  (id_name,location,timestamp,status, uptime_sec,uptime))
+                    con.commit()
+                except lite.Error, e:
                     print "mysql error: %s" % e
-                    db.rollback()
+                    con.rollback()
                 else:
                     print "db_update okay!"
         else:
             print "DISCON found, skipping" + str(row)
-
-
-#returns location/description string, given an id_name
-def get_location(id_name):
-    sql = """SELECT ID_NAME, LOCATION FROM LOCATIONS WHERE ID_NAME LIKE %s
-""" 
-    try:
-        cursor.execute(sql, (('%' + id_name + '%',)))
-        data = cursor.fetchall()
-        for row in data:
-            return row[1]
-    except Exception, e:
-        print "SQL error! %s" % e
-        return "" #blank location, will show as None in SQL
-
-#creates a Pi status update with current timestamp, sends it to mysql_data
-def pi_status_update(addr, status):
-    id_name = addr
-#    print "id_name " + id_name
-#    print "status " + status
-    timestamp = str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
-#    print "timestamp " + timestamp
-    data = status + " " + id_name + " " + "0 unknown"
-    mysql_data(data, "PIS")
-    
-#writes Pi & Arduino status updates out to mysql
-def mysql_data(data, pi_or_arduino):
-    if len(data) == 0:
-        return
-
-#    print "got data mysql_data: " + data
-    data_list = data.split();
-    status = data_list[0]
-    id_name = data_list[1]
-    uptime_sec = data_list[2]
-    strr = " "
-    uptime = strr.join(data_list[3:])
-    if (len(uptime) == 0):
-#for now only loneduinos fail to send time
-        sec = int(uptime_sec)
-        mins = sec/60
-        hours = mins/60
-        days = hours / 24
-        
-        sec=sec-(mins*60) #subtract the coverted seconds to minutes in order to display 59 secs max
-        mins=mins-(hours*60) #subtract the coverted minutes to hours in order to display 59 minutes max
-        hours=hours-(days*24) #subtract the coverted hours to days in order to display 23 hours max
-        if (days == 0):
-            uptime = "%02d:%02d:%02d" % (hours, mins, sec) 
-        else:
-            if (days == 1):
-                uptime = "%d day, %02d:%02d:%02d" % (days, hours, mins, sec)
-            else:
-                uptime = "%d days, %02d:%02d:%02d" % (days, hours, mins, sec)
-
-    if ("PI_" in status):
-        pi_or_arduino = "PIS"
-    else:
-        pi_or_arduino = "ARDUINOS"
-
-    timestamp = str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
-    location = get_location(id_name)
-
-    print "got data: " + status + " " + id_name + " " + timestamp + " Uptime: " + uptime_sec + ", " + uptime
-
-#insert & commit, otherwise rollback
-    try:
-        query = """INSERT INTO %s(ID_NAME, LOCATION, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME)  
-             VALUES (%%s, %%s, %%s, %%s, %%s, %%s)                                           
-             ON DUPLICATE KEY UPDATE                                           
-             TIMESTAMP = VALUES(TIMESTAMP),
-             LOCATION = VALUES(LOCATION),
-             UPTIME = VALUES(UPTIME),
-             UPTIME_SEC = VALUES(UPTIME_SEC),
-             STATUS = VALUES(STATUS) ;                                         
-      """ % (pi_or_arduino)
-        cursor.execute(query, (id_name,location,timestamp,status, uptime_sec,uptime))
-        db.commit()
-    except Exception, e:
-        print "mysql error: %s" % e
-        db.rollback()
-#    else:
-#        print "db_update okay!"
 
 if __name__ == "__main__":
       
@@ -167,8 +163,12 @@ if __name__ == "__main__":
 
     try:
 # Open database connection, create cursor
-        db = MySQLdb.connect("localhost","demo-user","plaintext","demosdb" )
-        cursor = db.cursor()
+        if os.name == 'nt':
+            con = lite.connect('c:\\watchdog\\tcp_watchdog_server_sqlite\\demosdb.db')
+        else:
+            con = lite.connect('demosdb.db')     
+#        db = MySQLdb.connect("localhost","demo-user","plaintext","demosdb" )
+#        cursor = db.cursor()
     except Exception, e:
         print "Can't connect to demosdb! %s" % e
  
@@ -203,10 +203,8 @@ if __name__ == "__main__":
     while 1:
         #new stuff for periodic data check
         if (time.time() - periodic_timer > periodic_period):
-            data = get_pis("PIS")
-            parse_data(data)
-            data2 = get_pis("ARDUINOS")
-            parse_data(data2)
+            data = get_pis_sqlite("DEVICES")
+            parse_data_sqlite(data)
             periodic_timer = time.time()
 
         # Get the list of sockets which are ready to be read through select
@@ -244,7 +242,8 @@ if __name__ == "__main__":
                             CONNECTION_LIST.remove(sock)
                         else:
                         # at this point we got data, so log it
-                            mysql_data(data, "ARDUINOS")
+                            data2 = listify_data(data)
+                            sql_data_sqlite(data2, "ARDUINOS")
                             connected = 1;
 
                 # client disconnected, so remove it from the socket list
@@ -257,10 +256,10 @@ if __name__ == "__main__":
                     sock.close()
                     disconnect()
                     addr_str = str(addr[0])
-#                    pi_status_update(addr_str, "ERRPI_DISCON")
                     CONNECTION_LIST.remove(sock)
                     continue
 
 # disconnect from mysql server
-    db.close()         
+    con.close()
+ #   db.close()         
     server_socket.close()

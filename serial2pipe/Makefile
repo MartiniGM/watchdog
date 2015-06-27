@@ -9,10 +9,10 @@ all:
 	$(CC) $(CFLAGS) $(LIBS) -o $(BUILDDIR)/$(TGT1:.c= ) $(TGT1)
 
 clean:
-	rm $(BUILDDIR)/*
+
 
 # should also make init.d link for this
 # and make should update-rc.d
 install:
 	@mkdir -p $(HOME)/builds/
-	@cp -v $(BUILDDIR)/$(TGT1:.c= ) $(HOME)/serial2pipe
+	@cp -v $(BUILDDIR)/$(TGT1:.c= ) $(HOME)/tcp_send_test
