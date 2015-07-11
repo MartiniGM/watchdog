@@ -1,22 +1,27 @@
 #!/usr/bin/python 
 import socket, select
-#import MySQLdb
 import sqlite3 as lite
 import datetime
 import time
 import os
-connected = 1;
-periodic_timer = time.time()
-periodic_period = 120 #check for NOREPLY every 4 minutes
+import re
+#connected = 1;
+periodic_timer = time.time() 
+periodic_period = 120 #check for NOREPLY every X seconds
 
-#reports disconnect, prepares for reconnect 
-def disconnect():
-    global connected
-    if (connected == 1):
-#        print "Disconnect detected!"
-        connected = 0;
+############################################################
+# disconnect()
+############################################################
+# reports disconnect, prepares for reconnect. does nothing anymore so removed 
+#def disconnect():
+#    global connected
+#    if (connected == 1):
+#        connected = 0;
 
-#returns data from arduinos and pis
+############################################################
+# get_pis_sqlite()
+############################################################        
+# returns data from arduinos and pis (as a list of tuples)
 def get_pis_sqlite(pi_or_arduino):
     global con
     with con:
@@ -25,8 +30,11 @@ def get_pis_sqlite(pi_or_arduino):
         cur.execute(sql)
         data = cur.fetchall()
         return data
-
-#returns location/description string, given an id_name
+    
+############################################################
+# get_location_sqlite()
+############################################################        
+# returns location/description string, given an id_name
 def get_location_sqlite(id_name):
     global con
     try:
@@ -42,7 +50,10 @@ def get_location_sqlite(id_name):
         print "SQL error! %s" % e
         return "" #blank location, will show as None in SQL
 
-#creates a Pi status update with current timestamp, sends it to sql_data_sqlite
+############################################################
+# pi_status_update_sqlite()
+############################################################        
+# creates a Pi status update with current timestamp (as list of tuples), sends it to sql_data_sqlite
 def pi_status_update_sqlite(addr, status):
     id_name = addr
 
@@ -52,8 +63,13 @@ def pi_status_update_sqlite(addr, status):
 #    print "timestamp " + timestamp
     data = [(id_name, timestamp, status, 0, "unknown")]
     sql_data_sqlite(data, "DEVICES")
- 
-#splits string input into a list and passes it on 
+
+############################################################
+# listify_data()
+############################################################            
+# splits string input into a formatted list of tuples and returns it.
+# this is intended to match the way SQLite returns values, so we can use the
+# same functions to parse both.
 def listify_data(data):
     if len(data) == 0:
         return
@@ -67,6 +83,10 @@ def listify_data(data):
     uptime = strr.join(data_list[3:])
     return [(id_name, timestamp, status, uptime_sec, uptime)]
 
+############################################################
+# sql_data_sqlite()
+############################################################        
+# parses data (as a list of tuples, either from SQLite or listify_data) and updates SQLite
 def sql_data_sqlite(data, pi_or_arduino):
     global con
     if len(data) == 0:
@@ -81,7 +101,8 @@ def sql_data_sqlite(data, pi_or_arduino):
     uptime_sec = datalist[3]
     uptime = datalist[4]
     if (len(uptime) == 0):
-#for now only loneduinos fail to send time
+        # for now only loneduinos fail to send uptime as a string.
+        # if so, create a string from the number of seconds rec'd
         sec = int(uptime_sec)
         mins = sec/60
         hours = mins/60
@@ -98,14 +119,14 @@ def sql_data_sqlite(data, pi_or_arduino):
             else:
                 uptime = "%d days, %02d:%02d:%02d" % (days, hours, mins, sec)
 
-        pi_or_arduino = "DEVICES"
+#        pi_or_arduino = "DEVICES"
 
     timestamp = str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
     location = get_location_sqlite(id_name)
 
     print "got data: " + status + " " + id_name + " " + timestamp + " Uptime: " + str(uptime_sec) + ", " + uptime
 
-#insert & commit, otherwise rollback
+    # insert & commit, otherwise rollback
     try:
         cur = con.cursor()
         cur.execute("INSERT OR REPLACE INTO DEVICES(ID_NAME, LOCATION, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME) values (?, ?, ?, ?, ?, ?)",  (id_name,location,timestamp,status, uptime_sec,uptime))
@@ -116,7 +137,10 @@ def sql_data_sqlite(data, pi_or_arduino):
     else:
         print "db_update okay!"
 
-#parses data
+############################################################
+# parse_data_sqlite()
+############################################################        
+#parses & checks for periodic disconnects; if found, inserts NOREPLY into SQLite
 def parse_data_sqlite(data):
     for row in data:
         print row[0] + " " + row[1] + " " + row[2] + " " + str(row[3]) + " " + row[4]
@@ -136,7 +160,7 @@ M:%S")
             total_seconds = ((time_cur-time_ts).seconds)
             print "total seconds between times: " + str(total_seconds)
             if (total_seconds > periodic_period):
-                    #more than X minutes
+            # more than X seconds since last message. update this entry with NOREPLY
                 print "More than %d minutes for %s" % (periodic_period / 60, id_name)
                 timestamp = str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
 
@@ -154,6 +178,11 @@ M:%S")
         else:
             print "DISCON found, skipping" + str(row)
 
+############################################################
+# main()
+############################################################        
+# checks for TCP connections, recvs and parses data if present
+
 if __name__ == "__main__":
       
     CONNECTION_LIST = []    # list of socket clients
@@ -166,8 +195,6 @@ if __name__ == "__main__":
             con = lite.connect('c:\\watchdog\\tcp_watchdog_server_sqlite\\demosdb.db')
         else:
             con = lite.connect('demosdb.db')     
-#        db = MySQLdb.connect("localhost","demo-user","plaintext","demosdb" )
-#        cursor = db.cursor()
     except Exception, e:
         print "Can't connect to demosdb! %s" % e
  
@@ -179,10 +206,9 @@ if __name__ == "__main__":
     x = server_socket.getsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE)
     if (x == 0):
         x = server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
-        #60 secs to 1st timeout, 4 retries @ 15 secs per = 2 mins til timeout
 
-        # overrides value (in seconds) shown by sysctl net.ipv4.tcp_keepalive_time. Only works on linux, not on windows
-
+        # overrides value (in seconds) for the TCP keepalives. Only works on linux, not on windows
+        # 60 secs to 1st timeout, 4 retries @ 15 secs per = 2 mins til timeout
         if (os.name == 'linux'):
             server_socket.setsockopt(socket.SOL_TCP, socket.TCP_KEEPIDLE, 60)
             # overrides value shown by sysctl net.ipv4.tcp_keepalive_probes
@@ -200,7 +226,7 @@ if __name__ == "__main__":
     print "Watchdog server started on port " + str(PORT)
  
     while 1:
-        #new stuff for periodic data check
+        # periodic data check. Checks SQLite every X seconds for lack of replies
         if (time.time() - periodic_timer > periodic_period):
             data = get_pis_sqlite("DEVICES")
             parse_data_sqlite(data)
@@ -212,53 +238,63 @@ if __name__ == "__main__":
         for sock in read_sockets:
              
             if sock == server_socket:
-                # Handle the case in which there is a new connection received through server_socket
+                # Handle a new connection
                 sockfd, addr = server_socket.accept()
                 CONNECTION_LIST.append(sockfd)
                 print "-----Client (%s, %s) connected" % addr
                 addr_str = str(addr[0])
-                #took this out now that pis & arduinos send their own OK msgs
-                #pi_status_update(addr_str, "ERRPI_ACKCLEAR")
                 
             else:
                 # Data recieved, process it
                 try:
-                    #In Windows, sometimes when a TCP program closes abruptly,
-                    # a "Connection reset by peer" exception will be thrown
                     data = sock.recv(RECV_BUFFER)
                     if not sock:
                         print "No socket, popping an error"
-                        disconnect()
+#                        disconnect()
                         #pi_status_update(addr_str, "ERRPI_DISCON")
                     else:
+                        # If nothing's rec'd from recv, this indicates the client has closed the connection
                         if data == '':
                             print "-----Client (%s, %s) is offline" % addr
                             print "-----due to client disconnected / closed."
                             sock.close()
-                            disconnect()
-                            addr_str = str(addr[0])
+#                            disconnect()
+#                            addr_str = str(addr[0])
                          #   pi_status_update(addr_str, "ERRPI_DISCON")
                             CONNECTION_LIST.remove(sock)
-                        else:
+                        else:                            
                         # at this point we got data, so log it
-                            data2 = listify_data(data)
-                            sql_data_sqlite(data2, "ARDUINOS")
-                            connected = 1;
+                            if data.count("ERRPI") + data.count("ERRDUINO") > 1:
+                                # we may get more than one message at a time
+                                # due to the way TCP works. If so, split 'em.
+                                datas = re.split('(ERR)', data)
+                                for data in datas:
+                                    if data != "" and data != "ERR":
+                                        data2 = "ERR"+data
+                                        print "line is " + data2
+                                        data3 = listify_data(data2)
+                                        sql_data_sqlite(data3, "ARDUINOS")
+#                                        connected = 1;
+                            # otherwise, just log one message
+                            else:        
+                                data2 = listify_data(data)
+                                sql_data_sqlite(data2, "ARDUINOS")
+#                                connected = 1;
 
-                # client disconnected, so remove it from the socket list
+                # just ignore socket timeouts, as they do not break the conn
                 except socket.timeout:
                     print "socket timeout!"
                     continue
+                # other exceptions cause the client to be removed from the list
                 except Exception, e:
                     print "-----Client (%s, %s) is offline" % addr
                     print "-----due to %s" % e
                     sock.close()
-                    disconnect()
+#                    disconnect()
                     addr_str = str(addr[0])
                     CONNECTION_LIST.remove(sock)
                     continue
 
-# disconnect from mysql server
+# upon exit, disconnect from mysql server and close sockets
     con.close()
- #   db.close()         
     server_socket.close()
