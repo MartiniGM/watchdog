@@ -1,6 +1,7 @@
 #include <sys/time.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
+#include <sys/sysinfo.h>
 #include <termios.h>
 #include <stdio.h>
 #include <fcntl.h>
@@ -20,26 +21,29 @@
 #define SERIAL_DEVICE_A "/dev/cu.usbmodem1411"
 #endif
 #ifdef __linux__
-//#define SERIAL_DEVICE_A "/dev/arduino1"
-#define SERIAL_DEVICE_A "/dev/arduino2"
+#define SERIAL_DEVICE_A "/dev/arduino1"
+//#define SERIAL_DEVICE_A "/dev/arduino2"
 #endif
 
-//#define PIPE_1 "watchdog_pipe1"
-//#define PIPE_2 "arduino_pipe1"
-#define PIPE_1 "watchdog_pipe2"
-#define PIPE_2 "arduino_pipe2"
+#define PIPE_1 "watchdog_pipe1"
+#define PIPE_2 "arduino_pipe1"
+//#define PIPE_1 "watchdog_pipe2"
+//#define PIPE_2 "arduino_pipe2"
 #define BAUD B115200
 
 // globals for when we need to close
 int fda; FILE *fsa;
 int pipe1, pipe2;
 int num_ffs = 0;
-int pipe1_connected = 1;
-int pipe2_connected = 1;
+int pipe1_connected = 0;
+int pipe2_connected = 0;
+time_t start, end; //timer for ACKCLEAR messages for pipe1
+time_t start2, end2; //timer for ACKCLEAR messages for pipe2
+time_t start3, end3; //timer to keep "can't open" messages from overflow
 
 //TCP host details:
 #define PORT 6666
-#define HOST "127.0.0.1"
+#define HOST "192.168.1.17"
 
 static void murder(int ignore) { 
   fclose(fsa); 
@@ -52,11 +56,31 @@ static void murder(int ignore) {
 } 
 
 void build_error_str(char *dest, char *errcode_str, char* pipename) {
-  char            fmt[64], buf[64];
-  struct timeval  tv;
-  struct tm       *tm;
+  char buf[64];
+  /*  struct timeval  tv;
+      struct tm       *tm;*/
   char hostname[1024];
+  struct sysinfo info;
+  int mins, hours, days, sec;
+  sysinfo(&info);
+  sec = info.uptime;
+  //  printf("Uptime = %d\n", sec);
+  mins = sec/60;
+  hours = mins/60;
+  days = hours / 24;
 
+  sec=sec-(mins*60);
+  mins=mins-(hours*60);
+  hours=hours-(days*24); 	
+  if (days == 0) {
+    sprintf(buf, "%02d:%02d:%02d", hours, mins, sec);
+  } else if (days == 1) {
+    sprintf(buf,"%d day, %02d:%02d:%02d", days, hours, mins, sec);
+  } else {
+    sprintf(buf, "%d days, %02d:%02d:%02d", days, hours, mins, sec);
+  }
+
+  /*
   gettimeofday(&tv, NULL);
   if ((tm = localtime(&tv.tv_sec)) != NULL) {
     strftime(fmt, sizeof fmt, "%b %d, %Y %H:%M:%S", tm);
@@ -65,17 +89,16 @@ void build_error_str(char *dest, char *errcode_str, char* pipename) {
   } else {
     sprintf(buf, "%s", "None");
   }
+  */
   gethostname(hostname, 1024);
-  //printf("%s\n", hostname);
-  //  printf("make a dest\n");
-  sprintf(dest, "%s %s/serial2pipe/%s %s", errcode_str, hostname, pipename, buf);
+  sprintf(dest, "%s %s/serial2pipe/%s %ld %s", errcode_str, hostname, pipename, info.uptime, buf);
   printf("%s\n", dest);
-  //  char *message = "ERRSERIAL_BROKENPIPE 127.0.0.1 May 06, 2015 6:06:06";
+  //  char *message = "ERRDUINO_BROKENPIPE 127.0.0.1 1234 x days, 00:01:02";
 }
 
 void TCPSendMessage(char * message)
 {
-  int sd, ret;
+  int sd;
   struct sockaddr_in server;
   struct in_addr ipv4addr;
   struct hostent *hp;
@@ -93,20 +116,33 @@ void TCPSendMessage(char * message)
   connect(sd, (struct sockaddr *)&server, sizeof(server));
   if (sd) {
     send(sd, (char *)message, strlen((char *)message), 0);
+    //    printf("Sent %s\n", message);
     close(sd);
+  } else {
+    printf("Error, can't connect to %s\n", HOST);
   }
 }
 
 void open_ports() {
   fda = -1;
+  time(&start);
+  time(&start2);
+  time(&start3);
   //this loop should allow you to start serial2pipe while the Arduino isn't 
   //connected. Also allows reconnect on serial errors.
   while(fda < 0) {
     // get descriptor for serial port to arduino
     fda = open(SERIAL_DEVICE_A, O_RDONLY | O_NOCTTY );
-    if (fda < 0) 
-      printf("[ERROR] cannot open file %s\n", 
-	     SERIAL_DEVICE_A);
+    if (fda < 0) { 
+      double diff;
+      time(&end3);
+      diff = difftime(end3,start3);
+      if (diff > 30) {
+	printf("[ERROR] cannot open file %s\n", 
+	       SERIAL_DEVICE_A);
+	time(&start3);
+      }
+    }
   }
   
   // get file stream pointer for serial port to arduino
@@ -217,18 +253,25 @@ int main(void)
 	//put error reporting to the watchdog here -- we want to know if the pipe breaks 
 	char error_str[2000];
 	char *error_str2 = (char *)malloc(2000);
-	sprintf(error_str, "Write error on %s:", PIPE_1);
-	perror(error_str);
-	build_error_str(error_str2, "ERRSERIAL_BROKENPIPE", PIPE_1);
-	TCPSendMessage(error_str2);
-	if (pipe1_connected == 1)
+	//	printf("pipe1_connected %d\n", pipe1_connected);
+	  sprintf(error_str, "Write error on %s:", PIPE_1);
+	  perror(error_str);
+	  build_error_str(error_str2, "ERRDUINO_BROKENPIPE", PIPE_1);
+	  TCPSendMessage(error_str2);
+	if (pipe1_connected == 1) {
 	  pipe1_connected = 0;
+	}
       } else {
-	if (pipe1_connected == 0) {
+	double diff;
+	time(&end);
+	diff = difftime(end,start);
+	//	printf("Seconds since last send %.2lf\n", diff);
+	if (diff > 30) {
 	  char *error_str2 = (char *)malloc(2000);
-	  build_error_str(error_str2, "ERRSERIAL_ACKCLEAR", PIPE_1);
+	  build_error_str(error_str2, "ERRDUINO_ACKCLEAR", PIPE_1);
 	  TCPSendMessage(error_str2);
           pipe1_connected = 1;
+	  time(&start);
 	}
       }
       
@@ -238,16 +281,21 @@ int main(void)
 	char *error_str2 = (char *)malloc(2000);
 	sprintf(error_str, "Write error on %s:", PIPE_2);
 	perror(error_str);
-	build_error_str(error_str2, "ERRSERIAL_BROKENPIPE", PIPE_2);
+	build_error_str(error_str2, "ERRDUINO_BROKENPIPE", PIPE_2);
 	TCPSendMessage(error_str2);
 	if (pipe2_connected == 1)
 	  pipe2_connected = 0;
       } else {
-	if (pipe2_connected == 0) {
+	double diff;
+	time(&end2);
+	diff = difftime(end2,start2);
+	//	printf("Seconds since last send %.2lf\n", diff);
+	if (diff > 30) {
 	  char *error_str2 = (char *)malloc(2000);
-	  build_error_str(error_str2, "ERRSERIAL_ACKCLEAR", PIPE_2);
+	  build_error_str(error_str2, "ERRDUINO_ACKCLEAR", PIPE_2);
 	  TCPSendMessage(error_str2);
           pipe2_connected = 1;
+	  time(&start2);
 	}
       }
       
