@@ -21,8 +21,7 @@ send_ok_timer_pi = time.time()
 USE_SOCKETS = 1
 
 #set TCP watchdog IP and port here
-host = '192.168.1.66';
-#host = '192.168.1.17';
+host = '192.168.1.17';
 port = 6666;
 
 #creates a socket up-front, just to initialize it 
@@ -142,7 +141,10 @@ class Arduino:
                  else:
                      print "failed to send " + message
                  #put retry here
- 
+             except IOError as e:
+                 print "failed to send "
+                 #put retry here
+
 #this sends the watchdog message (errcode) via TCP
     def watchdog(self, errcode):
 #        print("Watchdog called on port " + self.port + " Time since last dog: " + str(time.time() - self.wdtimerstart))
