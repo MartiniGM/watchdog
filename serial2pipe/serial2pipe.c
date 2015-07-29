@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <sys/time.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
@@ -30,21 +31,33 @@
 //#define PIPE_1 "watchdog_pipe2"
 //#define PIPE_2 "arduino_pipe2"
 #define BAUD B115200
+#define WD_RECONNECT_TIME 60 //time in seconds between subsequent TCP reconnect attempts
 
-// globals for when we need to close
+// globals 
 int fda; FILE *fsa;
 int pipe1, pipe2;
-int num_ffs = 0;
-int pipe1_connected = 0;
-int pipe2_connected = 0;
+int num_ffs = 0; //counter to detect if the Arduino serial cable has been yanked out (if so, Arduino floods 0xFF)
+int pipe1_connected = 0; //0 if pipe not open, 1 if open
+int pipe2_connected = 0; //0 if pipe not open, 1 if open
+int watchdog_connected  = 0; //0 if not connected via TCP, 1 if connected
 time_t start, end; //timer for ACKCLEAR messages for pipe1
 time_t start2, end2; //timer for ACKCLEAR messages for pipe2
 time_t start3, end3; //timer to keep "can't open" messages from overflow
+time_t start4, end4; //timer to keep disconnected watchdog server from blocking/delaying
+//stuff for TCP connection
+struct hostent *hp; 
+int sd = 0;
+struct sockaddr_in server;
+struct in_addr ipv4addr;
 
 //TCP host details:
 #define PORT 6666
-#define HOST "192.168.1.17"
+//use this to test happy connection
+#define HOST "10.42.16.17"
+//use this to test broken connection
+//#define HOST "192.168.1.17"
 
+/* closes everything upon exit */
 static void murder(int ignore) { 
   fclose(fsa); 
   close(fda); 
@@ -52,13 +65,13 @@ static void murder(int ignore) {
     close(pipe1);
   if(pipe2)
     close(pipe2);
+  if(sd)
+    close(sd);
   exit(0);
 } 
 
 void build_error_str(char *dest, char *errcode_str, char* pipename) {
   char buf[64];
-  /*  struct timeval  tv;
-      struct tm       *tm;*/
   char hostname[1024];
   struct sysinfo info;
   int mins, hours, days, sec;
@@ -80,46 +93,64 @@ void build_error_str(char *dest, char *errcode_str, char* pipename) {
     sprintf(buf, "%d days, %02d:%02d:%02d", days, hours, mins, sec);
   }
 
-  /*
-  gettimeofday(&tv, NULL);
-  if ((tm = localtime(&tv.tv_sec)) != NULL) {
-    strftime(fmt, sizeof fmt, "%b %d, %Y %H:%M:%S", tm);
-    snprintf(buf, sizeof buf, fmt, tv.tv_usec);
-    //    printf("'%s'\n", buf);
-  } else {
-    sprintf(buf, "%s", "None");
-  }
-  */
   gethostname(hostname, 1024);
   sprintf(dest, "%s %s/serial2pipe/%s %ld %s", errcode_str, hostname, pipename, info.uptime, buf);
   printf("%s\n", dest);
+  // format example/test:
   //  char *message = "ERRDUINO_BROKENPIPE 127.0.0.1 1234 x days, 00:01:02";
 }
 
+/* Tries to connect (if not connected) every N seconds. If already connected, sends the message */
+/* The initial TCP connection blocks pretty badly, so we want to avoid reconnects as much as possible */
 void TCPSendMessage(char * message)
 {
-  int sd;
-  struct sockaddr_in server;
-  struct in_addr ipv4addr;
-  struct hostent *hp;
+  if (watchdog_connected == 0) {
+    double diff;
+    time(&end4);
+    diff = difftime(end4,start4);
+    //    printf("trying to send/comparing times: %f sec\n", diff);
 
-  sd = socket(AF_INET,SOCK_STREAM,0);
-  server.sin_family = AF_INET;
+    if (diff < WD_RECONNECT_TIME) {
+      return;
+    } else {
+      //      printf("thirty seconds passed, try again\n");
+      time(&start4);  //restarts timer for "don't block/constantly reconnect" loop
+    }
 
-  inet_pton(AF_INET, HOST, &ipv4addr);
-  hp = gethostbyaddr(&ipv4addr, sizeof ipv4addr, AF_INET);
-  //hp = gethostbyname(HOST);
+    printf("Now connecting / reconnecting\n");
+    sd = socket(AF_INET,SOCK_STREAM,0);
+    server.sin_family = AF_INET;
+    
+    inet_pton(AF_INET, HOST, &ipv4addr);
+    hp = gethostbyaddr(&ipv4addr, sizeof ipv4addr, AF_INET);
+    if (hp == 0) {
+      herror("gethostbyname error:");
+      watchdog_connected = 0;
+      time(&start4);  //restarts timer for "don't block/constantly reconnect" loop
+      sd = 0;
+    } else {
+      bcopy(hp->h_addr, &(server.sin_addr.s_addr), hp->h_length);
+      server.sin_port = htons(PORT);
+      
+      connect(sd, (struct sockaddr *)&server, sizeof(server));
+    }
+  } // endif (watchdog_connected == 0) {
 
-  bcopy(hp->h_addr, &(server.sin_addr.s_addr), hp->h_length);
-  server.sin_port = htons(PORT);
-
-  connect(sd, (struct sockaddr *)&server, sizeof(server));
   if (sd) {
-    send(sd, (char *)message, strlen((char *)message), 0);
+    int ret = 0;
+
+    ret = send(sd, (char *)message, strlen((char *)message), 0);
+    if (ret != -1)
     //    printf("Sent %s\n", message);
-    close(sd);
+      watchdog_connected = 1;
+    else {
+      perror("send() error:");
+      watchdog_connected = 0;
+    }
   } else {
     printf("Error, can't connect to %s\n", HOST);
+    watchdog_connected = 0;
+    time(&start4); //restarts timer for "don't block/constantly reconnect" loop
   }
 }
 
@@ -128,6 +159,7 @@ void open_ports() {
   time(&start);
   time(&start2);
   time(&start3);
+  time(&start4);
   //this loop should allow you to start serial2pipe while the Arduino isn't 
   //connected. Also allows reconnect on serial errors.
   while(fda < 0) {
@@ -210,7 +242,7 @@ int main(void)
   if (signal(SIGINT, murder) == SIG_ERR)
     printf("[FAILED] to install SIGINT handle\n");
   
-  //ignore SIGPIPE. Necessary to keep broken pipes from killing the program
+  //ignore SIGPIPE. Necessary to keep broken pipes from killing the program.
   //this redirects errors to the write() calls below, where they can be handled. 
   signal(SIGPIPE, SIG_IGN); 
   
@@ -220,7 +252,7 @@ int main(void)
   
   printf("Initialized! Beginning loop...\n");
   
-  while(1)  // our loop
+  while(1)  // main loop
     //grabs chars off the arduino serial port, writes to both pipes.
     {
       tmp = getc(fsa);
@@ -242,10 +274,10 @@ int main(void)
 	open_ports();
       }
       
-      if (tmp >=32 && tmp <= 126) //don't print unicode etc as characters!
-	printf("%c\n",tmp);
+      if (tmp >=32 && tmp <= 126) //don't print unicode etc as characters! weird stuff printf'd as %c can segfault on linux
+	printf("%c",tmp);
       else
-	printf("%x\n",tmp);
+	printf("%x",tmp);
       stat1 = write(pipe1, &tmp, 1);
       stat2 = write(pipe2, &tmp, 1);
       
@@ -300,6 +332,6 @@ int main(void)
       }
       
     } 
-  murder(1); //if we end up here, close the pipes
+  murder(1); //if we end up here, close the pipes and TCP connection
   return 0;
 }
