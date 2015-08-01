@@ -128,8 +128,9 @@ class Arduino:
 #                     print message
 #str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))   
                  else:
+                     ip = get_ip_address('eth0')
                      uptime_string , uptime_seconds = self.get_uptime()
-                     message = "ERRDUINO_ACKCLEAR " + str(socket.gethostname()) + "/" + self.port + " " + str(uptime_seconds) + " " + uptime_string
+                     message = "ERRDUINO_ACKCLEAR " + ip + "/" + self.port + " " + str(uptime_seconds) + " " + uptime_string
 # str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
 #                     print message
                  watchsock.sendall(message)
@@ -157,7 +158,8 @@ class Arduino:
 #str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S")))
             if (USE_SOCKETS):
                 try:
-                    message = errcode + " " + str(socket.gethostname()) + "/" + self.port + " " + str(uptime_seconds) + " " + uptime_string
+                    ip = get_ip_address('eth0')
+                    message = errcode + " " + ip + "/" + self.port + " " + str(uptime_seconds) + " " + uptime_string
 #str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
                     watchsock.sendall(message)
                 except socket.error as e:
