@@ -11,6 +11,10 @@
 #include <string.h>
 #include <stdbool.h>
 #include <signal.h>
+#include <ifaddrs.h>
+#include <netinet/in.h> 
+#include <string.h> 
+#include <arpa/inet.h>
 
 #include "lo/lo.h"
 
@@ -70,9 +74,38 @@ static void murder(int ignore) {
   exit(0);
 } 
 
+void get_ip(char *buff) {
+  struct ifaddrs * ifAddrStruct = NULL, * ifa = NULL;
+  void * tmpAddrPtr = NULL;
+  getifaddrs(&ifAddrStruct);
+  for (ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next) {
+    if (ifa ->ifa_addr->sa_family == AF_INET) { // check it is IP4
+      char mask[INET_ADDRSTRLEN];
+      void* mask_ptr = &((struct sockaddr_in*) ifa->ifa_netmask)->sin_addr;
+      inet_ntop(AF_INET, mask_ptr, mask, INET_ADDRSTRLEN);
+      if (strcmp(mask, "255.0.0.0") != 0) {
+        // is a valid IP4 Address
+        tmpAddrPtr = &((struct sockaddr_in *) ifa->ifa_addr)->sin_addr;
+        char addressBuffer[INET_ADDRSTRLEN];
+        inet_ntop(AF_INET, tmpAddrPtr, addressBuffer, INET_ADDRSTRLEN);
+	if (strcmp(ifa->ifa_name, "eth0") == 0) {
+	  if (ifAddrStruct != NULL) freeifaddrs(ifAddrStruct);
+	  sprintf(buff, "%s", addressBuffer);
+	  return;
+	}
+	//        printf("%s IP Address %s\n", ifa->ifa_name, addressBuffer);
+      } else if (ifa->ifa_addr->sa_family == AF_INET6) { // check it is IP6
+        // is a valid IP6 Address
+        // fuck it
+      }
+    }
+  }
+  if (ifAddrStruct != NULL) freeifaddrs(ifAddrStruct);
+}
 void build_error_str(char *dest, char *errcode_str, char* pipename) {
   char buf[64];
-  char hostname[1024];
+  char hostname[1024];       
+  char addressBuffer[INET_ADDRSTRLEN];
   struct sysinfo info;
   int mins, hours, days, sec;
   sysinfo(&info);
@@ -85,16 +118,17 @@ void build_error_str(char *dest, char *errcode_str, char* pipename) {
   sec=sec-(mins*60);
   mins=mins-(hours*60);
   hours=hours-(days*24); 	
-  if (days == 0) {
+  /*  if (days == 0) {
     sprintf(buf, "%02d:%02d:%02d", hours, mins, sec);
   } else if (days == 1) {
     sprintf(buf,"%d day, %02d:%02d:%02d", days, hours, mins, sec);
-  } else {
+    } else {*/
     sprintf(buf, "%d days, %02d:%02d:%02d", days, hours, mins, sec);
-  }
+    //  }
 
   gethostname(hostname, 1024);
-  sprintf(dest, "%s %s/serial2pipe/%s %ld %s", errcode_str, hostname, pipename, info.uptime, buf);
+  get_ip(addressBuffer);
+  sprintf(dest, "%s %s/%s %ld %s", errcode_str, addressBuffer, pipename, info.uptime, buf);
   printf("%s\n", dest);
   // format example/test:
   //  char *message = "ERRDUINO_BROKENPIPE 127.0.0.1 1234 x days, 00:01:02";
