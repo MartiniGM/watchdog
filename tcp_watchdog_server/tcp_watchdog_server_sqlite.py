@@ -111,13 +111,13 @@ def sql_data_sqlite(data, pi_or_arduino):
         sec=sec-(mins*60) #subtract the coverted seconds to minutes 
         mins=mins-(hours*60) #subtract the coverted minutes to hours 
         hours=hours-(days*24) #subtract the coverted hours to days 
-        if (days == 0):
-            uptime = "%02d:%02d:%02d" % (hours, mins, sec)
-        else:
-            if (days == 1):
-                uptime = "%d day, %02d:%02d:%02d" % (days, hours, mins, sec)
-            else:
-                uptime = "%d days, %02d:%02d:%02d" % (days, hours, mins, sec)
+#        if (days == 0):
+#            uptime = "%02d:%02d:%02d" % (hours, mins, sec)
+#        else:
+#            if (days == 1):
+#                uptime = "%d day, %02d:%02d:%02d" % (days, hours, mins, sec)
+#            else:
+        uptime = "%d days, %02d:%02d:%02d" % (days, hours, mins, sec)
 
 #        pi_or_arduino = "DEVICES"
 
@@ -129,7 +129,7 @@ def sql_data_sqlite(data, pi_or_arduino):
     # insert & commit, otherwise rollback
     try:
         cur = con.cursor()
-        cur.execute("INSERT OR REPLACE INTO DEVICES(ID_NAME, LOCATION, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME) values (?, ?, ?, ?, ?, ?)",  (id_name,location,timestamp,status, uptime_sec,uptime))
+        cur.execute("INSERT OR REPLACE INTO DEVICES(ID_NAME, LOCATION, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME) values (?, ?, ?, ?, ?, ?)",  (id_name,location,timestamp,status, (int)uptime_sec,uptime))
         con.commit()
     except lite.Error, e:
         print "mysql error: %s" % e
@@ -168,7 +168,7 @@ M:%S")
                 table = "DEVICES"
                 try:
                     cur = con.cursor()
-                    cur.execute("INSERT OR REPLACE INTO DEVICES(ID_NAME, LOCATION, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME) values (?, ?, ?, ?, ?, ?)",  (id_name,location,timestamp,status, uptime_sec,uptime))
+                    cur.execute("INSERT OR REPLACE INTO DEVICES(ID_NAME, LOCATION, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME) values (?, ?, ?, ?, ?, ?)",  (id_name,location,timestamp,status, (int)uptime_sec,uptime))
                     con.commit()
                 except lite.Error, e:
                     print "mysql error: %s" % e
