@@ -21,7 +21,7 @@ send_ok_timer_pi = time.time()
 USE_SOCKETS = 1
 
 #set TCP watchdog IP and port here
-host = '192.168.1.17';
+host = '10.42.16.17';
 port = 6666;
 
 #creates a socket up-front, just to initialize it 
@@ -124,13 +124,13 @@ class Arduino:
                      ip = get_ip_address('eth0')
 
                      uptime_string , uptime_seconds = self.get_uptime()
-                     message = "ERRPI_ACKCLEAR " + ip + " " + str(uptime_seconds) + " " + uptime_string
+                     message = "ERRPI_ACKCLEAR " + ip + "/" + os.path.basename(self.port) + " " + str(uptime_seconds) + " " + uptime_string
 #                     print message
 #str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))   
                  else:
                      ip = get_ip_address('eth0')
                      uptime_string , uptime_seconds = self.get_uptime()
-                     message = "ERRDUINO_ACKCLEAR " + ip + "/" + self.port + " " + str(uptime_seconds) + " " + uptime_string
+                     message = "ERRDUINO_ACKCLEAR " + ip + "/" + os.path.basename(self.port) + " " + str(uptime_seconds) + " " + uptime_string
 # str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
 #                     print message
                  watchsock.sendall(message)
@@ -154,12 +154,12 @@ class Arduino:
             self.send_ok = 1; #this tells the watchdog to send an ACKCLEAR
                               #on the next good read
             uptime_string, uptime_seconds = self.get_uptime()
-            print("^^^^^WATCHDOG ACTIVE^^^^^:"+ self.port + " " + str(uptime_seconds) + " " + uptime_string)
+            print("^^^^^WATCHDOG ACTIVE^^^^^:"+ os.path.basename(self.port) + " " + str(uptime_seconds) + " " + uptime_string)
 #str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S")))
             if (USE_SOCKETS):
                 try:
                     ip = get_ip_address('eth0')
-                    message = errcode + " " + ip + "/" + self.port + " " + str(uptime_seconds) + " " + uptime_string
+                    message = errcode + " " + ip + "/" + os.path.basename(self.port) + " " + str(uptime_seconds) + " " + uptime_string
 #str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
                     watchsock.sendall(message)
                 except socket.error as e:
@@ -217,7 +217,7 @@ class Arduino:
             #From here down, we got a read-success    
             self.set_failstart = 0  # clears the failure code in case we failed earlier 
             if (self.last_len != 0):
-                print "Got data on port " + self.port + " in sec:" + str(time.time() - self.start).split('.')[0] + "  " + self.textln 
+                print "Got data on port " + os.path.basename(self.port) + " in sec:" + str(time.time() - self.start).split('.')[0] + "  " + self.textln 
                 self.start = time.time()
                 if (USE_SOCKETS):
                 #sends ERRPI_ACKCLEAR every X seconds
@@ -256,20 +256,15 @@ if (USE_SOCKETS):
 #use serial2pipe to split the Arduino output into two named pipes, then attach
 #the following to one of the pipes, and the other to the program to be 
 #monitored!
-
-#note: wdtime should be at least 2x patting-time to prevent spurious watchdogs
-#                  input filename,             pin,timeout, wdtime, dogtime
-arduino1 = Arduino("serial2pipe/watchdog_pipe1", 1, 0.0, 40.0, 100.0)
-arduino2 = Arduino("serial2pipe/watchdog_pipe2", 1, 0.0, 43.0, 103.0)
-#arduino3 = None
+arduino1 = Arduino("./piezo_wd_pipe", 1, 0.0, 40.0, 100.0)
+arduino2 = Arduino("./laser_wd_pipe", 1, 0.0, 40.0, 100.0)
+arduino3 = Arduino("./chest_wd_pipe", 1, 0.0, 40.0, 100.0)
 
 # builds a list to step through the arduinos
 arduinolist = []
 arduinolist.append(arduino1)
 arduinolist.append(arduino2)
-#arduinolist.append(arduino3)
-
-print len(arduinolist)
+arduinolist.append(arduino3)
 
 while 1:
     if (len(arduinolist) == 1):
