@@ -10,7 +10,7 @@ periodic_timer = time.time()
 periodic_period = 120 #check for NOREPLY every X seconds
 
 ############################################################
-# disconnect()
+#disconnect()
 ############################################################
 # reports disconnect, prepares for reconnect. does nothing anymore so removed 
 #def disconnect():
@@ -129,7 +129,7 @@ def sql_data_sqlite(data, pi_or_arduino):
     # insert & commit, otherwise rollback
     try:
         cur = con.cursor()
-        cur.execute("INSERT OR REPLACE INTO DEVICES(ID_NAME, LOCATION, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME) values (?, ?, ?, ?, ?, ?)",  (id_name,location,timestamp,status, (int)uptime_sec,uptime))
+        cur.execute("INSERT OR REPLACE INTO DEVICES(ID_NAME, LOCATION, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME) values (?, ?, ?, ?, ?, ?)",  (id_name,location,timestamp,status, uptime_sec,uptime))
         con.commit()
     except lite.Error, e:
         print "mysql error: %s" % e
@@ -168,7 +168,7 @@ M:%S")
                 table = "DEVICES"
                 try:
                     cur = con.cursor()
-                    cur.execute("INSERT OR REPLACE INTO DEVICES(ID_NAME, LOCATION, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME) values (?, ?, ?, ?, ?, ?)",  (id_name,location,timestamp,status, (int)uptime_sec,uptime))
+                    cur.execute("INSERT OR REPLACE INTO DEVICES(ID_NAME, LOCATION, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME) values (?, ?, ?, ?, ?, ?)",  (id_name,location,timestamp,status, uptime_sec,uptime))
                     con.commit()
                 except lite.Error, e:
                     print "mysql error: %s" % e
