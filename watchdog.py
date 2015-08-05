@@ -110,7 +110,7 @@ class Arduino:
     def get_uptime(self):
 
         with open('/proc/uptime', 'r') as f:
-            uptime_seconds = float(f.readline().split()[0])
+            uptime_seconds = int(float(f.readline().split()[0]))
             uptime_string = str(datetime.timedelta(seconds = uptime_seconds))
             uptime_string = uptime_string.split('.')[0]
 #            print "UPTIME STR: " + uptime_string
