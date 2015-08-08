@@ -124,16 +124,17 @@ class Arduino:
                      ip = get_ip_address('eth0')
 
                      uptime_string , uptime_seconds = self.get_uptime()
-                     message = "ERRPI_ACKCLEAR " + ip + "/" + os.path.basename(self.port) + " " + str(uptime_seconds) + " " + uptime_string
-#                     print message
+                     message = "ERRPI_ACKCLEAR " + ip + " " + str(uptime_seconds) + " " + uptime_string
+#                     message = "ERRPI_ACKCLEAR " + ip + "/" + os.path.basename(self.port) + " " + str(uptime_seconds) + " " + uptime_string
+                     print message
 #str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))   
-                 else:
-                     ip = get_ip_address('eth0')
-                     uptime_string , uptime_seconds = self.get_uptime()
-                     message = "ERRDUINO_ACKCLEAR " + ip + "/" + os.path.basename(self.port) + " " + str(uptime_seconds) + " " + uptime_string
+#                 else:
+#                     ip = get_ip_address('eth0')
+#                     uptime_string , uptime_seconds = self.get_uptime()
+#                     message = "ERRDUINO_ACKCLEAR " + ip + "/" + os.path.basename(self.port) + " " + str(uptime_seconds) + " " + uptime_string
 # str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
 #                     print message
-                 watchsock.sendall(message)
+                     watchsock.sendall(message)
              except socket.error as e:
                  print "Send failed! %s" % e
                  status = socket_connect()
@@ -175,6 +176,9 @@ class Arduino:
 #either resets the watchdog timer due to good data, or waits til it expires
 #and triggers the watchdog.
     def scan(self):
+            global send_ok_timer
+            global send_ok_timer_pi
+            global send_ok_period
             sleep(0.005) #otherwise it eats every CPU :3
                          #delete/tweak this if you're getting lag
             try:
@@ -192,9 +196,12 @@ class Arduino:
                     else:
                         if (len(self.textln) != 0):
                         #sends the OK message for the connected Arduino
-                            if (self.send_ok == 1):
-                                self.send_ok_now("ARDUINO")
-                                self.send_ok = 0;
+#                            if (self.send_ok == 1):
+#                                print "timer " + str(time.time() - self.send_ok_timer) + " period " + str(send_ok_period)
+#                                if (time.time() - self.send_ok_timer > send_ok_period):
+#                                    self.send_ok_now("ARDUINO")
+#                                    self.send_ok_timer = time.time()
+#                                    self.send_ok = 0;
                             self.last_len = len(self.textln)
                         else:
                             self.last_len = 0
@@ -221,16 +228,13 @@ class Arduino:
                 self.start = time.time()
                 if (USE_SOCKETS):
                 #sends ERRPI_ACKCLEAR every X seconds
-                    global send_ok_timer
-                    global send_ok_timer_pi
-                    global send_ok_period
                     #print "timer " + str(time.time() - send_ok_timer) + " period " + str(send_ok_period)
                     if (time.time() - send_ok_timer_pi > send_ok_period + 30):
                         self.send_ok_now("PI")
                         send_ok_timer_pi = time.time()
-                    if (time.time() - self.send_ok_timer > send_ok_period):
-                        self.send_ok_now("ARDUINO")
-                        self.send_ok_timer = time.time()
+#                    if (time.time() - self.send_ok_timer > send_ok_period):
+#                        self.send_ok_now("ARDUINO")
+#                        self.send_ok_timer = time.time()
 
  #               print "self.start reset to " + str(self.start) + "at " + str(datetime.datetime.now())
             else: 
