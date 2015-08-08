@@ -23,7 +23,7 @@ periodic_period = 120 #seconds
 periodic_timer = time.time() #initialize timer
 
 # give a filename for the watchdog's SQLite database here
-DB_FILENAME = 'c:\\watchdog\\tcp_watchdog_server_sqlite\\demosdb.db'
+DB_FILENAME = 'c:\\watchdog\\tcp_watchdog_server\\demosdb.db'
 
 PORT = 6666 # port number to watch
 NUM_QUEUED_CONNECTIONS = 10 # number of backlogged connections
@@ -66,6 +66,7 @@ signal.signal(signal.SIGINT, signal_handler)
 def return_last_reset(new_uptime, last_uptime, id_name):
     if (last_uptime == None):
         last_uptime = 0
+    print "new uptime " + str(new_uptime) + " old uptime " + str(last_uptime)
     if (int(new_uptime) < int(last_uptime)):
         #detected a device reset since the last time we checked the uptime
         last_reset_time = datetime.datetime.now() - datetime.timedelta(seconds=int(new_uptime))

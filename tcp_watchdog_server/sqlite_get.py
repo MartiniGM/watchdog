@@ -26,7 +26,7 @@ with con:
     for row in rows:
 #    cur.execute("CREATE TABLE DEVICES(ID_NAME  TEXT PRIMARY KEY, LOCATION  TEXT, TIMESTAMP TEXT, UPTIME TEXT, UPTIME_SEC INT, LAST_UPTIME_SEC INT, STATUS TEXT, DEVICE_TYPE TEXT, LAST_RESET_TIMESTAMP TEXT)")
 
-        print str(row[0]) + " " + str(row[6]) + ", TS: " + str(row[2]) + ", Uptime: " + str(row[3]) + " (" + str(row[4]) + " sec), last uptime: " + str(row[5]) + " last reset at: " + str(row[8])
+        print str(row[0]) + " " + str(row[5]) + ", TS: " + str(row[2]) + ", Uptime: " + str(row[3]) + " (" + str(row[4]) + " sec), last uptime: " + str(row[8]) + " last reset at: " + str(row[7])
 
 
 
