@@ -9,7 +9,7 @@
 			"modernui" : 1
 		}
 ,
-		"rect" : [ 67.0, 110.0, 640.0, 480.0 ],
+		"rect" : [ 575.0, 755.0, 922.0, 332.0 ],
 		"bglocked" : 0,
 		"openinpresentation" : 1,
 		"default_fontsize" : 12.0,
@@ -93,7 +93,21 @@
 						"tags" : "",
 						"style" : "",
 						"subpatcher_template" : "",
+						"visible" : 1,
 						"boxes" : [ 							{
+								"box" : 								{
+									"id" : "obj-1",
+									"maxclass" : "newobj",
+									"numinlets" : 2,
+									"numoutlets" : 2,
+									"outlettype" : [ "bang", "" ],
+									"patching_rect" : [ 108.0, 138.0, 100.0, 22.0 ],
+									"style" : "",
+									"text" : "select OKAY"
+								}
+
+							}
+, 							{
 								"box" : 								{
 									"id" : "obj-179",
 									"maxclass" : "newobj",
@@ -129,19 +143,6 @@
 									"patching_rect" : [ 215.5, 175.0, 24.0, 22.0 ],
 									"style" : "",
 									"text" : "t b"
-								}
-
-							}
-, 							{
-								"box" : 								{
-									"id" : "obj-24",
-									"maxclass" : "newobj",
-									"numinlets" : 1,
-									"numoutlets" : 5,
-									"outlettype" : [ "", "", "", "", "" ],
-									"patching_rect" : [ 159.0, 147.0, 132.0, 22.0 ],
-									"style" : "",
-									"text" : "regexp .+_ACKCLEAR"
 								}
 
 							}
@@ -215,6 +216,24 @@
  ],
 						"lines" : [ 							{
 								"patchline" : 								{
+									"destination" : [ "obj-177", 0 ],
+									"disabled" : 0,
+									"hidden" : 0,
+									"source" : [ "obj-1", 0 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
+									"destination" : [ "obj-178", 0 ],
+									"disabled" : 0,
+									"hidden" : 0,
+									"source" : [ "obj-1", 1 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
 									"destination" : [ "obj-57", 0 ],
 									"disabled" : 0,
 									"hidden" : 0,
@@ -233,6 +252,15 @@
 							}
 , 							{
 								"patchline" : 								{
+									"destination" : [ "obj-1", 0 ],
+									"disabled" : 0,
+									"hidden" : 0,
+									"source" : [ "obj-179", 1 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
 									"destination" : [ "obj-181", 0 ],
 									"disabled" : 0,
 									"hidden" : 0,
@@ -242,37 +270,10 @@
 							}
 , 							{
 								"patchline" : 								{
-									"destination" : [ "obj-24", 0 ],
-									"disabled" : 0,
-									"hidden" : 0,
-									"source" : [ "obj-179", 1 ]
-								}
-
-							}
-, 							{
-								"patchline" : 								{
 									"destination" : [ "obj-179", 0 ],
 									"disabled" : 0,
 									"hidden" : 0,
 									"source" : [ "obj-180", 0 ]
-								}
-
-							}
-, 							{
-								"patchline" : 								{
-									"destination" : [ "obj-177", 0 ],
-									"disabled" : 0,
-									"hidden" : 0,
-									"source" : [ "obj-24", 2 ]
-								}
-
-							}
-, 							{
-								"patchline" : 								{
-									"destination" : [ "obj-178", 0 ],
-									"disabled" : 0,
-									"hidden" : 0,
-									"source" : [ "obj-24", 3 ]
 								}
 
 							}
@@ -328,11 +329,11 @@
 					"numinlets" : 2,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
-					"patching_rect" : [ 369.5, 430.0, 196.0, 22.0 ],
+					"patching_rect" : [ 439.5, 233.0, 196.0, 22.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 349.5, 0.0, 196.0, 22.0 ],
+					"presentation_rect" : [ 346.5, 0.0, 196.0, 22.0 ],
 					"style" : "",
-					"text" : "days"
+					"text" : "ERRPI_ACKCLEAR"
 				}
 
 			}
@@ -343,11 +344,11 @@
 					"numinlets" : 2,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
-					"patching_rect" : [ 313.5, 430.0, 50.0, 22.0 ],
+					"patching_rect" : [ 383.5, 233.0, 56.0, 22.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 259.5, 0.0, 88.0, 22.0 ],
+					"presentation_rect" : [ 258.5, 0.0, 88.0, 22.0 ],
 					"style" : "",
-					"text" : "10"
+					"text" : "1471740"
 				}
 
 			}
@@ -358,9 +359,9 @@
 					"numinlets" : 2,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
-					"patching_rect" : [ 53.5, 430.0, 258.0, 22.0 ],
+					"patching_rect" : [ 123.5, 233.0, 258.0, 22.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ -0.5, 0.0, 258.0, 22.0 ],
+					"presentation_rect" : [ 0.5, 0.0, 258.0, 22.0 ],
 					"style" : "",
 					"text" : "10.42.16.154"
 				}
