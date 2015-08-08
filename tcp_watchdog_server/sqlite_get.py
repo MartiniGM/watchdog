@@ -24,9 +24,9 @@ with con:
 
     print "DEVICES:"
     for row in rows:
-#ur.execute("CREATE TABLE DEVICES(ID_NAME  TEXT PRIMARY KEY, LOCATION  TEXT, TIMESTAMP TEXT, UPTIME TEXT, UPTIME_SEC INT, STATUS TEXT, DEVICE_TYPE TEXT )
+#    cur.execute("CREATE TABLE DEVICES(ID_NAME  TEXT PRIMARY KEY, LOCATION  TEXT, TIMESTAMP TEXT, UPTIME TEXT, UPTIME_SEC INT, LAST_UPTIME_SEC INT, STATUS TEXT, DEVICE_TYPE TEXT, LAST_RESET_TIMESTAMP TEXT)")
 
-        print str(row[0]) + ": " + str(row[5]) + " at " + str(row[1]) + ", TS: " + str(row[2]) + ", Uptime: " + str(row[3]) + " " + str(row[4]) + " type: " + str(row[6])
+        print str(row[0]) + " " + str(row[6]) + ", TS: " + str(row[2]) + ", Uptime: " + str(row[3]) + " (" + str(row[4]) + " sec), last uptime: " + str(row[5]) + " last reset at: " + str(row[8])
 
 
 

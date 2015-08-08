@@ -40,7 +40,7 @@ LOG_NUM_BACKUPS = 5 # five .out files before they roll over
 # EXIT HANDLER
 ####################                
 
-# upon exit, log exit msg, disconnect from mysql server and close sockets
+# upon exit, log exit msg, disconnect from sqlite and close sockets
 def exit_func():
     logger.warning ("     Watchdog server STOPPED on port " + str(PORT))
     con.close()
@@ -56,8 +56,28 @@ signal.signal(signal.SIGINT, signal_handler)
 
 ####################
 # FUNCTIONS
-####################                
+####################
 
+############################################################
+#return_last_reset()
+############################################################
+# figures last detected reset time and returns as timestamp string
+
+def return_last_reset(new_uptime, last_uptime, id_name):
+    if (last_uptime == None):
+        last_uptime = 0
+    if (int(new_uptime) < int(last_uptime)):
+        #detected a device reset since the last time we checked the uptime
+        last_reset_time = datetime.datetime.now() - datetime.timedelta(seconds=int(new_uptime))
+        last_reset_timestamp = str(last_reset_time.strftime("%b %d, %Y %H:%M:%S"))
+        logger.warning (id_name + " **DEVICE RESET** detected at " + last_reset_timestamp)
+        logger.debug("old uptime" + str(last_uptime) + ",new uptime " + str(new_uptime))
+        return last_reset_timestamp
+    else:
+        #just return the last recorded one so we can write it back to the DB
+        last_reset_timestamp = get_item_sqlite(id_name, "LAST_RESET_TIMESTAMP")
+        return last_reset_timestamp
+        
 ############################################################
 #return_status()
 ############################################################
@@ -94,16 +114,28 @@ def get_pis_sqlite(pi_or_arduino):
         return data
     
 ############################################################
-# get_location_sqlite()
+# get_item_sqlite()
 ############################################################        
 # returns location/description string, given an id_name
 
-def get_location_sqlite(id_name):
+def get_item_sqlite(id_name, item_name):
     global con
     try:
         cur = con.cursor()
-        cur.execute("SELECT ID_NAME, LOCATION FROM LOCATIONS WHERE ID_NAME LIKE\
- ?", ('%'+id_name+'%',))
+        if (item_name == "LOCATION"):
+            cur.execute("SELECT ID_NAME, LOCATION FROM LOCATIONS WHERE ID_NAME LIKE\
+            ?", ('%'+id_name+'%',))
+        else:
+            if (item_name == "LAST_UPTIME_SEC"):
+                cur.execute("SELECT ID_NAME, LAST_UPTIME_SEC FROM DEVICES WHERE ID_NAME LIKE\
+                ?", ('%'+id_name+'%',))
+            else:
+                if (item_name == "LAST_RESET_TIMESTAMP"):
+                    cur.execute("SELECT ID_NAME, LAST_RESET_TIMESTAMP FROM DEVICES WHERE ID_NAME LIKE\
+                    ?", ('%'+id_name+'%',))                    
+                else:
+                    print "Unknown item_name in get_item_sqlite"
+                    return "" #blank location, will show as None in SQL
         data = cur.fetchall()
         for row in data:
             return row[1]
@@ -177,17 +209,22 @@ def sql_data_sqlite(data, pi_or_arduino):
         uptime = "%d days, %02d:%02d:%02d" % (days, hours, mins, sec)
 
     timestamp = str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
-    location = get_location_sqlite(id_name)
-
+    location = get_item_sqlite(id_name, "LOCATION")
+    last_uptime = get_item_sqlite(id_name, "LAST_UPTIME_SEC")
     logger.info(id_name + " reports " + new_status + " with uptime " + uptime)
 
+    #gets timestamp of last detected reset from the new/old uptime
+    last_reset_timestamp = return_last_reset(uptime_sec, last_uptime, id_name)
+    #reset uptime and write back to the database
+    last_uptime = uptime_sec
+    
     # insert & commit, otherwise rollback
     try:
         cur = con.cursor()
-        cur.execute("INSERT OR REPLACE INTO DEVICES(ID_NAME, LOCATION, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME) values (?, ?, ?, ?, ?, ?)",  (id_name,location,timestamp,new_status, uptime_sec,uptime))
+        cur.execute("INSERT OR REPLACE INTO DEVICES(ID_NAME, LOCATION, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME, LAST_UPTIME_SEC, LAST_RESET_TIMESTAMP) values (?, ?, ?, ?, ?, ?, ?, ?)",  (id_name,location,timestamp,new_status, uptime_sec, uptime, last_uptime, last_reset_timestamp))
         con.commit()
     except lite.Error, e:
-        logger.error(" mysql error: %s" % e)
+        logger.error(" sqlite error: %s" % e)
         con.rollback()
 
 ############################################################
@@ -201,7 +238,7 @@ def parse_data_sqlite(data):
         timestamp = row[1]
         status = row[2]
         new_status = return_status(status)
-        location = get_location_sqlite(id_name)
+        location = get_item_sqlite(id_name, "LOCATION")
         uptime_sec = row[3]
         uptime = row[4]
         time_cur = datetime.datetime.now()
@@ -217,10 +254,10 @@ def parse_data_sqlite(data):
             logger.info(id_name + " silent for " + str(total_seconds) + " seconds, setting " + status + " with uptime " + uptime)
             try:
                 cur = con.cursor()
-                cur.execute("INSERT OR REPLACE INTO DEVICES(ID_NAME, LOCATION, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME) values (?, ?, ?, ?, ?, ?)",  (id_name,location,timestamp,status, uptime_sec,uptime))
+                cur.execute("INSERT OR REPLACE INTO DEVICES(ID_NAME, LOCATION, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME, LAST_UPTIME_SEC) values (?, ?, ?, ?, ?, ?, ?)",  (id_name,location,timestamp,status, uptime_sec,uptime,uptime_sec))
                 con.commit()
             except lite.Error, e:
-                logger.error("mysql error: %s" % e)
+                logger.error("sqlite error: %s" % e)
                 con.rollback()
 
 ############################################################                
@@ -418,5 +455,5 @@ if __name__ == "__main__":
     ##################
     # EXIT
     ##################                
-    # upon exit, disconnect from mysql server and close sockets
+    # upon exit, disconnect from sqlite and close sockets
     exit_func()
