@@ -17,14 +17,14 @@ send_ok_period = 30 #sends ERRPI_ACKCLEAR every 30s
 send_ok_timer = time.time()
 send_ok_timer_pi = time.time()
 
-#comment this to turn socket messages (to the TCP watchdog server) off 
+# comment this to turn socket messages (to the TCP watchdog server) off 
 USE_SOCKETS = 1
 
-#set TCP watchdog IP and port here
+# set TCP watchdog IP and port here
 host = '10.42.16.17';
 port = 6666;
 
-#creates a socket up-front, just to initialize it 
+# creates a socket up-front, just to initialize it 
 if (USE_SOCKETS):
     #create an INET, STREAMing socket
     try:
@@ -32,7 +32,7 @@ if (USE_SOCKETS):
     except socket.error as e:
             print 'Failed to create socket: %s' % e
 
-#gets IP address of eth0 as a string
+# gets IP address of eth0 as a string
 def get_ip_address(ifname):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     return socket.inet_ntoa(fcntl.ioctl(
@@ -41,7 +41,16 @@ def get_ip_address(ifname):
         struct.pack('256s', ifname[:15])
     )[20:24])
 
-#connects to the TCP watchdog. See host/port above. Run in a loop to retry
+# returns this Pi's uptime in seconds and as formatted string
+def get_uptime():
+    with open('/proc/uptime', 'r') as f:
+        uptime_seconds = int(float(f.readline().split()[0]))
+        uptime_string = str(datetime.timedelta(seconds = uptime_seconds))
+        uptime_string = uptime_string.split('.')[0]
+#            print "UPTIME STR: " + uptime_string
+        return (uptime_string, uptime_seconds)
+
+# connects to the TCP watchdog. See host/port above. Run in a loop to retry
 def socket_connect():
     global watchsock
     global host
@@ -59,12 +68,59 @@ def socket_connect():
             print 'Socket Connected to ' + host + ' on ip ' + remote_ip
             return 1
 
+# this sends an OK message (ERRDUINO_ACKCLEAR or ERRPI_ACKCLEAR) via TCP
+# moved this up because for now watchdog.py doesn't send OK msgs for
+# connected devices -- serial2pipe does that
+def send_ok_now(pi_or_arduino):
+        if (USE_SOCKETS):
+             try:
+                 if (pi_or_arduino == "PI"):
+                     ip = get_ip_address('eth0')
+
+                     uptime_string , uptime_seconds = get_uptime()
+                     message = "ERRPI_ACKCLEAR " + ip + " " + str(uptime_seconds) + " " + uptime_string
+#                     message = "ERRPI_ACKCLEAR " + ip + "/" + os.path.basename(self.port) + " " + str(uptime_seconds) + " " + uptime_string
+                     print message
+#str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))   
+#                 else:
+#                     ip = get_ip_address('eth0')
+#                     uptime_string , uptime_seconds = get_uptime()
+#                     message = "ERRDUINO_ACKCLEAR " + ip + "/" + os.path.basename(self.port) + " " + str(uptime_seconds) + " " + uptime_string
+# str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
+#                     print message
+                     watchsock.sendall(message)
+             except socket.error as e:
+                 print "Send failed! %s" % e
+                 status = socket_connect()
+                 if (status == 1):
+                     watchsock.sendall(message)
+                 else:
+                     print "failed to send " + message
+                 #put retry here
+             except IOError as e:
+                 print "failed to send "
+                 #put retry here
+        
 # ensures we can kill the script with ctrl-C for testing
 def signal_handler(signal, frame):
     print('Exiting...')
     os._exit(0) 
 
 signal.signal(signal.SIGINT, signal_handler)
+
+def pi_scan():
+     global send_ok_timer
+     global send_ok_timer_pi
+     global send_ok_period
+     sleep(1) #otherwise it eats every CPU :3
+     #delete/tweak this if you're getting lag
+     #does not need to be super fast because this Pi is not receiving data
+     try:
+         if (time.time() - send_ok_timer_pi > send_ok_period + 30):
+             send_ok_now("PI")
+             send_ok_timer_pi = time.time()
+     except Exception, e:
+         print "FAILURE in pi_scan! %s" % e
 
 #class with all internal variables & its own named pipe for each Arduino
 class Arduino:
@@ -97,7 +153,7 @@ class Arduino:
         except Exception, e:
             print "Failed to open %s : %s!" % (self.port, e)
 
-#this opens the named pipe
+# this opens the named pipe
     def openPort(self):
         if (self.not_open):
             try:
@@ -107,54 +163,14 @@ class Arduino:
             else:
                 self.not_open = 0;
 
-    def get_uptime(self):
-
-        with open('/proc/uptime', 'r') as f:
-            uptime_seconds = int(float(f.readline().split()[0]))
-            uptime_string = str(datetime.timedelta(seconds = uptime_seconds))
-            uptime_string = uptime_string.split('.')[0]
-#            print "UPTIME STR: " + uptime_string
-            return (uptime_string, uptime_seconds)
-
-#this sends an OK message (ERRDUINO_ACKCLEAR or ERRPI_ACKCLEAR) via TCP
-    def send_ok_now(self, pi_or_arduino):
-        if (USE_SOCKETS):
-             try:
-                 if (pi_or_arduino == "PI"):
-                     ip = get_ip_address('eth0')
-
-                     uptime_string , uptime_seconds = self.get_uptime()
-                     message = "ERRPI_ACKCLEAR " + ip + " " + str(uptime_seconds) + " " + uptime_string
-#                     message = "ERRPI_ACKCLEAR " + ip + "/" + os.path.basename(self.port) + " " + str(uptime_seconds) + " " + uptime_string
-                     print message
-#str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))   
-#                 else:
-#                     ip = get_ip_address('eth0')
-#                     uptime_string , uptime_seconds = self.get_uptime()
-#                     message = "ERRDUINO_ACKCLEAR " + ip + "/" + os.path.basename(self.port) + " " + str(uptime_seconds) + " " + uptime_string
-# str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
-#                     print message
-                     watchsock.sendall(message)
-             except socket.error as e:
-                 print "Send failed! %s" % e
-                 status = socket_connect()
-                 if (status == 1):
-                     watchsock.sendall(message)
-                 else:
-                     print "failed to send " + message
-                 #put retry here
-             except IOError as e:
-                 print "failed to send "
-                 #put retry here
-
-#this sends the watchdog message (errcode) via TCP
+# this sends the watchdog message (errcode) via TCP
     def watchdog(self, errcode):
 #        print("Watchdog called on port " + self.port + " Time since last dog: " + str(time.time() - self.wdtimerstart))
         if (time.time() - self.wdtimerstart > self.dogtime):
             self.wdtimerstart = time.time();
             self.send_ok = 1; #this tells the watchdog to send an ACKCLEAR
                               #on the next good read
-            uptime_string, uptime_seconds = self.get_uptime()
+            uptime_string, uptime_seconds = get_uptime()
             print("^^^^^WATCHDOG ACTIVE^^^^^:"+ os.path.basename(self.port) + " " + str(uptime_seconds) + " " + uptime_string)
 #str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S")))
             if (USE_SOCKETS):
@@ -172,9 +188,9 @@ class Arduino:
                     else:
                         print "failed to send " + message
 
-#this is the main scan loop for each arduino. Gets data over the pipe, and 
-#either resets the watchdog timer due to good data, or waits til it expires
-#and triggers the watchdog.
+# this is the main scan loop for each arduino. Gets data over the pipe, and 
+# either resets the watchdog timer due to good data, or waits til it expires
+# and triggers the watchdog.
     def scan(self):
             global send_ok_timer
             global send_ok_timer_pi
@@ -182,7 +198,7 @@ class Arduino:
             sleep(0.005) #otherwise it eats every CPU :3
                          #delete/tweak this if you're getting lag
             try:
-#try block creates, opens, and reads serials. if any failures, retry.
+# try block creates, opens, and reads serials. if any failures, retry.
                 self.openPort()
                 #it's difficult to get non-blocking pipes in Python, but the 
                 #following works!
@@ -230,7 +246,7 @@ class Arduino:
                 #sends ERRPI_ACKCLEAR every X seconds
                     #print "timer " + str(time.time() - send_ok_timer) + " period " + str(send_ok_period)
                     if (time.time() - send_ok_timer_pi > send_ok_period + 30):
-                        self.send_ok_now("PI")
+                        send_ok_now("PI")
                         send_ok_timer_pi = time.time()
 #                    if (time.time() - self.send_ok_timer > send_ok_period):
 #                        self.send_ok_now("ARDUINO")
@@ -238,9 +254,9 @@ class Arduino:
 
  #               print "self.start reset to " + str(self.start) + "at " + str(datetime.datetime.now())
             else: 
-                    #because the Pi itself is still up even when its arduinos are not, we need to duplicate this here or we will never hear back from the pi is all arduinos are down
+                    # because the Pi itself is still up even when its arduinos are not, we need to duplicate this here or we will never hear back from the pi is all arduinos are down
                 if (time.time() - send_ok_timer_pi > send_ok_period + 30):
-                    self.send_ok_now("PI")
+                    send_ok_now("PI")
                     send_ok_timer_pi = time.time()
                  #print "Warning! no data on port " + self.port + " in sec: " + str(time.time() - self.start)
                 #likewise, if it's been too long since we saw data, pop the watchdog
@@ -264,18 +280,25 @@ arduino1 = Arduino("./piezo_wd_pipe", 1, 0.0, 40.0, 100.0)
 arduino2 = Arduino("./laser_wd_pipe", 1, 0.0, 40.0, 100.0)
 arduino3 = Arduino("./chest_wd_pipe", 1, 0.0, 40.0, 100.0)
 
-# builds a list to step through the arduinos
+# builds a list to step through the arduinos.
+# Leave this list blank (as below) to monitor only this Pi.
 arduinolist = []
-arduinolist.append(arduino1)
-arduinolist.append(arduino2)
-arduinolist.append(arduino3)
+#arduinolist.append(arduino1)
+#arduinolist.append(arduino2)
+#arduinolist.append(arduino3)
 
 while 1:
-    if (len(arduinolist) == 1):
-        arduino1.scan()
+    # if there's nothing connected we still want to monitor this Pi.
+    # just send OKAY every N seconds.
+    if (len(arduinolist) == 0):
+        pi_scan()
+    # otherwise go through the list and monitor each connected arduino.
     else:
-        for l in arduinolist:
-            l.scan()
+        if (len(arduinolist) == 1):
+            arduino1.scan()
+        else:
+            for l in arduinolist:
+                l.scan()
 
 # fifth version. Uses named pipes rather than serial comms!
 
