@@ -276,9 +276,9 @@ if (USE_SOCKETS):
 #use serial2pipe to split the Arduino output into two named pipes, then attach
 #the following to one of the pipes, and the other to the program to be 
 #monitored!
-arduino1 = Arduino("./piezo_wd_pipe", 1, 0.0, 40.0, 100.0)
-arduino2 = Arduino("./laser_wd_pipe", 1, 0.0, 40.0, 100.0)
-arduino3 = Arduino("./chest_wd_pipe", 1, 0.0, 40.0, 100.0)
+#arduino1 = Arduino("./piezo_wd_pipe", 1, 0.0, 40.0, 100.0)
+#arduino2 = Arduino("./laser_wd_pipe", 1, 0.0, 40.0, 100.0)
+#arduino3 = Arduino("./chest_wd_pipe", 1, 0.0, 40.0, 100.0)
 
 # builds a list to step through the arduinos.
 # Leave this list blank (as below) to monitor only this Pi.
@@ -286,6 +286,8 @@ arduinolist = []
 #arduinolist.append(arduino1)
 #arduinolist.append(arduino2)
 #arduinolist.append(arduino3)
+
+print len(arduinolist)
 
 while 1:
     # if there's nothing connected we still want to monitor this Pi.
