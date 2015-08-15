@@ -65,17 +65,20 @@ signal.signal(signal.SIGINT, signal_handler)
 
 def return_last_reset(new_uptime, last_uptime, id_name):
     last_reset_timestamp_check = get_item_sqlite(id_name, "LAST_RESET_TIMESTAMP")
-    if (last_reset_timestamp_check == None):
+    uptime_sec = get_item_sqlite(id_name, "UPTIME_SEC")
+  #  print "*******************last check is " + str(last_reset_timestamp_check) + " uptime is " + str(uptime_sec)
+    if (last_reset_timestamp_check == None and uptime_sec != None):
         #get the uptime and subtract from the current time to create baseline ts
-        uptime_sec = get_item_sqlite(id_name, "UPTIME_SEC")
         last_reset_time = datetime.datetime.now() - datetime.timedelta(seconds=int(uptime_sec))
         last_reset_timestamp = str(last_reset_time.strftime("%b %d, %Y %H:%M:%S"))
-        print "*****************NOW SETTING BLANK RESET TS TO: " + str(last_reset_timestamp) 
+#        print "*****************NOW SETTING BLANK RESET TS TO: " + str(last_reset_timestamp) 
         return last_reset_timestamp
     else:
-
         if (last_uptime == None):
-            last_uptime = 0
+            #just return the last recorded one so we can write it back to the DB
+            last_reset_timestamp = get_item_sqlite(id_name, "LAST_RESET_TIMESTAMP")
+            return last_reset_timestamp
+        else:
             print "new uptime " + str(new_uptime) + " old uptime " + str(last_uptime)
             if (int(new_uptime) < int(last_uptime)):
                 #detected a device reset since the last time we checked the uptime
