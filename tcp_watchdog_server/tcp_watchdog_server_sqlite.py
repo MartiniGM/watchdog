@@ -64,20 +64,30 @@ signal.signal(signal.SIGINT, signal_handler)
 # figures last detected reset time and returns as timestamp string
 
 def return_last_reset(new_uptime, last_uptime, id_name):
-    if (last_uptime == None):
-        last_uptime = 0
-    print "new uptime " + str(new_uptime) + " old uptime " + str(last_uptime)
-    if (int(new_uptime) < int(last_uptime)):
-        #detected a device reset since the last time we checked the uptime
-        last_reset_time = datetime.datetime.now() - datetime.timedelta(seconds=int(new_uptime))
+    last_reset_timestamp_check = get_item_sqlite(id_name, "LAST_RESET_TIMESTAMP")
+    if (last_reset_timestamp_check == None):
+        #get the uptime and subtract from the current time to create baseline ts
+        uptime_sec = get_item_sqlite(id_name, "UPTIME_SEC")
+        last_reset_time = datetime.datetime.now() - datetime.timedelta(seconds=int(uptime_sec))
         last_reset_timestamp = str(last_reset_time.strftime("%b %d, %Y %H:%M:%S"))
-        logger.warning (id_name + " **DEVICE RESET** detected at " + last_reset_timestamp)
-        logger.debug("old uptime" + str(last_uptime) + ",new uptime " + str(new_uptime))
+        print "*****************NOW SETTING BLANK RESET TS TO: " + str(last_reset_timestamp) 
         return last_reset_timestamp
     else:
-        #just return the last recorded one so we can write it back to the DB
-        last_reset_timestamp = get_item_sqlite(id_name, "LAST_RESET_TIMESTAMP")
-        return last_reset_timestamp
+
+        if (last_uptime == None):
+            last_uptime = 0
+            print "new uptime " + str(new_uptime) + " old uptime " + str(last_uptime)
+            if (int(new_uptime) < int(last_uptime)):
+                #detected a device reset since the last time we checked the uptime
+                last_reset_time = datetime.datetime.now() - datetime.timedelta(seconds=int(new_uptime))
+                last_reset_timestamp = str(last_reset_time.strftime("%b %d, %Y %H:%M:%S"))
+                logger.warning (id_name + " **DEVICE RESET** detected at " + last_reset_timestamp)
+                logger.debug("old uptime" + str(last_uptime) + ",new uptime " + str(new_uptime))
+                return last_reset_timestamp
+            else:
+                #just return the last recorded one so we can write it back to the DB
+                last_reset_timestamp = get_item_sqlite(id_name, "LAST_RESET_TIMESTAMP")
+                return last_reset_timestamp
         
 ############################################################
 #return_status()
@@ -131,12 +141,16 @@ def get_item_sqlite(id_name, item_name):
                 cur.execute("SELECT ID_NAME, LAST_UPTIME_SEC FROM DEVICES WHERE ID_NAME LIKE\
                 ?", ('%'+id_name+'%',))
             else:
-                if (item_name == "LAST_RESET_TIMESTAMP"):
-                    cur.execute("SELECT ID_NAME, LAST_RESET_TIMESTAMP FROM DEVICES WHERE ID_NAME LIKE\
-                    ?", ('%'+id_name+'%',))                    
+                if (item_name == "UPTIME_SEC"):
+                    cur.execute("SELECT ID_NAME, UPTIME_SEC FROM DEVICES WHERE ID_NAME LIKE\
+                    ?", ('%'+id_name+'%',))
                 else:
-                    print "Unknown item_name in get_item_sqlite"
-                    return "" #blank location, will show as None in SQL
+                    if (item_name == "LAST_RESET_TIMESTAMP"):
+                        cur.execute("SELECT ID_NAME, LAST_RESET_TIMESTAMP FROM DEVICES WHERE ID_NAME LIKE\
+                        ?", ('%'+id_name+'%',))                    
+                    else:
+                        print "Unknown item_name in get_item_sqlite"
+                        return "" #blank location, will show as None in SQL
         data = cur.fetchall()
         for row in data:
             return row[1]
