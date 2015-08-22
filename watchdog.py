@@ -2,7 +2,7 @@
 import serial
 import socket 
 from sys import exit
-import os, fcntl
+import os, fcntl, re
 import time
 import signal
 import time    
@@ -12,16 +12,18 @@ import struct
 from contextlib import contextmanager
 from multiprocessing.dummy import Pool as ThreadPool 
 from time import sleep
- 
+import subprocess
+
 send_ok_period = 30 #sends ERRPI_ACKCLEAR every 30s
 send_ok_timer = time.time()
 send_ok_timer_pi = time.time()
+send_ok_timer_software = time.time()
 
 # comment this to turn socket messages (to the TCP watchdog server) off 
 USE_SOCKETS = 1
 
 # set TCP watchdog IP and port here
-host = '10.42.16.17';
+host = '10.42.16.170';
 port = 6666;
 
 # creates a socket up-front, just to initialize it 
@@ -71,21 +73,25 @@ def socket_connect():
 # this sends an OK message (ERRDUINO_ACKCLEAR or ERRPI_ACKCLEAR) via TCP
 # moved this up because for now watchdog.py doesn't send OK msgs for
 # connected devices -- serial2pipe does that
-def send_ok_now(pi_or_arduino):
+def send_ok_now(pi_or_arduino, status, append_string):
         if (USE_SOCKETS):
              try:
                  if (pi_or_arduino == "PI"):
                      ip = get_ip_address('eth0')
 
                      uptime_string , uptime_seconds = get_uptime()
-                     message = "ERRPI_ACKCLEAR " + ip + " " + str(uptime_seconds) + " " + uptime_string
+                     if len((append_string) == 0):
+                         message = status + " " + ip + " " + str(uptime_seconds) + " " + uptime_string
+                     else:
+                         message = status + " " + ip + "/" + append_message + " " str(uptime_seconds) + " " + uptime_string
+
 #                     message = "ERRPI_ACKCLEAR " + ip + "/" + os.path.basename(self.port) + " " + str(uptime_seconds) + " " + uptime_string
                      print message
 #str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))   
 #                 else:
 #                     ip = get_ip_address('eth0')
 #                     uptime_string , uptime_seconds = get_uptime()
-#                     message = "ERRDUINO_ACKCLEAR " + ip + "/" + os.path.basename(self.port) + " " + str(uptime_seconds) + " " + uptime_string
+#                     message = "ERRPI_ACKCLEAR " + ip + "/" + os.path.basename(self.port) + " " + str(uptime_seconds) + " " + uptime_string
 # str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
 #                     print message
                      watchsock.sendall(message)
@@ -108,8 +114,36 @@ def signal_handler(signal, frame):
 
 signal.signal(signal.SIGINT, signal_handler)
 
+# returns True if this process is running, False if not.
+def process_exists(proc_name):
+    if (os.name != 'nt'):
+#linux or mac type
+        ps = subprocess.Popen("ps ax -o pid= -o args= ", shell=True, stdout=subprocess.PIPE)
+        ps_pid = ps.pid
+        output = ps.stdout.read()
+        ps.stdout.close()
+        ps.wait()
+
+        for line in output.split("\n"):
+            res = re.findall("(\d+) (.*)", line)
+            if res:
+                pid = int(res[0][0])
+                if proc_name in res[0][1] and pid != os.getpid() and pid != ps_pid:
+                    return True
+        return False
+    else:
+#windowsish
+        import wmi
+        c = wmi.WMI ()
+
+        for process in c.Win32_Process ():
+            print process.ProcessId, process.Name
+            if proc_name in process.Name:
+                return True
+        return False
+
+# Sends OKAY messages every N seconds for this Pi/PC
 def pi_scan():
-     global send_ok_timer
      global send_ok_timer_pi
      global send_ok_period
      sleep(1) #otherwise it eats every CPU :3
@@ -117,10 +151,26 @@ def pi_scan():
      #does not need to be super fast because this Pi is not receiving data
      try:
          if (time.time() - send_ok_timer_pi > send_ok_period + 30):
-             send_ok_now("PI")
+             send_ok_now("PI", "ERRPI_ACKCLEAR", "")
              send_ok_timer_pi = time.time()
      except Exception, e:
          print "FAILURE in pi_scan! %s" % e
+
+# checks software on this Pi or PC, sends OKAY or NONRESPONSIVE
+def software_scan(software_list):
+     global send_ok_timer_software
+     global send_ok_period
+     sleep(1) #otherwise eats CPU
+     try:
+         if (time.time() - send_ok_timer_software > send_ok_period + 15):
+             for (proc_name, proc_path ) in software_list:
+                 print "Scanning " + proc_name + " , " + proc_path
+                 if (process_exists(proc_name)):
+                     print "Exists!"
+                     send_ok_now("PI", "ERRPI_ACKCLEAR", proc_name)
+                 else:
+                     send_ok_now("PI", "ERRPI_NOREPLY", proc_name)
+                     print "Is Down!"
 
 #class with all internal variables & its own named pipe for each Arduino
 class Arduino:
@@ -246,7 +296,7 @@ class Arduino:
                 #sends ERRPI_ACKCLEAR every X seconds
                     #print "timer " + str(time.time() - send_ok_timer) + " period " + str(send_ok_period)
                     if (time.time() - send_ok_timer_pi > send_ok_period + 30):
-                        send_ok_now("PI")
+                        send_ok_now("PI", "ERRPI_ACKCLEAR", "")
                         send_ok_timer_pi = time.time()
 #                    if (time.time() - self.send_ok_timer > send_ok_period):
 #                        self.send_ok_now("ARDUINO")
@@ -256,7 +306,7 @@ class Arduino:
             else: 
                     # because the Pi itself is still up even when its arduinos are not, we need to duplicate this here or we will never hear back from the pi is all arduinos are down
                 if (time.time() - send_ok_timer_pi > send_ok_period + 30):
-                    send_ok_now("PI")
+                    send_ok_now("PI", "ERRPI_ACKCLEAR", "")
                     send_ok_timer_pi = time.time()
                  #print "Warning! no data on port " + self.port + " in sec: " + str(time.time() - self.start)
                 #likewise, if it's been too long since we saw data, pop the watchdog
@@ -287,10 +337,13 @@ arduinolist = []
 #arduinolist.append(arduino2)
 #arduinolist.append(arduino3)
 
-print len(arduinolist)
+# builds a list to step through the software on this Pi.
+# Leave this list blank to skip software monitoring.
+softwarelist = []
+softwarelist.append(("service.sh", "/home/pi/RUNNING/scripts/service.sh"))
 
 while 1:
-    # if there's nothing connected we still want to monitor this Pi.
+    # if there's nothing connected we still want to monitor this Pi or PC.
     # just send OKAY every N seconds.
     if (len(arduinolist) == 0):
         pi_scan()
@@ -302,6 +355,9 @@ while 1:
             for l in arduinolist:
                 l.scan()
 
-# fifth version. Uses named pipes rather than serial comms!
+    #same for the list of software. treat software just like a device!
+    software_scan(softwarelist)
+
+# sixth version. Sends software status updates
 
 
