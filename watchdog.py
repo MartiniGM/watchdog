@@ -15,8 +15,7 @@ from time import sleep
 import subprocess
 import traceback
 
-#send_ok_period = 30 #sends ERRPI_ACKCLEAR every 30s
-send_ok_period = 5
+send_ok_period = 30 #sends ERRPI_ACKCLEAR every 30s
 send_ok_timer = time.time()
 send_ok_timer_pi = time.time()
 send_ok_timer_software = time.time()
