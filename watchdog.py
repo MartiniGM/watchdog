@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import serial
 import socket 
-from sys import exit
+import sys
 import os, fcntl, re
 import time
 import signal
@@ -13,8 +13,10 @@ from contextlib import contextmanager
 from multiprocessing.dummy import Pool as ThreadPool 
 from time import sleep
 import subprocess
+import traceback
 
-send_ok_period = 30 #sends ERRPI_ACKCLEAR every 30s
+#send_ok_period = 30 #sends ERRPI_ACKCLEAR every 30s
+send_ok_period = 5
 send_ok_timer = time.time()
 send_ok_timer_pi = time.time()
 send_ok_timer_software = time.time()
@@ -23,7 +25,7 @@ send_ok_timer_software = time.time()
 USE_SOCKETS = 1
 
 # set TCP watchdog IP and port here
-host = '10.42.16.170';
+host = '10.42.16.17';
 port = 6666;
 
 # creates a socket up-front, just to initialize it 
@@ -80,13 +82,13 @@ def send_ok_now(pi_or_arduino, status, append_string):
                      ip = get_ip_address('eth0')
 
                      uptime_string , uptime_seconds = get_uptime()
-                     if len((append_string) == 0):
-                         message = status + " " + ip + " " + str(uptime_seconds) + " " + uptime_string
+                     if (len(str(append_string)) == 0):
+                         message = status + " " + ip + " " + str(uptime_seconds) + " " + str(uptime_string)                         
                      else:
-                         message = status + " " + ip + "/" + append_message + " " str(uptime_seconds) + " " + uptime_string
+                         message = status + " " + ip + "/" + str(append_string) + " " + str(uptime_seconds) + " " + str(uptime_string)
 
 #                     message = "ERRPI_ACKCLEAR " + ip + "/" + os.path.basename(self.port) + " " + str(uptime_seconds) + " " + uptime_string
-                     print message
+#                     print message
 #str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))   
 #                 else:
 #                     ip = get_ip_address('eth0')
@@ -154,6 +156,9 @@ def pi_scan():
              send_ok_now("PI", "ERRPI_ACKCLEAR", "")
              send_ok_timer_pi = time.time()
      except Exception, e:
+         for frame in traceback.extract_tb(sys.exc_info()[2]):
+             fname,lineno,fn,text = frame
+             print "     in %s on line %d" % (fname, lineno)
          print "FAILURE in pi_scan! %s" % e
 
 # checks software on this Pi or PC, sends OKAY or NONRESPONSIVE
@@ -164,17 +169,21 @@ def software_scan(software_list):
      try:
          if (time.time() - send_ok_timer_software > send_ok_period + 15):
              for (proc_name, proc_path ) in software_list:
-                 print "Scanning " + proc_name + " , " + proc_path
+                 #print "Scanning " + proc_name + " , " + proc_path
                  if (process_exists(proc_name)):
-                     print "Exists!"
+                  #   print "Exists!"
                      send_ok_now("PI", "ERRPI_ACKCLEAR", proc_name)
                  else:
                      send_ok_now("PI", "ERRPI_NOREPLY", proc_name)
-                     print "Is Down!"
+                   #  print "Is Down!"
+     except Exception, e:
+         for frame in traceback.extract_tb(sys.exc_info()[2]):
+             fname,lineno,fn,text = frame
+             print "     in %s on line %d" % (fname, lineno)
+             print "Error in software_scan(): %s" % e
 
 #class with all internal variables & its own named pipe for each Arduino
 class Arduino:
-    
     def __init__(self, port, pin, timeout, wdtime, dogtime):
 
  # port: input pipe filename, from Arduino (i.e. "/path/to/watchdog_pipe")
@@ -341,6 +350,9 @@ arduinolist = []
 # Leave this list blank to skip software monitoring.
 softwarelist = []
 softwarelist.append(("service.sh", "/home/pi/RUNNING/scripts/service.sh"))
+softwarelist.append(("service2.sh", "/home/pi/RUNNING/scripts/service2.sh"))
+softwarelist.append(("service3.sh", "/home/pi/RUNNING/scripts/service3.sh"))
+softwarelist.append(("service4.sh", "/home/pi/RUNNING/scripts/service4.sh"))
 
 while 1:
     # if there's nothing connected we still want to monitor this Pi or PC.
