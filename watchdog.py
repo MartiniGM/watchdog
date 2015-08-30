@@ -37,22 +37,42 @@ if (USE_SOCKETS):
 
 # gets IP address of eth0 as a string
 def get_ip_address(ifname):
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    return socket.inet_ntoa(fcntl.ioctl(
-        s.fileno(),
-        0x8915,  # SIOCGIFADDR
-        struct.pack('256s', ifname[:15])
-    )[20:24])
+    if (os.name != 'nt'):
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        return socket.inet_ntoa(fcntl.ioctl(
+            s.fileno(),
+            0x8915,  # SIOCGIFADDR
+            struct.pack('256s', ifname[:15])
+        )[20:24])
+    else:
+        hostname = socket.gethostname()
+        IP = socket.gethostbyname(hostname)
+        return(IP)
 
 # returns this Pi's uptime in seconds and as formatted string
 def get_uptime():
-    with open('/proc/uptime', 'r') as f:
-        uptime_seconds = int(float(f.readline().split()[0]))
-        uptime_string = str(datetime.timedelta(seconds = uptime_seconds))
-        uptime_string = uptime_string.split('.')[0]
+    if (os.name != 'nt'):
+        try:
+            with open('/proc/uptime', 'r') as f:
+                uptime_seconds = int(float(f.readline().split()[0]))
+                uptime_string = str(datetime.timedelta(seconds = uptime_seconds))
+                uptime_string = uptime_string.split('.')[0]
+                #            print "UPTIME STR: " + uptime_string
+                return (uptime_string, uptime_seconds)
+        except Exception, e:
+            print "can't get uptime, %s" % e
+            return ("", 0)
+    else:
+        try:
+            import win32api
+            uptime_seconds = win32api.GetTickCount() / 1000
+            uptime_string = str(datetime.timedelta(seconds = uptime_seconds))
+            uptime_string = uptime_string.split('.')[0]
 #            print "UPTIME STR: " + uptime_string
-        return (uptime_string, uptime_seconds)
-
+            return (uptime_string, uptime_seconds)
+        except Exception, e:
+            print "can't get uptime, %s" % e
+            return ("", 0)
 # connects to the TCP watchdog. See host/port above. Run in a loop to retry
 def socket_connect():
     global watchsock
@@ -79,7 +99,7 @@ def send_ok_now(pi_or_arduino, status, append_string):
              try:
                  if (pi_or_arduino == "PI"):
                      ip = get_ip_address('eth0')
-
+                     print ip
                      uptime_string , uptime_seconds = get_uptime()
                      if (len(str(append_string)) == 0):
                          message = status + " " + ip + " " + str(uptime_seconds) + " " + str(uptime_string)                         
@@ -99,13 +119,14 @@ def send_ok_now(pi_or_arduino, status, append_string):
              except socket.error as e:
                  print "Send failed! %s" % e
                  status = socket_connect()
+                 print status
                  if (status == 1):
                      watchsock.sendall(message)
                  else:
-                     print "failed to send " + message
+                     print "failed to send %s" % e
                  #put retry here
              except IOError as e:
-                 print "failed to send "
+                 print "failed to send %s" % e
                  #put retry here
         
 # ensures we can kill the script with ctrl-C for testing
@@ -138,7 +159,7 @@ def process_exists(proc_name):
         c = wmi.WMI ()
 
         for process in c.Win32_Process ():
-            print process.ProcessId, process.Name
+            #print process.ProcessId, process.Name
             if proc_name in process.Name:
                 return True
         return False
@@ -168,13 +189,13 @@ def software_scan(software_list):
      try:
          if (time.time() - send_ok_timer_software > send_ok_period + 15):
              for (proc_name, proc_path ) in software_list:
-                 #print "Scanning " + proc_name + " , " + proc_path
+                 print "Scanning " + proc_name + " , " + proc_path
                  if (process_exists(proc_name)):
-                  #   print "Exists!"
+                     print "Exists!"
                      send_ok_now("PI", "ERRPI_ACKCLEAR", proc_name)
                  else:
                      send_ok_now("PI", "ERRPI_NOREPLY", proc_name)
-                   #  print "Is Down!"
+                     print "Is Down!"
      except Exception, e:
          for frame in traceback.extract_tb(sys.exc_info()[2]):
              fname,lineno,fn,text = frame
@@ -244,7 +265,7 @@ class Arduino:
                     if (status == 1):
                         watchsock.sendall(message)
                     else:
-                        print "failed to send " + message
+                        print "failed to send %s" % e
 
 # this is the main scan loop for each arduino. Gets data over the pipe, and 
 # either resets the watchdog timer due to good data, or waits til it expires
@@ -348,10 +369,7 @@ arduinolist = []
 # builds a list to step through the software on this Pi.
 # Leave this list blank to skip software monitoring.
 softwarelist = []
-softwarelist.append(("service.sh", "/home/pi/RUNNING/scripts/service.sh"))
-softwarelist.append(("service2.sh", "/home/pi/RUNNING/scripts/service2.sh"))
-softwarelist.append(("service3.sh", "/home/pi/RUNNING/scripts/service3.sh"))
-softwarelist.append(("service4.sh", "/home/pi/RUNNING/scripts/service4.sh"))
+softwarelist.append(("Max.exe", ""))
 
 while 1:
     # if there's nothing connected we still want to monitor this Pi or PC.
