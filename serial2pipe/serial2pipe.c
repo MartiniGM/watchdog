@@ -19,19 +19,18 @@
 #include "lo/lo.h"
 
 //info: data will not appear on either named pipe unless/until BOTH pipes are 
-//connected to a reader (because open() blocks for a reader in write-only mode).
-//be sure to start both reader programs!
+//connected to a reader. be sure to start both reader programs!
 
 #ifdef __APPLE__
 #define SERIAL_DEVICE_A "/dev/cu.usbmodem1411"
 #endif
 #ifdef __linux__
-#define SERIAL_DEVICE_A "/dev/arduino1"
+#define SERIAL_DEVICE_A "/dev/arduino3"
 //#define SERIAL_DEVICE_A "/dev/arduino2"
 #endif
 
-#define PIPE_1 "watchdog_pipe1"
-#define PIPE_2 "arduino_pipe1"
+#define PIPE_1 "laser_wd_pipe"
+#define PIPE_2 "laser_pipe"
 //#define PIPE_1 "watchdog_pipe2"
 //#define PIPE_2 "arduino_pipe2"
 #define BAUD B115200
@@ -96,7 +95,7 @@ void get_ip(char *buff) {
 	//        printf("%s IP Address %s\n", ifa->ifa_name, addressBuffer);
       } else if (ifa->ifa_addr->sa_family == AF_INET6) { // check it is IP6
         // is a valid IP6 Address
-        // fuck it
+	//forget itttt
       }
     }
   }
@@ -117,14 +116,14 @@ void build_error_str(char *dest, char *errcode_str, char* pipename) {
 
   sec=sec-(mins*60);
   mins=mins-(hours*60);
-  hours=hours-(days*24); 	
+  hours=hours-(days*24); 
   /*  if (days == 0) {
     sprintf(buf, "%02d:%02d:%02d", hours, mins, sec);
   } else if (days == 1) {
     sprintf(buf,"%d day, %02d:%02d:%02d", days, hours, mins, sec);
     } else {*/
-    sprintf(buf, "%d days, %02d:%02d:%02d", days, hours, mins, sec);
-    //  }
+  sprintf(buf, "%d days, %02d:%02d:%02d", days, hours, mins, sec);
+  //  }
 
   gethostname(hostname, 1024);
   get_ip(addressBuffer);
@@ -175,7 +174,7 @@ void TCPSendMessage(char * message)
 
     ret = send(sd, (char *)message, strlen((char *)message), 0);
     if (ret != -1)
-    //    printf("Sent %s\n", message);
+      //    printf("Sent %s\n", message);
       watchdog_connected = 1;
     else {
       perror("send() error:");
@@ -248,42 +247,49 @@ void open_ports() {
   
 }
 
-void open_pipes() {
+int open_pipes() {
   printf("Started. Please start programs to listen on %s and %s. serial2pipe will now block (i.e. wait forever!) until both reader programs have been started.\n\n", PIPE_1, PIPE_2);
   fflush(stdout);
-  //opens named pipes
-  pipe1 = open(PIPE_1, O_WRONLY);
+  /* opens named pipes. you need both RDWR (even though we are not reading,
+    read/write causes our pipe to wait til the other side is connected) AND 
+    O_NONBLOCK, or you will end up with a blocking watchdog! CML 9/19/15 */
+  pipe1 = open(PIPE_1, O_RDWR| O_NONBLOCK);
+  //  pipe1 = open(PIPE_1, O_WRONLY);
   printf("Reader successfully connected to %s\n", PIPE_1);
-  pipe2 = open(PIPE_2, O_WRONLY);
+  pipe2 = open(PIPE_2, O_RDWR| O_NONBLOCK);
+  
+  // pipe2 = open(PIPE_2, O_WRONLY);
   printf("Reader successfully connected to %s\n", PIPE_2);
   
   if (pipe1 == 0) {
     printf("Error! Can't open named pipe %s\n", PIPE_1);
-    exit(-1);
+    return -1;
   }
   
   if (pipe2 == 0) {
     printf("Error! Can't open named pipe %s\n", PIPE_2);
-    exit(-1);
+    return -1;
   }
+  return 0;
 }
 
 int main(void)
 {
   char tmp;
   int stat1 = 0, stat2 = 0;
+  int errno1 = 0, errno2 = 0;
+  int open_pipes_stat = -1;
   // install signal handler
   if (signal(SIGINT, murder) == SIG_ERR)
     printf("[FAILED] to install SIGINT handle\n");
   
   //ignore SIGPIPE. Necessary to keep broken pipes from killing the program.
-  //this redirects errors to the write() calls below, where they can be handled. 
+  //this redirects errors to the write() calls below, where they can be handled 
   signal(SIGPIPE, SIG_IGN); 
   
   open_ports();
-  
   open_pipes();
-  
+
   printf("Initialized! Beginning loop...\n");
   
   while(1)  // main loop
@@ -301,7 +307,7 @@ int main(void)
       if (tmp == 0xFF) {
         num_ffs++;
       } else
-    	num_ffs = 0;
+	num_ffs = 0;
       
       if (num_ffs >= 10) {
 	printf("SERIAL ERROR\n");
@@ -312,18 +318,23 @@ int main(void)
 	printf("%c",tmp);
       else
 	printf("%x",tmp);
+
       stat1 = write(pipe1, &tmp, 1);
+      errno1 = errno;
+      //      printf("\n\n\nstat1 %d errno1 %d\n", stat1, errno1);
       stat2 = write(pipe2, &tmp, 1);
-      
-      if (stat1 < 0) {
+      errno2 = errno;
+      // printf("\n\n\nstat2 %d errno2 %d\n", stat2, errno2);
+
+      if (stat1 < 0 && errno1 != EAGAIN) {
 	//put error reporting to the watchdog here -- we want to know if the pipe breaks 
 	char error_str[2000];
 	char *error_str2 = (char *)malloc(2000);
-	//	printf("pipe1_connected %d\n", pipe1_connected);
-	  sprintf(error_str, "Write error on %s:", PIPE_1);
-	  perror(error_str);
-	  build_error_str(error_str2, "ERRDUINO_BROKENPIPE", PIPE_1);
-	  TCPSendMessage(error_str2);
+	//printf("pipe1_connected %d\n", pipe1_connected);
+	sprintf(error_str, "Write error on %s:", PIPE_1);
+	perror(error_str);
+	build_error_str(error_str2, "ERRDUINO_BROKENPIPE", PIPE_1);
+	TCPSendMessage(error_str2);
 	if (pipe1_connected == 1) {
 	  pipe1_connected = 0;
 	}
@@ -331,7 +342,7 @@ int main(void)
 	double diff;
 	time(&end);
 	diff = difftime(end,start);
-	//	printf("Seconds since last send %.2lf\n", diff);
+	//printf("Seconds since last send %.2lf\n", diff);
 	if (diff > 30) {
 	  char *error_str2 = (char *)malloc(2000);
 	  build_error_str(error_str2, "ERRDUINO_ACKCLEAR", PIPE_1);
@@ -341,7 +352,7 @@ int main(void)
 	}
       }
       
-      if (stat2 < 0) {
+      if (stat2 < 0 && errno2 != EAGAIN) {
 	//put error reporting to the watchdog here -- we want to know if the pipe breaks 
 	char error_str[2000];
 	char *error_str2 = (char *)malloc(2000);
@@ -355,7 +366,7 @@ int main(void)
 	double diff;
 	time(&end2);
 	diff = difftime(end2,start2);
-	//	printf("Seconds since last send %.2lf\n", diff);
+	//printf("Seconds since last send %.2lf\n", diff);
 	if (diff > 30) {
 	  char *error_str2 = (char *)malloc(2000);
 	  build_error_str(error_str2, "ERRDUINO_ACKCLEAR", PIPE_2);
@@ -364,7 +375,6 @@ int main(void)
 	  time(&start2);
 	}
       }
-      
     } 
   murder(1); //if we end up here, close the pipes and TCP connection
   return 0;
