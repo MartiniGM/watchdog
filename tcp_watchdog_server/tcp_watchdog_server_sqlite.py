@@ -10,6 +10,10 @@ import logging.handlers
 import sys
 import signal
 import traceback
+import json
+import gspread
+from collections import defaultdict
+from oauth2client.client import SignedJwtAssertionCredentials
 
 ####################
 # GLOBALS & SETTINGS
@@ -22,8 +26,10 @@ import traceback
 periodic_period = 120 #seconds 
 periodic_timer = time.time() #initialize timer
 
-# give a filename for the watchdog's SQLite database here
-DB_FILENAME = 'c:\\watchdog\\tcp_watchdog_server\\demosdb.db'
+# give a filename for the watchdog's SQLite database here, on Windows
+WINDOWS_DB_FILENAME = 'c:\\watchdog\\tcp_watchdog_server\\demosdb.db'
+#and for Linux & OSX, I just used the local directory (where this file is) 
+LINUX_OSX_DB_FILENAME = 'demosdb.db'
 
 PORT = 6666 # port number to watch
 NUM_QUEUED_CONNECTIONS = 10 # number of backlogged connections
@@ -35,6 +41,24 @@ LOG_FILENAME = 'tcp_watchdog_server.out'
 LOG_SIZE = 2000000 #2 MB, in bytes
 # give the number of rolling log segments to record before the log rolls over
 LOG_NUM_BACKUPS = 5 # five .out files before they roll over
+
+# dictionary to load Google spreadsheet into (for device types and descriptions)
+googleSheetDict = {}
+# json file to hold Google credentials.
+# ----> DO NOT EVER UPLOAD the .json file to public access (github)! <----
+json_file = 'mwsheets-91347531e5f4.json'  #srsly DO NOT UPLOAD THE .JSON FILE
+
+# URL for the google sheet. this can be public
+googleSheetURL = 'https://docs.google.com/spreadsheets/d/1wv_s-CBKj56u9JbZtQA-E-dy5efrS9xPLvFu-TqD-xE/edit#gid=0'
+
+# load google sheet every hour. it's a bit slow to get the data back so it doesn't reload often, but if you want to trigger it immediately just restart the program
+loadGoogleSheetEvery = 3600 #seconds
+loadGoogleSheetTimer = time.time()
+
+# set this to 0 to turn off Google spreadsheets and use local database only
+# (f.ex if Google ever breaks the API!)
+# if 0 (or if there are errors loading the google sheet), the program will default to using the existing value of DEVICE_TYPE and LOCATION in the SQLite DB.
+USE_GOOGLE_SHEETS = 1
 
 ####################
 # EXIT HANDLER
@@ -59,10 +83,140 @@ signal.signal(signal.SIGINT, signal_handler)
 ####################
 
 ############################################################
+#open_googlesheet()
+############################################################
+# opens Google spreadsheet for later use. Call every hour or so to refresh the data from the Google sheet, then use get_item_googlesheet to access the data as often as you like in the interim.
+# use our JSON credentials to open the Google Drive sheet
+def open_googlesheet():
+# if we're not loading the Google sheet, just return
+    if (USE_GOOGLE_SHEETS != 1):
+        return
+# else use our JSON credentials to open the Google Drive sheet        
+    try:
+        global googleSheetDict
+        global json_file
+        global googleSheetURL
+        global googleWorksheet
+        json_key = json.load(open(json_file))
+        scope = ['https://spreadsheets.google.com/feeds']
+        
+        credentials = SignedJwtAssertionCredentials(json_key['client_email'], json_key['private_key'], scope)
+        
+        gc = gspread.authorize(credentials)
+        
+        googleWorksheet = gc.open_by_url(googleSheetURL).sheet1
+        list_of_lists = googleWorksheet.get_all_values()
+
+    except Exception, e:
+        logger.error("error in open_googlesheet: %s" % e)
+        for frame in traceback.extract_tb(sys.exc_info()[2]):
+            fname,lineno,fn,text = frame
+            logger.error( "     in %s on line %d" % (fname, lineno))
+
+# then get all values and iterate over the list. Skip header.
+    try:
+        #create searchable dictionary with ID_NAME as the key!
+        googleSheetDict = defaultdict(list)
+        for listy in list_of_lists:
+            googleSheetDict[listy[0]] += listy[1:]
+        googleSheetLen = len(googleSheetDict)    
+        #for keys,values in googleSheetDict.items():
+        #    print(keys)
+        #    print(values)
+        logger.info("     Google Sheets load OK, %s rows loaded" % googleSheetLen)
+    except Exception, e:
+        logger.error("error when iterating over Google sheet %s with json %s: %s" % (googleSheetURL, json_file, e))
+        for frame in traceback.extract_tb(sys.exc_info()[2]):
+            fname,lineno,fn,text = frame
+            logger.error( "     in %s on line %d" % (fname, lineno))
+
+############################################################
+#get_item_googlesheet()
+############################################################
+# queries google spreadsheet for id_name, returns string in item_name position
+# otherwise returns empty string ("")
+def get_item_googlesheet(id_name, item_name):
+    global googleSheetDict
+    if (bool(googleSheetDict) == False):
+        logger.error( "empty dictionary in get_item_googlesheet! Did you remember to call open_googlesheet?")
+        return ""
+    header_item = googleSheetDict["ID_NAME"]
+    try:
+        item_id = header_item.index(item_name)
+#        print "item_id " + str(item_id) + " for " + id_name
+        our_item = googleSheetDict[id_name]
+#        print our_item
+        return str(our_item[item_id])
+    except IndexError:
+        logger.warning("dict entry '%s' not found" % id_name)
+        return ""
+    except ValueError:
+        logger.warning("column '%s' not found" % item_name)
+        return ""
+    except Exception, e:
+        logger.error( "error in get_item_googlesheet! %s" % e)
+        for frame in traceback.extract_tb(sys.exc_info()[2]):
+            fname,lineno,fn,text = frame
+            logger.error( "     in %s on line %d" % (fname, lineno))
+        return ""
+
+############################################################
+#get_type_location_and_max_name()
+############################################################
+# queries the google spreadsheet dict for type and location, then writes
+# them out to the DB along with the MAX_ID_NAME for use with Max (Cycling '74)
+# otherwise does nothing
+def get_type_location_and_max_name(id_name):
+    if (USE_GOOGLE_SHEETS != 1):
+# read these back from the database as they already exist
+        location = get_item_sqlite(id_name, "LOCATION")
+        device_type = get_item_sqlite(id_name, "DEVICE_TYPE")
+  #      print "got location " + str(location) + " and type " + str(device_type)
+        return (location, device_type, id_name) #do nothing for now
+    try:
+        device_type = get_item_googlesheet(id_name, "DEVICE_TYPE")
+        location = get_item_googlesheet(id_name, "LOCATION / DESCRIPTION")
+#        print "id_name " + id_name
+#        print "device type " + device_type
+#        print "location " + location
+        parent_child_list = id_name.split('/', 1)
+        if len(parent_child_list) > 1:
+            (parent, child) = parent_child_list
+            if (len(device_type) > 0):
+                max_id_name = str(parent) + "/" + str(device_type) + "/" + str(child)
+            else:
+                max_id_name = str(parent) + "/" + "UNKNOWN" + "/" + str(child)           
+        else:
+            parent = id_name
+            child = ""
+            if (len(device_type) > 0):
+                max_id_name = str(parent) + "/" + str(device_type)
+            else:
+                max_id_name = str(parent) + "/" + "UNKNOWN"
+#            print "parent " + parent + " child " + child
+#        print "max_id_name " + max_id_name
+        return (location, device_type, max_id_name)
+    except Exception, e:
+        logger.error("get_type_location_and_max_name error! %s" % e)
+        for frame in traceback.extract_tb(sys.exc_info()[2]):
+            fname,lineno,fn,text = frame
+            logger.error("     in %s on line %d" % (fname, lineno))
+                   # read these back from the database as they already exist
+        try:
+            location = get_item_sqlite(id_name, "LOCATION")
+            device_type = get_item_sqlite(id_name, "DEVICE_TYPE")
+            return (location, device_type, id_name) #do nothing for now
+        except Exception, e:
+            logger.error("get_type_location_and_max_name error #2: %s" % e)
+            for frame in traceback.extract_tb(sys.exc_info()[2]):
+                fname,lineno,fn,text = frame
+                logger.error("     in %s on line %d" % (fname, lineno))
+                return ("", "", id_name) #do nothing for now
+            
+############################################################
 #return_last_reset()
 ############################################################
 # figures last detected reset time and returns as timestamp string
-
 def return_last_reset(new_uptime, last_uptime, id_name):
     last_reset_timestamp_check = get_item_sqlite(id_name, "LAST_RESET_TIMESTAMP")
     uptime_sec = get_item_sqlite(id_name, "UPTIME_SEC")
@@ -79,7 +233,7 @@ def return_last_reset(new_uptime, last_uptime, id_name):
             last_reset_timestamp = get_item_sqlite(id_name, "LAST_RESET_TIMESTAMP")
             return last_reset_timestamp
         else:
-            print "new uptime " + str(new_uptime) + " old uptime " + str(last_uptime)
+#            print "new uptime " + str(new_uptime) + " old uptime " + str(last_uptime)
             if (int(new_uptime) < int(last_uptime)):
                 #detected a device reset since the last time we checked the uptime
                 last_reset_time = datetime.datetime.now() - datetime.timedelta(seconds=int(new_uptime))
@@ -98,6 +252,9 @@ def return_last_reset(new_uptime, last_uptime, id_name):
 # returns new human-friendly status strings, given internal codes
 
 def return_status(stat):
+    if stat is None:
+        return "UNKNOWN" # in case something badly formatted got into the database
+    
     if ('CLEAR' in stat):
         return "OKAY"
     else:
@@ -137,7 +294,7 @@ def get_item_sqlite(id_name, item_name):
     try:
         cur = con.cursor()
         if (item_name == "LOCATION"):
-            cur.execute("SELECT ID_NAME, LOCATION FROM LOCATIONS WHERE ID_NAME LIKE\
+            cur.execute("SELECT ID_NAME, LOCATION FROM DEVICES WHERE ID_NAME LIKE\
             ?", ('%'+id_name+'%',))
         else:
             if (item_name == "LAST_UPTIME_SEC"):
@@ -152,8 +309,18 @@ def get_item_sqlite(id_name, item_name):
                         cur.execute("SELECT ID_NAME, LAST_RESET_TIMESTAMP FROM DEVICES WHERE ID_NAME LIKE\
                         ?", ('%'+id_name+'%',))                    
                     else:
-                        print "Unknown item_name in get_item_sqlite"
-                        return "" #blank location, will show as None in SQL
+                        if (item_name == "DEVICE_TYPE"):
+                            cur.execute("SELECT ID_NAME, DEVICE_TYPE FROM DEVIC\
+ES WHERE ID_NAME LIKE\
+                        ?", ('%'+id_name+'%',))
+                        else:
+                            if (item_name == "MAX_ID_NAME"):
+                                cur.execute("SELECT ID_NAME, MAX_ID_NAME FROM D\
+EVICES WHERE ID_NAME LIKE\
+                        ?", ('%'+id_name+'%',))
+                            else:
+                                logger.warning("Unknown item_name in get_item_sqlite: %s" % item_name)
+                                return "" #blank item, will show as None in SQL
         data = cur.fetchall()
         for row in data:
             return row[1]
@@ -161,7 +328,7 @@ def get_item_sqlite(id_name, item_name):
         if con:
             con.rollback()
         logger.error(" SQL error! %s" % e)
-        return "" #blank location, will show as None in SQL
+        return "" #blank item, will show as None in SQL
 
 ############################################################
 # pi_status_update_sqlite()
@@ -227,7 +394,6 @@ def sql_data_sqlite(data, pi_or_arduino):
         uptime = "%d days, %02d:%02d:%02d" % (days, hours, mins, sec)
 
     timestamp = str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
-    location = get_item_sqlite(id_name, "LOCATION")
     last_uptime = get_item_sqlite(id_name, "LAST_UPTIME_SEC")
     logger.info(id_name + " reports " + new_status + " with uptime " + uptime)
 
@@ -235,16 +401,17 @@ def sql_data_sqlite(data, pi_or_arduino):
     last_reset_timestamp = return_last_reset(uptime_sec, last_uptime, id_name)
     #reset uptime and write back to the database
     last_uptime = uptime_sec
-    
+    #also get location, device type, and max name from google sheet
+    (location, device_type, max_id_name) = get_type_location_and_max_name(id_name)
     # insert & commit, otherwise rollback
     try:
         cur = con.cursor()
-        cur.execute("INSERT OR REPLACE INTO DEVICES(ID_NAME, LOCATION, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME, LAST_UPTIME_SEC, LAST_RESET_TIMESTAMP) values (?, ?, ?, ?, ?, ?, ?, ?)",  (id_name,location,timestamp,new_status, uptime_sec, uptime, last_uptime, last_reset_timestamp))
+        cur.execute("INSERT OR REPLACE INTO DEVICES(ID_NAME, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME, LAST_UPTIME_SEC, LOCATION, DEVICE_TYPE, MAX_ID_NAME) values (?, ?, ?, ?, ?, ?, ?, ?, ?)",  (id_name,timestamp,status, uptime_sec,uptime,uptime_sec, location, device_type, max_id_name))
         con.commit()
     except lite.Error, e:
         logger.error(" sqlite error: %s" % e)
         con.rollback()
-
+        
 ############################################################
 # parse_data_sqlite()
 ############################################################        
@@ -252,15 +419,19 @@ def sql_data_sqlite(data, pi_or_arduino):
 
 def parse_data_sqlite(data):
     for row in data:
+#        logger.info("row is " + str(row))
         id_name = row[0]
         timestamp = row[1]
         status = row[2]
         new_status = return_status(status)
-        location = get_item_sqlite(id_name, "LOCATION")
+#        location = get_item_sqlite(id_name, "LOCATION")
         uptime_sec = row[3]
         uptime = row[4]
         time_cur = datetime.datetime.now()
-        time_ts = datetime.datetime.strptime(timestamp, "%b %d, %Y %H:%M:%S")
+        if timestamp is not None:
+            time_ts = datetime.datetime.strptime(timestamp, "%b %d, %Y %H:%M:%S")
+        else:
+            time_ts = datetime.datetime.time()
         total_seconds = ((time_cur-time_ts).seconds)
 #        logger.debug("total seconds between times: " + str(total_seconds))
         if (total_seconds > periodic_period):
@@ -269,10 +440,12 @@ def parse_data_sqlite(data):
             timestamp = str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
             status = "NONRESPONSIVE"
             table = "DEVICES"
+            #also get location, device type, and max name from google sheet
+            (location, device_type, max_id_name) = get_type_location_and_max_name(id_name)
             logger.info(id_name + " silent for " + str(total_seconds) + " seconds, setting " + status + " with uptime " + uptime)
             try:
                 cur = con.cursor()
-                cur.execute("INSERT OR REPLACE INTO DEVICES(ID_NAME, LOCATION, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME, LAST_UPTIME_SEC) values (?, ?, ?, ?, ?, ?, ?)",  (id_name,location,timestamp,status, uptime_sec,uptime,uptime_sec))
+                cur.execute("INSERT OR REPLACE INTO DEVICES(ID_NAME, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME, LAST_UPTIME_SEC, LOCATION, DEVICE_TYPE, MAX_ID_NAME) values (?, ?, ?, ?, ?, ?, ?, ?, ?)",  (id_name,timestamp,status, uptime_sec,uptime,uptime_sec, location, device_type, max_id_name))
                 con.commit()
             except lite.Error, e:
                 logger.error("sqlite error: %s" % e)
@@ -333,12 +506,18 @@ if __name__ == "__main__":
     try:
         # Open database connection, create cursor
         if os.name == 'nt':
-            con = lite.connect(DB_FILENAME)
+            con = lite.connect(WINDOWS_DB_FILENAME)
         else:
-            con = lite.connect('demosdb.db')     
+            con = lite.connect(LINUX_OSX_DB_FILENAME)     
     except Exception, e:
         logger.error("Can't connect to demosdb! %s" % e)
 
+    if (USE_GOOGLE_SHEETS == 1):
+        try:
+            open_googlesheet()
+        except Exception, e:
+            logger.error("Can't connect to googlesheet! %s" % e)
+        
     ##################
     # SOCKET SETUP
     ##################
@@ -375,7 +554,16 @@ if __name__ == "__main__":
     #######################
     
     while 1:
-        
+        #######################
+        # GOOGLE SHEET UPDATE
+        #######################
+        # refresh data from the google sheet. it's slow, don't do it too often!
+        if (USE_GOOGLE_SHEETS == 1):
+            if (time.time() - loadGoogleSheetTimer > loadGoogleSheetEvery):
+                #                update_from_googlesheet()
+                open_googlesheet()
+                loadGoogleSheetTimer = time.time()
+                
         #######################
         # PERIODIC DATA CHECK
         #######################
@@ -383,6 +571,7 @@ if __name__ == "__main__":
 
         if (time.time() - periodic_timer > periodic_period):
             data = get_pis_sqlite("DEVICES")
+#            print data
             parse_data_sqlite(data)
             periodic_timer = time.time()
 
