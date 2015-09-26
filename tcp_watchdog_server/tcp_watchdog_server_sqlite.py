@@ -10,9 +10,12 @@ import logging.handlers
 import sys
 import signal
 import traceback
+from collections import defaultdict
+# for the three below:
+# use "pip install gspread; pip install oauth2client; pip install PyOpenSSL"
+# install pip if you don't have it, on windows just google "get-pip.py"
 import json
 import gspread
-from collections import defaultdict
 from oauth2client.client import SignedJwtAssertionCredentials
 
 ####################
@@ -31,12 +34,20 @@ WINDOWS_DB_FILENAME = 'c:\\watchdog\\tcp_watchdog_server\\demosdb.db'
 #and for Linux & OSX, I just used the local directory (where this file is) 
 LINUX_OSX_DB_FILENAME = 'demosdb.db'
 
+# json file to hold Google credentials.
+# ----> DO NOT EVER UPLOAD the .json file to public access (github)! <----
+json_file = 'mwsheets-91347531e5f4.json'  #srsly DO NOT UPLOAD THE .JSON FILE
+
+# URL for the google sheet. this can be public
+googleSheetURL = 'https://docs.google.com/spreadsheets/d/1wv_s-CBKj56u9JbZtQA-E-dy5efrS9xPLvFu-TqD-xE/edit#gid=0'
+
+# give a filename for the watchdog's log file here
+LOG_FILENAME = 'tcp_watchdog_server.out'
+
 PORT = 6666 # port number to watch
 NUM_QUEUED_CONNECTIONS = 10 # number of backlogged connections
 SOCKET_TIMEOUT = 5.0 # timeout in seconds
 
-# give a filename for the watchdog's log file here
-LOG_FILENAME = 'tcp_watchdog_server.out'
 # give the size for each rolling log segment, in bytes
 LOG_SIZE = 2000000 #2 MB, in bytes
 # give the number of rolling log segments to record before the log rolls over
@@ -44,12 +55,7 @@ LOG_NUM_BACKUPS = 5 # five .out files before they roll over
 
 # dictionary to load Google spreadsheet into (for device types and descriptions)
 googleSheetDict = {}
-# json file to hold Google credentials.
-# ----> DO NOT EVER UPLOAD the .json file to public access (github)! <----
-json_file = 'mwsheets-91347531e5f4.json'  #srsly DO NOT UPLOAD THE .JSON FILE
-
-# URL for the google sheet. this can be public
-googleSheetURL = 'https://docs.google.com/spreadsheets/d/1wv_s-CBKj56u9JbZtQA-E-dy5efrS9xPLvFu-TqD-xE/edit#gid=0'
+list_of_lists = []
 
 # load google sheet every hour. it's a bit slow to get the data back so it doesn't reload often, but if you want to trigger it immediately just restart the program
 loadGoogleSheetEvery = 3600 #seconds
@@ -97,6 +103,7 @@ def open_googlesheet():
         global json_file
         global googleSheetURL
         global googleWorksheet
+        global list_of_lists
         json_key = json.load(open(json_file))
         scope = ['https://spreadsheets.google.com/feeds']
         
@@ -176,6 +183,10 @@ def get_type_location_and_max_name(id_name):
     try:
         device_type = get_item_googlesheet(id_name, "DEVICE_TYPE")
         location = get_item_googlesheet(id_name, "LOCATION / DESCRIPTION")
+        if (device_type == ""):
+            device_type = get_item_sqlite(id_name, "DEVICE_TYPE")
+        if (location == ""):
+            location = get_item_sqlite(id_name, "LOCATION")
 #        print "id_name " + id_name
 #        print "device type " + device_type
 #        print "location " + location
