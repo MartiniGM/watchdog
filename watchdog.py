@@ -9,11 +9,15 @@ import time
 import select
 import datetime
 import struct
-from contextlib import contextmanager
-from multiprocessing.dummy import Pool as ThreadPool 
+#from contextlib import contextmanager
+#from multiprocessing.dummy import Pool as ThreadPool 
 from time import sleep
 import subprocess
 import traceback
+
+####################
+# GLOBALS & SETTINGS
+####################
 
 send_ok_period = 30 #sends ERRPI_ACKCLEAR every 30s
 send_ok_timer = time.time()
@@ -39,18 +43,24 @@ if (USE_SOCKETS):
 # EXIT HANDLER
 ####################                
 
-# upon exit, disconnect from all pipes
-def exit_func():
-    
-    sys.exit(0)
-    
-# exits the program cleanly, logging exit time
-#def signal_handler(signal, frame):
-#    print ""
-#    exit_func()
+####################
+# EXIT HANDLER
+####################
+# ensures we can kill the script with ctrl-C for testing
+def signal_handler(signal, frame):
+    print('Exiting...')
+    watchsock.close()
+    os._exit(0) 
 
-#signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGINT, signal_handler)
+            
+####################
+# FUNCTIONS
+####################
 
+############################################################
+# get_ip_address()
+############################################################
 # gets IP address of eth0 as a string
 def get_ip_address(ifname):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -60,6 +70,9 @@ def get_ip_address(ifname):
         struct.pack('256s', ifname[:15])
     )[20:24])
 
+############################################################
+# get_uptime()
+############################################################
 # returns this Pi's uptime in seconds and as formatted string
 def get_uptime():
     with open('/proc/uptime', 'r') as f:
@@ -69,6 +82,9 @@ def get_uptime():
 #            print "UPTIME STR: " + uptime_string
         return (uptime_string, uptime_seconds)
 
+############################################################
+# socket_connect()
+############################################################   
 # connects to the TCP watchdog. See host/port above. Run in a loop to retry
 def socket_connect():
     global watchsock
@@ -87,6 +103,9 @@ def socket_connect():
             print 'Socket Connected to ' + host + ' on ip ' + remote_ip
             return 1
 
+############################################################
+# send_ok_now()
+############################################################ 
 # this sends an OK message (ERRDUINO_ACKCLEAR or ERRPI_ACKCLEAR) via TCP
 # moved this up because for now watchdog.py doesn't send OK msgs for
 # connected devices -- serial2pipe does that
@@ -124,13 +143,9 @@ def send_ok_now(pi_or_arduino, status, append_string):
                  print "failed to send "
                  #put retry here
         
-# ensures we can kill the script with ctrl-C for testing
-def signal_handler(signal, frame):
-    print('Exiting...')
-    os._exit(0) 
-
-signal.signal(signal.SIGINT, signal_handler)
-
+############################################################
+# process_exists()
+############################################################   
 # returns True if this process is running, False if not.
 def process_exists(proc_name):
     if (os.name != 'nt'):
@@ -159,6 +174,9 @@ def process_exists(proc_name):
                 return True
         return False
 
+############################################################
+# pi_scan()
+############################################################
 # Sends OKAY messages every N seconds for this Pi/PC
 def pi_scan():
      global send_ok_timer_pi
@@ -176,6 +194,9 @@ def pi_scan():
              print "     in %s on line %d" % (fname, lineno)
          print "FAILURE in pi_scan! %s" % e
 
+############################################################
+# software_scan()
+############################################################
 # checks software on this Pi or PC, sends OKAY or NONRESPONSIVE
 def software_scan(software_list):
      global send_ok_timer_software
@@ -198,6 +219,9 @@ def software_scan(software_list):
              print "     in %s on line %d" % (fname, lineno)
              print "Error in software_scan(): %s" % e
 
+############################################################
+# class Arduino:
+############################################################        
 #class with all internal variables & its own named pipe for each Arduino
 class Arduino:
     def __init__(self, port, pin, timeout, wdtime, dogtime):
@@ -228,6 +252,9 @@ class Arduino:
         except Exception, e:
             print "Failed to open %s : %s!" % (self.port, e)
 
+####################
+# openPort()
+####################  
 # this opens the named pipe
     def openPort(self):
         if (self.not_open):
@@ -238,6 +265,9 @@ class Arduino:
             else:
                 self.not_open = 0;
 
+####################
+# watchdog()
+####################   
 # this sends the watchdog message (errcode) via TCP
     def watchdog(self, errcode):
 #        print("Watchdog called on port " + self.port + " Time since last dog: " + str(time.time() - self.wdtimerstart))
@@ -263,6 +293,9 @@ class Arduino:
                     else:
                         print "failed to send " + message
 
+####################
+# scan()
+####################                          
 # this is the main scan loop for each arduino. Gets data over the pipe, and 
 # either resets the watchdog timer due to good data, or waits til it expires
 # and triggers the watchdog.
@@ -338,7 +371,10 @@ class Arduino:
                 #likewise, if it's been too long since we saw data, pop the watchdog
                 if (time.time() - self.start > self.wdtime):
                     self.watchdog("ERRDUINO_NOREPLY")
-#main starts here
+
+###################################
+# main() - main scan loop
+###################################     
 
 print "starting in 2 seconds..."
 time.sleep(2); # give arduinos time to start
