@@ -2,7 +2,7 @@
 import serial
 import socket 
 import sys
-import os, fcntl, re
+import os, re
 import time
 import signal
 import time    
@@ -63,24 +63,44 @@ signal.signal(signal.SIGINT, signal_handler)
 ############################################################
 # gets IP address of eth0 as a string
 def get_ip_address(ifname):
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    return socket.inet_ntoa(fcntl.ioctl(
-        s.fileno(),
-        0x8915,  # SIOCGIFADDR
-        struct.pack('256s', ifname[:15])
-    )[20:24])
-
+    if os.name == 'nt':
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(('8.8.8.8', 0))  # connecting to a UDP address doesn't send packets
+        local_ip_address = s.getsockname()[0]
+#        print local_ip_address
+        return local_ip_address
+    else:
+        import fnctl
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        return socket.inet_ntoa(fcntl.ioctl(
+            s.fileno(),
+            0x8915,  # SIOCGIFADDR
+            struct.pack('256s', ifname[:15])
+        )[20:24])
+        
 ############################################################
 # get_uptime()
 ############################################################
 # returns this Pi's uptime in seconds and as formatted string
 def get_uptime():
-    with open('/proc/uptime', 'r') as f:
-        uptime_seconds = int(float(f.readline().split()[0]))
-        uptime_string = str(datetime.timedelta(seconds = uptime_seconds))
-        uptime_string = uptime_string.split('.')[0]
-#            print "UPTIME STR: " + uptime_string
-        return (uptime_string, uptime_seconds)
+    try:
+        if os.name != 'nt':
+            with open('/proc/uptime', 'r') as f:
+                uptime_seconds = float(f.readline().split()[0])
+                uptime_string = str(datetime.timedelta(seconds = uptime_seconds))
+                uptime_string = uptime_string.split('.')[0]
+                #            print "UPTIME STR: " + uptime_string
+                return (uptime_string, uptime_seconds)
+        else:
+#            uptime_seconds = int(os.popen("uptime.exe").readline())
+#            uptime_string = str(datetime.timedelta(seconds = uptime_seconds))
+#            uptime_string = uptime_string.split('.')[0]
+#so broken!
+            #return (uptime_string, uptime_seconds)
+            return (" ", 0)
+    except Exception, e:
+        print "error getting uptime %s" % e 
+        return (" ", 0)
 
 ############################################################
 # socket_connect()
@@ -140,7 +160,7 @@ def send_ok_now(pi_or_arduino, status, append_string):
                      print "failed to send " + message
                  #put retry here
              except IOError as e:
-                 print "failed to send "
+                 print "failed to send %s " % e
                  #put retry here
         
 ############################################################
@@ -169,7 +189,7 @@ def process_exists(proc_name):
         c = wmi.WMI ()
 
         for process in c.Win32_Process ():
-            print process.ProcessId, process.Name
+            #print process.ProcessId, process.Name
             if proc_name in process.Name:
                 return True
         return False
@@ -248,7 +268,10 @@ class Arduino:
         self.last_len = 0
         self.send_ok = 1;
         try:
-            self.pipein = os.open(self.port, os.O_RDONLY | os.O_NONBLOCK)
+            if os.name != 'nt':
+                self.pipein = os.open(self.port, os.O_RDONLY | os.O_NONBLOCK)
+            else:
+                self.pipein = os.open(self.port, os.O_RDONLY)
         except Exception, e:
             print "Failed to open %s : %s!" % (self.port, e)
 
@@ -259,7 +282,10 @@ class Arduino:
     def openPort(self):
         if (self.not_open):
             try:
-                self.pipein = os.open(self.port, os.O_RDONLY | os.O_NONBLOCK)
+                if os.name != 'nt':
+                    self.pipein = os.open(self.port, os.O_RDONLY | os.O_NONBLOCK)
+                else:
+                    self.pipein = os.open(self.port, os.O_RDONLY)           
             except Exception, e:
                 print "Failed to open %s : %s!" % (self.port, e)
             else:
@@ -291,11 +317,10 @@ class Arduino:
                     if (status == 1):
                         watchsock.sendall(message)
                     else:
-                        print "failed to send " + message
+                        print "failed to send 1" + message
 
 ####################
-# scan()
-####################                          
+# scan()####################                          
 # this is the main scan loop for each arduino. Gets data over the pipe, and 
 # either resets the watchdog timer due to good data, or waits til it expires
 # and triggers the watchdog.
@@ -388,33 +413,22 @@ if (USE_SOCKETS):
 #use serial2pipe to split the Arduino output into two named pipes, then attach
 #the following to one of the pipes, and the other to the program to be 
 #monitored!
-#arduino1 = Arduino("./piezo_wd_pipe", 1, 0.0, 40.0, 100.0)
-#arduino2 = Arduino("./laser_wd_pipe", 1, 0.0, 40.0, 100.0)
-#arduino3 = Arduino("./chest_wd_pipe", 1, 0.0, 40.0, 100.0)
 
 # builds a list to step through the arduinos.
 # Leave this list blank (as below) to monitor only this Pi.
 arduinolist = []
-arduino1 = Arduino("./piezo_wd_pipe", 1, 0.0, 40.0, 100.0)
-arduino2 = Arduino("./laser_wd_pipe", 1, 0.0, 40.0, 100.0)
-arduino3 = Arduino("./chest_wd_pipe", 1, 0.0, 40.0, 100.0)
-arduinolist.append(arduino1)
-arduinolist.append(arduino2)
-arduinolist.append(arduino3)
+#arduino1 = Arduino("./piezo_wd_pipe", 1, 0.0, 40.0, 100.0)
+#arduino2 = Arduino("./laser_wd_pipe", 1, 0.0, 40.0, 100.0)
+#arduino3 = Arduino("./chest_wd_pipe", 1, 0.0, 40.0, 100.0)
+#arduinolist.append(arduino1)
+#arduinolist.append(arduino2)
+#arduinolist.append(arduino3)
 
 # builds a list to step through the software on this Pi.
 # Leave this list blank to skip software monitoring.
 softwarelist = []
 softwarelist.append(("alsa_out", ""))
-softwarelist.append(("start-piezo-splitter", ""))
-softwarelist.append(("start-piezo", ""))
-softwarelist.append(("piezo-recieve.pd", ""))
-#softwarelist.append(("start-chest-splitter", ""))
-#softwarelist.append(("start-chest", ""))
-#softwarelist.append(("chest-recieve.pd", ""))
-softwarelist.append(("start-laser-splitter", ""))
-softwarelist.append(("start-laser", ""))
-softwarelist.append(("laser-recieve.pd", ""))
+softwarelist.append(("Max.exe", ""))
 
 while 1:
     # if there's nothing connected we still want to monitor this Pi or PC.
