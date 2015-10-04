@@ -63,6 +63,10 @@ signal.signal(signal.SIGINT, signal_handler)
 ############################################################
 # gets IP address of eth0 as a string
 def get_ip_address(ifname):
+#try this next time:
+# hostname = socket.gethostname()
+#        IP = socket.gethostbyname(hostname)
+#        return(IP)
     if os.name == 'nt':
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(('8.8.8.8', 0))  # connecting to a UDP address doesn't send packets
@@ -92,15 +96,14 @@ def get_uptime():
                 #            print "UPTIME STR: " + uptime_string
                 return (uptime_string, uptime_seconds)
         else:
-#            uptime_seconds = int(os.popen("uptime.exe").readline())
-#            uptime_string = str(datetime.timedelta(seconds = uptime_seconds))
-#            uptime_string = uptime_string.split('.')[0]
-#so broken!
-            #return (uptime_string, uptime_seconds)
-            return (" ", 0)
+            import win32api
+            uptime_seconds = win32api.GetTickCount() / 1000
+            uptime_string = str(datetime.timedelta(seconds = uptime_seconds))
+            uptime_string = uptime_string.split('.')[0]
+            return (uptime_string, uptime_seconds)
     except Exception, e:
-        print "error getting uptime %s" % e 
-        return (" ", 0)
+        print "error getting uptime, %s" % e 
+        return ("", 0)
 
 ############################################################
 # socket_connect()
