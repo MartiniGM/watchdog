@@ -63,15 +63,15 @@ signal.signal(signal.SIGINT, signal_handler)
 ############################################################
 # gets IP address of eth0 as a string
 def get_ip_address(ifname):
-#try this next time:
-# hostname = socket.gethostname()
-#        IP = socket.gethostbyname(hostname)
-#        return(IP)
     if os.name == 'nt':
+#        hostname = socket.gethostname()
+#        IP = socket.gethostbyname(hostname)
+#        print IP
+#        return(IP)
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(('8.8.8.8', 0))  # connecting to a UDP address doesn't send packets
         local_ip_address = s.getsockname()[0]
-#        print local_ip_address
+        #print local_ip_address
         return local_ip_address
     else:
         import fnctl
@@ -100,6 +100,7 @@ def get_uptime():
             uptime_seconds = win32api.GetTickCount() / 1000
             uptime_string = str(datetime.timedelta(seconds = uptime_seconds))
             uptime_string = uptime_string.split('.')[0]
+            #print uptime_string
             return (uptime_string, uptime_seconds)
     except Exception, e:
         print "error getting uptime, %s" % e 
@@ -228,7 +229,7 @@ def software_scan(software_list):
      try:
          if (time.time() - send_ok_timer_software > send_ok_period + 15):
              for (proc_name, proc_path ) in software_list:
-                 print "Scanning " + proc_name + " , " + proc_path
+                 print "Scanning " + proc_name 
                  if (process_exists(proc_name)):
                      print "Exists!"
                      send_ok_now("PI", "ERRPI_ACKCLEAR", proc_name)
@@ -430,12 +431,12 @@ arduinolist = []
 # builds a list to step through the software on this Pi.
 # Leave this list blank to skip software monitoring.
 softwarelist = []
-softwarelist.append(("alsa_out", ""))
-softwarelist.append(("Max.exe", ""))
+softwarelist.append(("GV-VMS.exe", ""))
+
+#softwarelist.append(("Max.exe", ""))
 
 while 1:
-    # if there's nothing connected we still want to monitor this Pi or PC.
-    # just send OKAY every N seconds.
+    # if there's nothing connected we still want to monitor this Pi or PC. send OKAY every N seconds.
     if (len(arduinolist) == 0):
         pi_scan()
     # otherwise go through the list and monitor each connected arduino.
