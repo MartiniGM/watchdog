@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<!-- Path should be correct so change it if you're not running on cathy's lappy -->
+<!DOCTYPE tsung SYSTEM "/usr/local/Cellar/tsung/1.6.0/share/tsung/tsung-1.0.dtd">
+<tsung loglevel="notice" version="1.0">
+  <!-- Clients to generate load -->
+  <clients>
+    <!-- Must be hostname, can't be IP -->
+    <client host="localhost" use_controller_vm="true">
+      <ip value="10.42.16.222"></ip>
+    </client>
+  </clients>
+
+  <!-- Target servers -->
+  <servers>
+    <server host="10.42.16.17" port="6666" type="tcp"></server>
+  </servers>
+
+  <!-- Connections -->
+  <load>
+    <arrivalphase phase="1" duration="10" unit="minute">
+      <users arrivalrate="300" unit="minute"></users>
+    </arrivalphase>
+
+    <arrivalphase phase="2" duration="10" unit="minute">
+      <users arrivalrate="500" unit="minute"></users>
+    </arrivalphase>
+
+    <arrivalphase phase="3" duration="10" unit="minute">
+      <users arrivalrate="300" unit="minute"></users>
+    </arrivalphase>
+  </load>
+
+  <!--
+  http://tsung.erlang-projects.org/user_manual.html
+  If you need to open more than 30000 simultaneous connections on a client
+  machine, you will be limited by the number of TCP client ports, even if
+  you use several IPs (this is true at least on Linux). To bypass this limit,
+  Tsung must not delegate the selection of client ports and together with using
+  several IP for each client, you have to defined a range for available clients
+  ports.
+  -->
+  <options>
+    <option name="ports_range" min="1025" max="65535"/>
+  </options>
+
+  <!-- Sessions for a connection. Sum of all session's probabilities must be 100 -->
+  <sessions>
+    <session name="session1" probability="100" type="ts_raw">
+      <request> <raw data="ERRPI_ACKCLEAR 10.42.16.222 12345 3:33:33" ack="no_ack"></raw> </request>
+    </session>
+      <!-- Full URL with server name overrides the "server" config value -->
+	<!--
+	    </session>
+	    <session name="session2" probability="50" type="ts_http">
+	    <request><http url="/path3" method="GET" version="1.1"></http></request>
+	    <request><http url="/path4" method="GET" version="1.1"></http></request>
+	    </session>
+	-->
+  </sessions>
+</tsung>
