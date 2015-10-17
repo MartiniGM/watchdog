@@ -1,0 +1,45 @@
+#!/usr/bin/env expect -f
+
+# usage: ./power.exp (never | auto) switch_password enable_password interface
+
+set argument [lindex $argv 0]
+set interface [lindex $argv 1]
+
+#set timeout 1
+set user "meow"
+#DO NOT upload these files to github, they have our passwords in them!
+set pass1 [read [open "/Users/Aesir/Documents/watchdog/power_passphrase1.secret" r]]
+set pass2 [read [open "/Users/Aesir/Documents/watchdog/power_passphrase2.secret" r]]
+
+spawn telnet "10.42.0.3"
+expect "Connected"
+
+send "$user\r"
+expect "Password:"
+
+send "$pass1\r"
+expect "switch3>"
+
+send "enable\r"
+expect "Password:"
+
+send "$pass2\r"
+expect "switch3#"
+
+send "configure terminal\r"
+expect "switch3(config)#"
+
+# this is where we say which interfaces to change
+# interface looks like FastEthernet1/0/1 for the 1st interface
+send "interface $interface\r"
+expect "switch3(config-if)#"
+
+send "power inline $argument\r"
+expect "switch3(config-if)#"
+
+send "end\r"
+expect "switch3#"
+
+send "exit\r"
+expect "Connection closed by foreign host.\r"
+

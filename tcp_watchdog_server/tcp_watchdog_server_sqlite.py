@@ -37,7 +37,7 @@ LINUX_OSX_DB_FILENAME = 'demosdb.db'
 
 # json file to hold Google credentials.
 # ----> DO NOT EVER UPLOAD the .json file to public access (github)! <----
-json_file = 'mwsheets-91347531e5f4.json'  #srsly DO NOT UPLOAD THE .JSON FILE
+json_file = 'mwsheets-91347531e5f4.json.secret'  #srsly DO NOT UPLOAD THE .JSON FILE
 
 # URL for the google sheet. this can be public
 googleSheetURL = 'https://docs.google.com/spreadsheets/d/1wv_s-CBKj56u9JbZtQA-E-dy5efrS9xPLvFu-TqD-xE/edit#gid=0'
@@ -478,7 +478,7 @@ def parse_data_sqlite(data):
         logger.info(">>>>>>>>>>System Info: total is %d, okay %d, %d%% OK" % (num_total, num_okay, percent_okay))
         try:
             cur = con.cursor()
-            cur.execute("INSERT OR REPLACE INTO SYSTEM_INFO(ID_NAME, NUM_DEVICES, NUM_OKAY_DEVICES, PERCENT_OKAY) values (?, ?, ?, ?)",  (info_id_name, num_total, num_okay, (int)percent_okay))
+            cur.execute("INSERT OR REPLACE INTO SYSTEM_INFO(ID_NAME, NUM_DEVICES, NUM_OKAY_DEVICES, PERCENT_OKAY) values (?, ?, ?, ?)",  (info_id_name, num_total, num_okay, percent_okay))
             con.commit()
         except lite.Error, e:
             logger.error("sqlite error: %s" % e)

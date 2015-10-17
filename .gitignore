@@ -16,3 +16,5 @@ build-*/
 # emacs backup files
 *~
 
+# no distribute secret files
+*.secret
