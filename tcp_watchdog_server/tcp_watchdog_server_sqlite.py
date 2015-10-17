@@ -11,9 +11,10 @@ import sys
 import signal
 import traceback
 from collections import defaultdict
-# for the three below:
-# use "pip install gspread; pip install oauth2client; pip install PyOpenSSL"
-# install pip if you don't have it, on windows just google "get-pip.py"
+# to install the three below:
+# "pip install gspread; pip install oauth2client; pip install PyOpenSSL"
+# install pip first if you don't have it, on windows just google "get-pip.py".
+# on Mac OS use "easy_install pip"
 import json
 import gspread
 from oauth2client.client import SignedJwtAssertionCredentials
@@ -429,7 +430,10 @@ def sql_data_sqlite(data, pi_or_arduino):
 # parses/checks for periodic disconnects; if found, inserts NOREPLY into SQLite
 
 def parse_data_sqlite(data):
+    num_okay = 0
+    num_total = 0
     for row in data:
+        num_total += 1
 #        logger.info("row is " + str(row))
         id_name = row[0]
         timestamp = row[1]
@@ -461,7 +465,25 @@ def parse_data_sqlite(data):
             except lite.Error, e:
                 logger.error("sqlite error: %s" % e)
                 con.rollback()
-
+        else:
+            #this item was OK if its status says OKAY
+            if (new_status == "OKAY"):
+                num_okay += 1
+    # report / save system stats            
+    if (num_total == 0):
+        return
+    else:
+        percent_okay = (float(num_okay) / float(num_total)) * 100.0
+        info_id_name = "SYSTEM_INFO"
+        logger.info(">>>>>>>>>>System Info: total is %d, okay %d, %d%% OK" % (num_total, num_okay, percent_okay))
+        try:
+            cur = con.cursor()
+            cur.execute("INSERT OR REPLACE INTO SYSTEM_INFO(ID_NAME, NUM_DEVICES, NUM_OKAY_DEVICES, PERCENT_OKAY) values (?, ?, ?, ?)",  (info_id_name, num_total, num_okay, (int)percent_okay))
+            con.commit()
+        except lite.Error, e:
+            logger.error("sqlite error: %s" % e)
+            con.rollback()
+                
 ############################################################                
 ############################################################
 # main()
