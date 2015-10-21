@@ -1,0 +1,101 @@
+<?xml version="1.0"?>
+<!-- Path should be correct so change it if you're not running on cathy's lappy -->
+<!DOCTYPE tsung SYSTEM "/usr/local/Cellar/tsung/1.6.0/share/tsung/tsung-1.0.dtd">
+<tsung loglevel="notice" version="1.0">
+  <!-- Clients to generate load -->
+  <clients>
+    <!-- Must be hostname, can't be IP -->
+    <client host="localhost" use_controller_vm="true">
+      <ip value="192.168.254.5"></ip>
+    </client>
+  </clients>
+
+  <!-- Target servers -->
+  <servers>
+    <server host="192.168.254.5" port="6666" type="tcp"></server>
+  </servers>
+
+  <!-- Connections -->
+  <load>
+    <arrivalphase phase="1" duration="10" unit="minute">
+      <users arrivalrate="300" unit="minute"></users>
+    </arrivalphase>
+
+    <arrivalphase phase="2" duration="10" unit="minute">
+      <users arrivalrate="500" unit="minute"></users>
+    </arrivalphase>
+
+    <arrivalphase phase="3" duration="10" unit="minute">
+      <users arrivalrate="300" unit="minute"></users>
+    </arrivalphase>
+  </load>
+
+  <!--
+  http://tsung.erlang-projects.org/user_manual.html
+  If you need to open more than 30000 simultaneous connections on a client
+  machine, you will be limited by the number of TCP client ports, even if
+  you use several IPs (this is true at least on Linux). To bypass this limit,
+  Tsung must not delegate the selection of client ports and together with using
+  several IP for each client, you have to defined a range for available clients
+  ports.
+  -->
+  <options>
+    <option name="ports_range" min="1025" max="65535"/>
+  </options>
+
+  <!-- Sessions for a connection. Sum of all session's probabilities must be 100 -->
+  <!-- creates a delightful array of fake meow wolf device messages for testing -->
+  <sessions>
+    <session name="session1" probability="10" type="ts_raw">
+          <!-- cathy's lappy -->
+      <request> <raw data="ERRPI_ACKCLEAR 10.42.16.222 12345 3:33:33" ack="no_ack"></raw> </request>
+    </session>
+    <session name="session2" probability="10" type="ts_raw">
+          <!-- velostat -->
+      <request> <raw data="ERRPI_ACKCLEAR 10.42.16.177 12345 3:33:33" ack="no_ack"></raw> </request>
+    </session>
+    <session name="session3" probability="10" type="ts_raw">
+          <!-- laser harp pipe -->
+      <request> <raw data="ERRPI_ACKCLEAR 10.42.16.52/laser_wd_pipe 12345 3:33:33" ack="no_ack"></raw> </request>
+    </session>
+          <!-- NVR soft -->
+    <session name="session4" probability="10" type="ts_raw">
+      <request> <raw data="ERRPI_ACKCLEAR 10.42.96.4/GV-VMS.exe 12345 3:33:33" ack="no_ack"></raw> </request>
+    </session>
+    <session name="session5" probability="10" type="ts_raw">
+      <!-- stalagmite -->
+      <request> <raw data="ERRPI_ACKCLEAR 10.42.16.187 12345 3:33:33" ack="no_ack"></raw> </request>
+    </session>
+    <session name="session6" probability="10" type="ts_raw">
+      <!-- relay -->
+      <request> <raw data="ERRPI_ACKCLEAR 10.42.16.173 12345 3:33:33" ack="no_ack"></raw> </request>
+    </session>
+    <session name="session7" probability="10" type="ts_raw">
+      <!-- demos pi -->
+      <request> <raw data="ERRPI_ACKCLEAR 10.42.16.52 12345 3:33:33" ack="no_ack"></raw> </request>
+    </session>
+    <session name="session8" probability="10" type="ts_raw">
+      <!-- ultrasonic distance -->
+      <request> <raw data="ERRPI_ACKCLEAR 10.42.16.171 12345 3:33:33" ack="no_ack"></raw> </request>
+    </session>
+    <session name="session9" probability="10" type="ts_raw">
+      <!-- treenado -->
+      <request> <raw data="ERRPI_ACKCLEAR 10.42.16.166 12345 3:33:33" ack="no_ack"></raw> </request>
+    </session>
+    <session name="session10" probability="10" type="ts_raw">
+      <!-- uv light switch -->
+      <request> <raw data="ERRPI_ACKCLEAR 10.42.16.169 12345 3:33:33" ack="no_ack"></raw> </request>
+	  
+    </session>
+
+    
+      <!-- Full URL with server name overrides the "server" config value -->
+	<!--
+	    </session>
+	    <session name="session2" probability="50" type="ts_http">
+	    <request><http url="/path3" method="GET" version="1.1"></http></request>
+	    <request><http url="/path4" method="GET" version="1.1"></http></request>
+	    </session>
+	-->
+  </sessions>
+</tsung>

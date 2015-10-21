@@ -40,7 +40,10 @@ LINUX_OSX_DB_FILENAME = 'demosdb.db'
 json_file = 'mwsheets-91347531e5f4.json.secret'  #srsly DO NOT UPLOAD THE .JSON FILE
 
 # URL for the google sheet. this can be public
-googleSheetURL = 'https://docs.google.com/spreadsheets/d/1wv_s-CBKj56u9JbZtQA-E-dy5efrS9xPLvFu-TqD-xE/edit#gid=0'
+googleSheetKey = "1kHAcbAo8saNSTBc7ffidzrwu_FGK3FaBpmh7rO7hT-U"
+googleWorksheetName = "Networked Devices" #name of the tab on the google sheet
+
+#googleSheetURL = 'https://docs.google.com/spreadsheets/d/1wv_s-CBKj56u9JbZtQA-E-dy5efrS9xPLvFu-TqD-xE/edit#gid=0'
 
 # give a filename for the watchdog's log file here
 LOG_FILENAME = 'tcp_watchdog_server.out'
@@ -102,7 +105,7 @@ def open_googlesheet():
     try:
         global googleSheetDict
         global json_file
-        global googleSheetURL
+        global googleSheetKey
         global googleWorksheet
         global list_of_lists
         json_key = json.load(open(json_file))
@@ -111,8 +114,10 @@ def open_googlesheet():
         credentials = SignedJwtAssertionCredentials(json_key['client_email'], json_key['private_key'], scope)
         
         gc = gspread.authorize(credentials)
+        sh = gc.open_by_key(googleSheetKey)
+        googleWorksheet = sh.worksheet(googleWorksheetName)
         
-        googleWorksheet = gc.open_by_url(googleSheetURL).sheet1
+#        googleWorksheet = gc.open_by_url(googleSheetURL).sheet1
         list_of_lists = googleWorksheet.get_all_values()
 
     except Exception, e:
@@ -121,19 +126,20 @@ def open_googlesheet():
             fname,lineno,fn,text = frame
             logger.error( "     in %s on line %d" % (fname, lineno))
 
-# then get all values and iterate over the list. Skip header.
+#['IP ADDRESS', 'Mac Address', 'Hostname', 'Device Name', 'Device Type', 'Zone', 'Space', 'Location Details', 'Description', 'Flow Chart LInk', 'Order']
     try:
         #create searchable dictionary with ID_NAME as the key!
         googleSheetDict = defaultdict(list)
         for listy in list_of_lists:
-            googleSheetDict[listy[0]] += listy[1:]
+            #googleSheetDict[listy[0]] += listy[1:]
+            googleSheetDict[listy[1]] += listy[2:]
         googleSheetLen = len(googleSheetDict)    
-        #for keys,values in googleSheetDict.items():
+        for keys,values in googleSheetDict.items():
         #    print(keys)
         #    print(values)
         logger.info("     Google Sheets load OK, %s rows loaded" % googleSheetLen)
     except Exception, e:
-        logger.error("error when iterating over Google sheet %s with json %s: %s" % (googleSheetURL, json_file, e))
+        logger.error("error when iterating over Google sheet %s with json file %s: %s" % (googleSheetKey, json_file, e))
         for frame in traceback.extract_tb(sys.exc_info()[2]):
             fname,lineno,fn,text = frame
             logger.error( "     in %s on line %d" % (fname, lineno))
@@ -148,7 +154,7 @@ def get_item_googlesheet(id_name, item_name):
     if (bool(googleSheetDict) == False):
         logger.error( "empty dictionary in get_item_googlesheet! Did you remember to call open_googlesheet?")
         return ""
-    header_item = googleSheetDict["ID_NAME"]
+    header_item = googleSheetDict["IP ADDRESS"]
     try:
         item_id = header_item.index(item_name)
 #        print "item_id " + str(item_id) + " for " + id_name
@@ -168,6 +174,74 @@ def get_item_googlesheet(id_name, item_name):
             logger.error( "     in %s on line %d" % (fname, lineno))
         return ""
 
+
+############################################################
+#get_all_from_googlesheet()
+############################################################
+# queries the google spreadsheet dict for type, location, zone, space,
+# device name, and description. then returns them along with the MAX_ID_NAME
+# for use with Max (Cycling '74)
+# otherwise does nothing
+def get_all_from_googlesheet(id_name):
+    if (USE_GOOGLE_SHEETS != 1):
+        # if googlesheets are off, read these back from the database as they already exist
+        location = get_item_sqlite(id_name, "LOCATION")
+        device_type = get_item_sqlite(id_name, "DEVICE_TYPE")
+        zone = get_item_sqlite(id_name, "ZONE")
+        space = get_item_sqlite(id_name, "SPACE")
+        device_name = get_item_sqlite(id_name, "DEVICE_NAME")
+        description = get_item_sqlite(id_name, "DESCRIPTION")
+        
+        return (location, device_type, zone, space, device_name, description, id_name) #return items as-is from the database
+    try:
+        #otherwise try to read them from the googlesheet dictionary
+        device_type = get_item_googlesheet(id_name, "Device Type")
+        location = get_item_googlesheet(id_name, "Location Details")
+        zone = get_item_googlesheet(id_name, "Zone")
+        space = get_item_googlesheet(id_name, "Space")
+        device_name = get_item_googlesheet(id_name, "Device Name")
+        description = get_item_googlesheet(id_name, "Description")
+        
+        parent_child_list = id_name.split('/', 1)
+        if len(parent_child_list) > 1:
+            (parent, child) = parent_child_list
+            if (len(device_type) > 0):
+                max_id_name = str(parent) + "/" + str(device_type) + "/" + str(child)
+            else:
+                max_id_name = str(parent) + "/" + "UNKNOWN" + "/" + str(child)
+        else:
+            parent = id_name
+            child = ""
+            if (len(device_type) > 0):
+                max_id_name = str(parent) + "/" + str(device_type) 
+            else:
+                 max_id_name = str(parent) + "/" + "UNKNOWN"
+        print "parent " + parent + " child " + child
+        print "max_id_name " + max_id_name
+        return (location, device_type, zone, space, device_name, description, max_id_name) #return items from googlesheet dictionary
+    except Exception, e:
+        #if the googlesheet read fails, read them from the database
+        print "get_all_from_googlesheet error: %s" % e
+        for frame in traceback.extract_tb(sys.exc_info()[2]):
+            fname,lineno,fn,text = frame
+            print "     in %s on line %d" % (fname, lineno)
+        # read these back from the database as they already exist
+        try:
+            location = get_item_sqlite(id_name, "LOCATION")
+            device_type = get_item_sqlite(id_name, "DEVICE_TYPE")
+            zone = get_item_sqlite(id_name, "ZONE")
+            space = get_item_sqlite(id_name, "SPACE")
+            device_name = get_item_sqlite(id_name, "DEVICE_NAME")
+            description = get_item_sqlite(id_name, "DESCRIPTION")
+            return (location, device_type, zone, space, device_name, description, max_id_name) #return items as-is from the database
+        except Exception, e:
+            print "get_all_from_googlesheet error #2: %s" % e
+            for frame in traceback.extract_tb(sys.exc_info()[2]):
+                fname,lineno,fn,text = frame
+                print "     in %s on line %d" % (fname, lineno)
+#if all else fails, return empty items
+                return ("", "", "", "", "", "", id_name) #do nothing for now
+    
 ############################################################
 #get_type_location_and_max_name()
 ############################################################
@@ -295,13 +369,33 @@ def get_pis_sqlite(pi_or_arduino):
         cur.execute(sql)
         data = cur.fetchall()
         return data
-    
+
 ############################################################
 # get_item_sqlite()
 ############################################################        
 # returns location/description string, given an id_name
 
 def get_item_sqlite(id_name, item_name):
+    global con
+    try:
+        cur = con.cursor()
+        query = "SELECT ID_NAME, %s FROM DEVICES WHERE ID_NAME LIKE ?" % item_name
+        cur.execute(query, ('%'+id_name+'%',))
+        data = cur.fetchall()
+        for row in data:
+            return row[1]
+    except lite.Error, e:
+        if con:
+            con.rollback()
+        print(" SQL error! %s" % e)
+        return "" #blank item, will show as None in SQL
+    
+############################################################
+# get_item_sqlite()
+############################################################        
+# returns location/description string, given an id_name
+
+def get_item_sqlite2(id_name, item_name):
     global con
     try:
         cur = con.cursor()
@@ -414,11 +508,12 @@ def sql_data_sqlite(data, pi_or_arduino):
     #reset uptime and write back to the database
     last_uptime = uptime_sec
     #also get location, device type, and max name from google sheet
-    (location, device_type, max_id_name) = get_type_location_and_max_name(id_name)
+    #    (location, device_type, max_id_name) = get_type_location_and_max_name(id_name)
+    (location, device_type, zone, space, device_name, description, max_id_name) = get_all_from_googlesheet(id_name)
     # insert & commit, otherwise rollback
     try:
         cur = con.cursor()
-        cur.execute("INSERT OR REPLACE INTO DEVICES(ID_NAME, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME, LAST_UPTIME_SEC, LOCATION, DEVICE_TYPE, MAX_ID_NAME) values (?, ?, ?, ?, ?, ?, ?, ?, ?)",  (id_name,timestamp,status, uptime_sec,uptime,uptime_sec, location, device_type, max_id_name))
+        cur.execute("INSERT OR REPLACE INTO DEVICES(ID_NAME, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME, LAST_UPTIME_SEC, LOCATION, DEVICE_TYPE, MAX_ID_NAME, ZONE, SPACE, DEVICE_NAME, DESCRIPTION) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",  (id_name,timestamp,status, uptime_sec,uptime,uptime_sec, location, device_type, max_id_name, zone, space, device_name, description))
         con.commit()
     except lite.Error, e:
         logger.error(" sqlite error: %s" % e)
@@ -456,11 +551,12 @@ def parse_data_sqlite(data):
             status = "NONRESPONSIVE"
             table = "DEVICES"
             #also get location, device type, and max name from google sheet
-            (location, device_type, max_id_name) = get_type_location_and_max_name(id_name)
+            #            (location, device_type, max_id_name) = get_type_location_and_max_name(id_name)
+            (location, device_type, zone, space, device_name, description, max_id_name) = get_all_from_googlesheet(id_name)
             logger.info(id_name + " silent for " + str(total_seconds) + " seconds, setting " + status + " with uptime " + uptime)
             try:
                 cur = con.cursor()
-                cur.execute("INSERT OR REPLACE INTO DEVICES(ID_NAME, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME, LAST_UPTIME_SEC, LOCATION, DEVICE_TYPE, MAX_ID_NAME) values (?, ?, ?, ?, ?, ?, ?, ?, ?)",  (id_name,timestamp,status, uptime_sec,uptime,uptime_sec, location, device_type, max_id_name))
+                cur.execute("INSERT OR REPLACE INTO DEVICES(ID_NAME, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME, LAST_UPTIME_SEC, LOCATION, DEVICE_TYPE, MAX_ID_NAME, ZONE, SPACE, DEVICE_NAME, DESCRIPTION) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",  (id_name,timestamp,status, uptime_sec,uptime,uptime_sec, location, device_type, max_id_name, zone, space, device_name, description))
                 con.commit()
             except lite.Error, e:
                 logger.error("sqlite error: %s" % e)
