@@ -134,7 +134,7 @@ def open_googlesheet():
             #googleSheetDict[listy[0]] += listy[1:]
             googleSheetDict[listy[1]] += listy[2:]
         googleSheetLen = len(googleSheetDict)    
-        for keys,values in googleSheetDict.items():
+        #for keys,values in googleSheetDict.items():
         #    print(keys)
         #    print(values)
         logger.info("     Google Sheets load OK, %s rows loaded" % googleSheetLen)
@@ -173,7 +173,6 @@ def get_item_googlesheet(id_name, item_name):
             fname,lineno,fn,text = frame
             logger.error( "     in %s on line %d" % (fname, lineno))
         return ""
-
 
 ############################################################
 #get_all_from_googlesheet()
@@ -650,31 +649,37 @@ if __name__ == "__main__":
     ##################
     # SOCKET SETUP
     ##################
+
+    try:
+        server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        server_socket.bind(("0.0.0.0", PORT))
+    except socket.error, e:
+        print "socket error: " + e
         
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.settimeout(SOCKET_TIMEOUT) 
+    #    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#    server_socket.settimeout(SOCKET_TIMEOUT) 
  
     # check and turn on TCP keepalive -- this ensures that we'll get 
-    # disconnect errors from clients that go away
-    x = server_socket.getsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE)
-    if (x == 0):
-        x = server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+    # disconnect errors from clients that go away#
+#    x = server_socket.getsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE)
+#    if (x == 0):
+#        x = server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
 
         # overrides value (in seconds) for the TCP keepalives. Only works on linux, not on windows
         # 60 secs to 1st timeout, 4 retries @ 15 secs per = 2 mins til timeout
-        if (os.name == 'linux'):
-            server_socket.setsockopt(socket.SOL_TCP, socket.TCP_KEEPIDLE, 60)
+#        if (os.name == 'linux'):
+#            server_socket.setsockopt(socket.SOL_TCP, socket.TCP_KEEPIDLE, 60)
             # overrides value shown by sysctl net.ipv4.tcp_keepalive_probes
-            server_socket.setsockopt(socket.SOL_TCP, socket.TCP_KEEPCNT, 4)
+#            server_socket.setsockopt(socket.SOL_TCP, socket.TCP_KEEPCNT, 4)
             # overrides value shown by sysctl net.ipv4.tcp_keepalive_intvl
-            server_socket.setsockopt(socket.SOL_TCP, socket.TCP_KEEPINTVL, 15)
+#            server_socket.setsockopt(socket.SOL_TCP, socket.TCP_KEEPINTVL, 15)
     
-    server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    server_socket.bind(("0.0.0.0", PORT))
-    server_socket.listen(NUM_QUEUED_CONNECTIONS)
+#    server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+#    server_socket.bind(("0.0.0.0", PORT))
+#    server_socket.listen(NUM_QUEUED_CONNECTIONS)
  
     # Add server socket to the list of readable connections
-    CONNECTION_LIST.append(server_socket)
+#    CONNECTION_LIST.append(server_socket)
  
     logger.info ("     Watchdog server started on port " + str(PORT))
 
@@ -704,90 +709,30 @@ if __name__ == "__main__":
             parse_data_sqlite(data)
             periodic_timer = time.time()
 
-        # Get the list of sockets which are ready to be read through select
-        # thirty second timeout so the periodic data check will still work
-        # if nothing is connected
-        read_sockets,write_sockets,error_sockets = select.select(CONNECTION_LIST,[],[], 30.0)
-        
-        for sock in read_sockets:
-
+        data, address = server_socket.recvfrom(1024)
+        print data
+        if (data):
+            print "-----Client (%s) connected, sent %s" % (address, data)
             #######################
-            # NEW CONNECTION
+            # DATA RECEIVED
             #######################
-
-            if sock == server_socket:
-                # Handle a new connection
-                sockfd, addr = server_socket.accept()
-                CONNECTION_LIST.append(sockfd)
-                logger.info("     Client (%s) connected" % addr[0])
-                addr_str = str(addr[0])
+            # at this point we got data, so log it
+            
+            if data.count("ERRPI") + data.count("ERRDUINO") > 1:
+                # we may get more than one message at a time
+                # due to the way TCP works. If so, split 'em.
+                datas = re.split('(ERR)', data)
+                for data in datas:
+                    if data != "" and data != "ERR":
+                        data2 = "ERR"+data
+                        logger.debug("line is " + data2)
+                        data3 = listify_data(data2)
+                        sql_data_sqlite(data3, "ARDUINOS")
+                        # otherwise, just log one message
             else:
-
-                #######################
-                # EXISTING CONNECTION
-                #######################
-                # Data recieved, process it
-
-                try:
-                    data = sock.recv(RECV_BUFFER)
-                    if not sock:
-                        logger.error("No socket, popping an error")
-                    else:
+                data2 = listify_data(data)
+                sql_data_sqlite(data2, "ARDUINOS")
                         
-                        #######################
-                        # CONNECTION CLOSED
-                        #######################
-                        # If nothing's rec'd from recv, this indicates the client has closed the connection
-
-                        if data == '':
-                            logger.info("     Client (%s) is offline" % addr[0])
-                            logger.info("     due to client disconnected / closed.")
-                            sock.close()
-                            CONNECTION_LIST.remove(sock)
-                        else:
-
-                        #######################
-                        # DATA RECEIVED
-                        #######################
-                        # at this point we got data, so log it
-
-                            if data.count("ERRPI") + data.count("ERRDUINO") > 1:
-                                # we may get more than one message at a time
-                                # due to the way TCP works. If so, split 'em.
-                                datas = re.split('(ERR)', data)
-                                for data in datas:
-                                    if data != "" and data != "ERR":
-                                        data2 = "ERR"+data
-                                        logger.debug("line is " + data2)
-                                        data3 = listify_data(data2)
-                                        sql_data_sqlite(data3, "ARDUINOS")
-                            # otherwise, just log one message
-                            else:
-                                data2 = listify_data(data)
-                                sql_data_sqlite(data2, "ARDUINOS")
-
-                # just ignore socket timeouts, as they do not break the conn
-                except socket.timeout:
-                    logger.error("socket timeout!")
-                    continue
-
-                #######################
-                # ERROR / EXCEPTION
-                #######################
-                # other exceptions cause the client to be removed from the list
-
-                except Exception, e:
-                    logger.info("     Client (%s) is offline" % addr[0])
-                    logger.info("     due to %s" % e)
-                    # prints line number info
-                    for frame in traceback.extract_tb(sys.exc_info()[2]):
-                        fname,lineno,fn,text = frame
-                        logger.info("     in %s on line %d" % (fname, lineno))
-                    sock.close()
-                    addr_str = str(addr[0])
-                    CONNECTION_LIST.remove(sock)
-                    continue
-
     ##################
     # EXIT
     ##################                

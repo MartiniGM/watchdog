@@ -28,8 +28,10 @@ send_ok_timer_software = time.time()
 USE_SOCKETS = 1
 
 # set TCP watchdog IP and port here
-host = '10.42.16.17';
-port = 6666;
+#host = '10.42.16.17'
+host = "192.168.254.5"
+remote_ip = ""
+port = 6666
 
 # creates a socket up-front, just to initialize it 
 if (USE_SOCKETS):
@@ -38,10 +40,6 @@ if (USE_SOCKETS):
             watchsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     except socket.error as e:
             print 'Failed to create socket: %s' % e
-
-####################
-# EXIT HANDLER
-####################                
 
 ####################
 # EXIT HANDLER
@@ -71,24 +69,30 @@ def get_ip_address(ifname):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(('8.8.8.8', 0))  # connecting to a UDP address doesn't send packets
         local_ip_address = s.getsockname()[0]
-        #print local_ip_address
+#        print local_ip_address
         return local_ip_address
     else:
-        import fnctl
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        return socket.inet_ntoa(fcntl.ioctl(
-            s.fileno(),
-            0x8915,  # SIOCGIFADDR
-            struct.pack('256s', ifname[:15])
-        )[20:24])
-        
+        if os.name == 'linux':
+            import fnctl
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            return socket.inet_ntoa(fcntl.ioctl(
+                s.fileno(),
+                0x8915,  # SIOCGIFADDR
+                struct.pack('256s', ifname[:15])
+            )[20:24])
+        else: #mac os probably
+            import socket
+            local_ip_address = socket.gethostbyname(socket.gethostname())
+#            print local_ip_address
+            return local_ip_address
+
 ############################################################
 # get_uptime()
 ############################################################
 # returns this Pi's uptime in seconds and as formatted string
 def get_uptime():
     try:
-        if os.name != 'nt':
+        if os.name == 'linux':
             with open('/proc/uptime', 'r') as f:
                 uptime_seconds = float(f.readline().split()[0])
                 uptime_string = str(datetime.timedelta(seconds = uptime_seconds))
@@ -96,12 +100,22 @@ def get_uptime():
                 #            print "UPTIME STR: " + uptime_string
                 return (uptime_string, uptime_seconds)
         else:
-            import win32api
-            uptime_seconds = win32api.GetTickCount() / 1000
-            uptime_string = str(datetime.timedelta(seconds = uptime_seconds))
-            uptime_string = uptime_string.split('.')[0]
-            #print uptime_string
-            return (uptime_string, uptime_seconds)
+            if os.name == 'nt':
+                import win32api
+                uptime_seconds = win32api.GetTickCount() / 1000
+                uptime_string = str(datetime.timedelta(seconds = uptime_seconds))
+                uptime_string = uptime_string.split('.')[0]
+                #print uptime_string
+                return (uptime_string, uptime_seconds)
+            else: # mac os probably
+                output = subprocess.check_output(['sysctl', '-n', 'kern.boottime']).strip()
+                boottime = re.search('sec = (\d+),', output).group(1)
+                uptime_seconds = datetime.timedelta(seconds=float(boottime)).seconds
+#                print uptime_seconds
+                uptime_string = str(datetime.timedelta(seconds = uptime_seconds))
+                uptime_string = uptime_string.split('.')[0]
+#                print uptime_string
+                return (uptime_string, uptime_seconds)
     except Exception, e:
         print "error getting uptime, %s" % e 
         return ("", 0)
@@ -113,18 +127,18 @@ def get_uptime():
 def socket_connect():
     global watchsock
     global host
+    global remote_ip
     global port
     if (USE_SOCKETS):
         try:
-            watchsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
+            watchsock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
             remote_ip = socket.gethostbyname( host )
-            watchsock.connect((remote_ip , port))
  
         except socket.error as e:
             print 'Failed to create socket: %s' % e
             return 0
         else:
-            print 'Socket Connected to ' + host + ' on ip ' + remote_ip
+            print 'Socket created: ' + host + ' on ip ' + remote_ip
             return 1
 
 ############################################################
@@ -144,24 +158,16 @@ def send_ok_now(pi_or_arduino, status, append_string):
                          message = status + " " + ip + " " + str(uptime_seconds) + " " + str(uptime_string)                         
                      else:
                          message = status + " " + ip + "/" + str(append_string) + " " + str(uptime_seconds) + " " + str(uptime_string)
-
-#                     message = "ERRPI_ACKCLEAR " + ip + "/" + os.path.basename(self.port) + " " + str(uptime_seconds) + " " + uptime_string
-#                     print message
-#str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))   
-#                 else:
-#                     ip = get_ip_address('eth0')
-#                     uptime_string , uptime_seconds = get_uptime()
-#                     message = "ERRPI_ACKCLEAR " + ip + "/" + os.path.basename(self.port) + " " + str(uptime_seconds) + " " + uptime_string
-# str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
-#                     print message
-                     watchsock.sendall(message)
+                     watchsock.sendto(message, (remote_ip, port))
              except socket.error as e:
                  print "Send failed! %s" % e
-                 status = socket_connect()
+                 for frame in traceback.extract_tb(sys.exc_info()[2]):
+                     fname,lineno,fn,text = frame
+                     print "     in %s on line %d" % (fname, lineno)
                  if (status == 1):
-                     watchsock.sendall(message)
+                     watchsock.sendto(message, (remote_ip, port))
                  else:
-                     print "failed to send " + message
+                     print "failed to send"
                  #put retry here
              except IOError as e:
                  print "failed to send %s " % e
@@ -207,7 +213,6 @@ def pi_scan():
      global send_ok_period
      sleep(0.005) #otherwise it eats every CPU :3
      #delete/tweak this if you're getting lag
-     #does not need to be super fast because this Pi is not receiving data
      try:
          if (time.time() - send_ok_timer_pi > send_ok_period + 30):
              send_ok_now("PI", "ERRPI_ACKCLEAR", "")
@@ -312,19 +317,18 @@ class Arduino:
                 try:
                     ip = get_ip_address('eth0')
                     message = errcode + " " + ip + "/" + os.path.basename(self.port) + " " + str(uptime_seconds) + " " + uptime_string
-#str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
-                    watchsock.sendall(message)
+                    watchsock.sendto(message, (remote_ip, port))
                 except socket.error as e:
                     # tries to reconnect every time round the loop
                     print "Send failed! %s" % e
-                    status = socket_connect() 
                     if (status == 1):
-                        watchsock.sendall(message)
+                        watchsock.sendto(message, (remote_ip, port)) 
                     else:
                         print "failed to send 1" + message
 
 ####################
-# scan()####################                          
+# scan()
+####################                          
 # this is the main scan loop for each arduino. Gets data over the pipe, and 
 # either resets the watchdog timer due to good data, or waits til it expires
 # and triggers the watchdog.
@@ -377,20 +381,13 @@ class Arduino:
             #From here down, we got a read-success    
             self.set_failstart = 0  # clears the failure code in case we failed earlier 
             if (self.last_len != 0):
-#                print os.path.basename(self.port) + " " + self.textln
 #                print "Got data on port " + os.path.basename(self.port) + " in sec:" + str(time.time() - self.start).split('.')[0] + "  " + self.textln 
                 self.start = time.time()
                 if (USE_SOCKETS):
                 #sends ERRPI_ACKCLEAR every X seconds
-                    #print "timer " + str(time.time() - send_ok_timer) + " period " + str(send_ok_period)
                     if (time.time() - send_ok_timer_pi > send_ok_period + 30):
                         send_ok_now("PI", "ERRPI_ACKCLEAR", "")
                         send_ok_timer_pi = time.time()
-#                    if (time.time() - self.send_ok_timer > send_ok_period):
-#                        self.send_ok_now("ARDUINO")
-#                        self.send_ok_timer = time.time()
-
- #               print "self.start reset to " + str(self.start) + "at " + str(datetime.datetime.now())
             else: 
                     # because the Pi itself is still up even when its arduinos are not, we need to duplicate this here or we will never hear back from the pi is all arduinos are down
                 if (time.time() - send_ok_timer_pi > send_ok_period + 30):
@@ -421,8 +418,8 @@ if (USE_SOCKETS):
 # builds a list to step through the arduinos.
 # Leave this list blank (as below) to monitor only this Pi.
 arduinolist = []
-#arduino1 = Arduino("./piezo_wd_pipe", 1, 0.0, 40.0, 100.0)
-#arduino2 = Arduino("./laser_wd_pipe", 1, 0.0, 40.0, 100.0)
+arduino1 = Arduino("./piezo_wd_pipe", 1, 0.0, 40.0, 100.0)
+arduino2 = Arduino("./laser_wd_pipe", 1, 0.0, 40.0, 100.0)
 #arduino3 = Arduino("./chest_wd_pipe", 1, 0.0, 40.0, 100.0)
 #arduinolist.append(arduino1)
 #arduinolist.append(arduino2)
@@ -450,6 +447,4 @@ while 1:
     #same for the list of software. treat software just like a device!
     software_scan(softwarelist)
 
-# sixth version. Sends software status updates
-
-
+# seventh version. sends UDP messages
