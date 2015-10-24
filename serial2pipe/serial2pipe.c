@@ -56,9 +56,9 @@ struct in_addr ipv4addr;
 //UDP host details:
 #define PORT 6666
 //use this to test happy connection
-//#define HOST "10.42.16.17"
+#define HOST "10.42.16.17"
 //use this to test broken connection
-#define HOST "10.42.16.222"
+//#define HOST "10.42.16.222"
 
 /* closes everything upon exit */
 static void murder(int ignore) { 
