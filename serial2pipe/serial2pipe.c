@@ -25,16 +25,16 @@
 #define SERIAL_DEVICE_A "/dev/cu.usbmodem1411"
 #endif
 #ifdef __linux__
-#define SERIAL_DEVICE_A "/dev/arduino3"
+#define SERIAL_DEVICE_A "/dev/arduino1"
 //#define SERIAL_DEVICE_A "/dev/arduino2"
 #endif
 
-#define PIPE_1 "laser_wd_pipe"
-#define PIPE_2 "laser_pipe"
+#define PIPE_1 "watchdog_pipe1"
+#define PIPE_2 "arduino_pipe1"
 //#define PIPE_1 "watchdog_pipe2"
 //#define PIPE_2 "arduino_pipe2"
 #define BAUD B115200
-#define WD_RECONNECT_TIME 60 //time in seconds between subsequent TCP reconnect attempts
+#define WD_RECONNECT_TIME 60 //time in seconds between subsequent UDP reconnect attempts
 
 // globals 
 int fda; FILE *fsa;
@@ -42,23 +42,23 @@ int pipe1, pipe2;
 int num_ffs = 0; //counter to detect if the Arduino serial cable has been yanked out (if so, Arduino floods 0xFF)
 int pipe1_connected = 0; //0 if pipe not open, 1 if open
 int pipe2_connected = 0; //0 if pipe not open, 1 if open
-int watchdog_connected  = 0; //0 if not connected via TCP, 1 if connected
+int watchdog_connected  = 0; //0 if no UDP socket, 1 if connected
 time_t start, end; //timer for ACKCLEAR messages for pipe1
 time_t start2, end2; //timer for ACKCLEAR messages for pipe2
 time_t start3, end3; //timer to keep "can't open" messages from overflow
 time_t start4, end4; //timer to keep disconnected watchdog server from blocking/delaying
-//stuff for TCP connection
+//stuff for UDP connection
 struct hostent *hp; 
 int sd = 0;
 struct sockaddr_in server;
 struct in_addr ipv4addr;
 
-//TCP host details:
+//UDP host details:
 #define PORT 6666
 //use this to test happy connection
-#define HOST "10.42.16.17"
+//#define HOST "10.42.16.17"
 //use this to test broken connection
-//#define HOST "192.168.1.17"
+#define HOST "10.42.16.222"
 
 /* closes everything upon exit */
 static void murder(int ignore) { 
@@ -128,14 +128,65 @@ void build_error_str(char *dest, char *errcode_str, char* pipename) {
   gethostname(hostname, 1024);
   get_ip(addressBuffer);
   sprintf(dest, "%s %s/%s %ld %s", errcode_str, addressBuffer, pipename, info.uptime, buf);
-  printf("%s\n", dest);
+  // printf("%s\n", dest);
   // format example/test:
   //  char *message = "ERRDUINO_BROKENPIPE 127.0.0.1 1234 x days, 00:01:02";
 }
 
-/* Tries to connect (if not connected) every N seconds. If already connected, sends the message */
+void UDPSendMessage(char *message) {
+  /* Tries to connect (if not connected) every N seconds. If already connected, sends the message */
+  if (watchdog_connected == 0) {
+    double diff;
+    time(&end4);
+    diff = difftime(end4,start4);
+    //    printf("trying to send/comparing times: %f sec\n", diff);
+    
+    if (diff < WD_RECONNECT_TIME) {
+      return;
+    } else {
+      //      printf("thirty seconds passed, try again\n");
+      time(&start4);  //restarts timer for "don't block/constantly reconnect" loop
+    }
+    
+    printf("Now connecting / reconnecting\n");
+    sd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    if (sd == -1) {
+      herror("socket error:");
+      watchdog_connected = 0;
+      time(&start4);  //restarts timer for "don't block/constantly reconnect" loop
+      sd = 0;
+    }
+    server.sin_family = AF_INET;
+    
+    inet_pton(AF_INET, HOST, &ipv4addr);
+    hp = gethostbyaddr(&ipv4addr, sizeof ipv4addr, AF_INET);
+    if (hp == 0) {
+      herror("gethostbyname error:");
+      watchdog_connected = 0;
+      time(&start4);  //restarts timer for "don't block/constantly reconnect" loop
+      sd = 0;
+    } else {
+      bcopy(hp->h_addr, &(server.sin_addr.s_addr), hp->h_length);
+      server.sin_port = htons(PORT);
+      printf("Successfully connected\n");
+      watchdog_connected = 1;
+    }
+  }
+
+  if (sendto(sd, message, strlen(message) , 0 , (struct sockaddr *) &server, sizeof(server))==-1) {
+    printf("Can't send %s to %s\n", message, HOST);
+  } else {
+    printf("%s: %s\n", HOST, message);
+  }
+}
+
+
+
+
+
+
 /* The initial TCP connection blocks pretty badly, so we want to avoid reconnects as much as possible */
-void TCPSendMessage(char * message)
+void TCPSendMessage(char *message)
 {
   if (watchdog_connected == 0) {
     double diff;
@@ -313,12 +364,13 @@ int main(void)
 	printf("SERIAL ERROR\n");
 	open_ports();
       }
-      
+
+      /*      
       if (tmp >=32 && tmp <= 126) //don't print unicode etc as characters! weird stuff printf'd as %c can segfault on linux
 	printf("%c",tmp);
       else
 	printf("%x",tmp);
-
+      */
       stat1 = write(pipe1, &tmp, 1);
       errno1 = errno;
       //      printf("\n\n\nstat1 %d errno1 %d\n", stat1, errno1);
@@ -334,7 +386,7 @@ int main(void)
 	sprintf(error_str, "Write error on %s:", PIPE_1);
 	perror(error_str);
 	build_error_str(error_str2, "ERRDUINO_BROKENPIPE", PIPE_1);
-	TCPSendMessage(error_str2);
+	UDPSendMessage(error_str2);
 	if (pipe1_connected == 1) {
 	  pipe1_connected = 0;
 	}
@@ -346,7 +398,7 @@ int main(void)
 	if (diff > 30) {
 	  char *error_str2 = (char *)malloc(2000);
 	  build_error_str(error_str2, "ERRDUINO_ACKCLEAR", PIPE_1);
-	  TCPSendMessage(error_str2);
+	  UDPSendMessage(error_str2);
           pipe1_connected = 1;
 	  time(&start);
 	}
@@ -359,7 +411,7 @@ int main(void)
 	sprintf(error_str, "Write error on %s:", PIPE_2);
 	perror(error_str);
 	build_error_str(error_str2, "ERRDUINO_BROKENPIPE", PIPE_2);
-	TCPSendMessage(error_str2);
+	UDPSendMessage(error_str2);
 	if (pipe2_connected == 1)
 	  pipe2_connected = 0;
       } else {
@@ -370,12 +422,12 @@ int main(void)
 	if (diff > 30) {
 	  char *error_str2 = (char *)malloc(2000);
 	  build_error_str(error_str2, "ERRDUINO_ACKCLEAR", PIPE_2);
-	  TCPSendMessage(error_str2);
+	  UDPSendMessage(error_str2);
           pipe2_connected = 1;
 	  time(&start2);
 	}
       }
     } 
-  murder(1); //if we end up here, close the pipes and TCP connection
+  murder(1); //if we end up here, close the pipes 
   return 0;
 }

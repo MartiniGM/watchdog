@@ -28,8 +28,7 @@ send_ok_timer_software = time.time()
 USE_SOCKETS = 1
 
 # set TCP watchdog IP and port here
-#host = '10.42.16.17'
-host = "192.168.254.5"
+host = '10.42.16.222'
 remote_ip = ""
 port = 6666
 
@@ -72,8 +71,9 @@ def get_ip_address(ifname):
 #        print local_ip_address
         return local_ip_address
     else:
-        if os.name == 'linux':
-            import fnctl
+        if sys.platform == 'linux' or sys.platform == 'linux2':
+            import fcntl
+            import socket
             s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             return socket.inet_ntoa(fcntl.ioctl(
                 s.fileno(),
@@ -92,7 +92,7 @@ def get_ip_address(ifname):
 # returns this Pi's uptime in seconds and as formatted string
 def get_uptime():
     try:
-        if os.name == 'linux':
+        if sys.platform == 'linux' or sys.platform == 'linux2':
             with open('/proc/uptime', 'r') as f:
                 uptime_seconds = float(f.readline().split()[0])
                 uptime_string = str(datetime.timedelta(seconds = uptime_seconds))
@@ -418,8 +418,8 @@ if (USE_SOCKETS):
 # builds a list to step through the arduinos.
 # Leave this list blank (as below) to monitor only this Pi.
 arduinolist = []
-arduino1 = Arduino("./piezo_wd_pipe", 1, 0.0, 40.0, 100.0)
-arduino2 = Arduino("./laser_wd_pipe", 1, 0.0, 40.0, 100.0)
+arduino1 = Arduino("./watchdog_pipe1", 1, 0.0, 40.0, 100.0)
+arduino2 = Arduino("./watchdog_pipe2", 1, 0.0, 40.0, 100.0)
 #arduino3 = Arduino("./chest_wd_pipe", 1, 0.0, 40.0, 100.0)
 #arduinolist.append(arduino1)
 #arduinolist.append(arduino2)
