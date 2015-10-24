@@ -126,7 +126,7 @@ def open_googlesheet():
             fname,lineno,fn,text = frame
             logger.error( "     in %s on line %d" % (fname, lineno))
 
-#['IP ADDRESS', 'Mac Address', 'Hostname', 'Device Name', 'Device Type', 'Zone', 'Space', 'Location Details', 'Description', 'Flow Chart LInk', 'Order']
+#['IP ADDRESS', 'Mac Address', 'Hostname', 'Device Name', 'Device Type', 'Zone', 'Space', 'Location Details', 'Description', 'Flow Chart LInk', 'Order', 'Switch Interface']
     try:
         #create searchable dictionary with ID_NAME as the key!
         googleSheetDict = defaultdict(list)
@@ -190,8 +190,8 @@ def get_all_from_googlesheet(id_name):
         space = get_item_sqlite(id_name, "SPACE")
         device_name = get_item_sqlite(id_name, "DEVICE_NAME")
         description = get_item_sqlite(id_name, "DESCRIPTION")
-        
-        return (location, device_type, zone, space, device_name, description, id_name) #return items as-is from the database
+        switch_interface = get_item_sqlite(id_name, "SWITCH_INTERFACE")
+        return (location, device_type, zone, space, device_name, description, switch_interface, id_name) #return items as-is from the database
     try:
         #otherwise try to read them from the googlesheet dictionary
         device_type = get_item_googlesheet(id_name, "Device Type")
@@ -200,6 +200,7 @@ def get_all_from_googlesheet(id_name):
         space = get_item_googlesheet(id_name, "Space")
         device_name = get_item_googlesheet(id_name, "Device Name")
         description = get_item_googlesheet(id_name, "Description")
+        switch_interface = get_item_googlesheet(id_name, "Switch Interface")
         
         parent_child_list = id_name.split('/', 1)
         if len(parent_child_list) > 1:
@@ -217,7 +218,7 @@ def get_all_from_googlesheet(id_name):
                  max_id_name = str(parent) + "/" + "UNKNOWN"
         print "parent " + parent + " child " + child
         print "max_id_name " + max_id_name
-        return (location, device_type, zone, space, device_name, description, max_id_name) #return items from googlesheet dictionary
+        return (location, device_type, zone, space, device_name, description, switch_interface, max_id_name) #return items from googlesheet dictionary
     except Exception, e:
         #if the googlesheet read fails, read them from the database
         print "get_all_from_googlesheet error: %s" % e
@@ -232,71 +233,15 @@ def get_all_from_googlesheet(id_name):
             space = get_item_sqlite(id_name, "SPACE")
             device_name = get_item_sqlite(id_name, "DEVICE_NAME")
             description = get_item_sqlite(id_name, "DESCRIPTION")
-            return (location, device_type, zone, space, device_name, description, max_id_name) #return items as-is from the database
+            switch_interface = get_item_sqlite(id_name, "SWITCH_INTERFACE")
+            return (location, device_type, zone, space, device_name, description, switch_interface, max_id_name) #return items as-is from the database
         except Exception, e:
             print "get_all_from_googlesheet error #2: %s" % e
             for frame in traceback.extract_tb(sys.exc_info()[2]):
                 fname,lineno,fn,text = frame
                 print "     in %s on line %d" % (fname, lineno)
 #if all else fails, return empty items
-                return ("", "", "", "", "", "", id_name) #do nothing for now
-    
-############################################################
-#get_type_location_and_max_name()
-############################################################
-# queries the google spreadsheet dict for type and location, then writes
-# them out to the DB along with the MAX_ID_NAME for use with Max (Cycling '74)
-# otherwise does nothing
-def get_type_location_and_max_name(id_name):
-    if (USE_GOOGLE_SHEETS != 1):
-# read these back from the database as they already exist
-        location = get_item_sqlite(id_name, "LOCATION")
-        device_type = get_item_sqlite(id_name, "DEVICE_TYPE")
-  #      print "got location " + str(location) + " and type " + str(device_type)
-        return (location, device_type, id_name) #do nothing for now
-    try:
-        device_type = get_item_googlesheet(id_name, "DEVICE_TYPE")
-        location = get_item_googlesheet(id_name, "LOCATION / DESCRIPTION")
-        if (device_type == ""):
-            device_type = get_item_sqlite(id_name, "DEVICE_TYPE")
-        if (location == ""):
-            location = get_item_sqlite(id_name, "LOCATION")
-#        print "id_name " + id_name
-#        print "device type " + device_type
-#        print "location " + location
-        parent_child_list = id_name.split('/', 1)
-        if len(parent_child_list) > 1:
-            (parent, child) = parent_child_list
-            if (len(device_type) > 0):
-                max_id_name = str(parent) + "/" + str(device_type) + "/" + str(child)
-            else:
-                max_id_name = str(parent) + "/" + "UNKNOWN" + "/" + str(child)           
-        else:
-            parent = id_name
-            child = ""
-            if (len(device_type) > 0):
-                max_id_name = str(parent) + "/" + str(device_type)
-            else:
-                max_id_name = str(parent) + "/" + "UNKNOWN"
-#            print "parent " + parent + " child " + child
-#        print "max_id_name " + max_id_name
-        return (location, device_type, max_id_name)
-    except Exception, e:
-        logger.error("get_type_location_and_max_name error! %s" % e)
-        for frame in traceback.extract_tb(sys.exc_info()[2]):
-            fname,lineno,fn,text = frame
-            logger.error("     in %s on line %d" % (fname, lineno))
-                   # read these back from the database as they already exist
-        try:
-            location = get_item_sqlite(id_name, "LOCATION")
-            device_type = get_item_sqlite(id_name, "DEVICE_TYPE")
-            return (location, device_type, id_name) #do nothing for now
-        except Exception, e:
-            logger.error("get_type_location_and_max_name error #2: %s" % e)
-            for frame in traceback.extract_tb(sys.exc_info()[2]):
-                fname,lineno,fn,text = frame
-                logger.error("     in %s on line %d" % (fname, lineno))
-                return ("", "", id_name) #do nothing for now
+                return ("", "", "", "", "", "", "", id_name) #do nothing for now
             
 ############################################################
 #return_last_reset()
@@ -508,11 +453,11 @@ def sql_data_sqlite(data, pi_or_arduino):
     last_uptime = uptime_sec
     #also get location, device type, and max name from google sheet
     #    (location, device_type, max_id_name) = get_type_location_and_max_name(id_name)
-    (location, device_type, zone, space, device_name, description, max_id_name) = get_all_from_googlesheet(id_name)
+    (location, device_type, zone, space, device_name, description, switch_interface, max_id_name) = get_all_from_googlesheet(id_name)
     # insert & commit, otherwise rollback
     try:
         cur = con.cursor()
-        cur.execute("INSERT OR REPLACE INTO DEVICES(ID_NAME, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME, LAST_UPTIME_SEC, LOCATION, DEVICE_TYPE, MAX_ID_NAME, ZONE, SPACE, DEVICE_NAME, DESCRIPTION) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",  (id_name,timestamp,status, uptime_sec,uptime,uptime_sec, location, device_type, max_id_name, zone, space, device_name, description))
+        cur.execute("INSERT OR REPLACE INTO DEVICES(ID_NAME, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME, LAST_UPTIME_SEC, LOCATION, DEVICE_TYPE, MAX_ID_NAME, ZONE, SPACE, DEVICE_NAME, DESCRIPTION, SWITCH_INTERFACE) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",  (id_name,timestamp,status, uptime_sec,uptime,uptime_sec, location, device_type, max_id_name, zone, space, device_name, description, switch_interface))
         con.commit()
     except lite.Error, e:
         logger.error(" sqlite error: %s" % e)
@@ -551,11 +496,11 @@ def parse_data_sqlite(data):
             table = "DEVICES"
             #also get location, device type, and max name from google sheet
             #            (location, device_type, max_id_name) = get_type_location_and_max_name(id_name)
-            (location, device_type, zone, space, device_name, description, max_id_name) = get_all_from_googlesheet(id_name)
+            (location, device_type, zone, space, device_name, description, switch_interface, max_id_name) = get_all_from_googlesheet(id_name)
             logger.info(id_name + " silent for " + str(total_seconds) + " seconds, setting " + status + " with uptime " + uptime)
             try:
                 cur = con.cursor()
-                cur.execute("INSERT OR REPLACE INTO DEVICES(ID_NAME, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME, LAST_UPTIME_SEC, LOCATION, DEVICE_TYPE, MAX_ID_NAME, ZONE, SPACE, DEVICE_NAME, DESCRIPTION) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",  (id_name,timestamp,status, uptime_sec,uptime,uptime_sec, location, device_type, max_id_name, zone, space, device_name, description))
+                cur.execute("INSERT OR REPLACE INTO DEVICES(ID_NAME, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME, LAST_UPTIME_SEC, LOCATION, DEVICE_TYPE, MAX_ID_NAME, ZONE, SPACE, DEVICE_NAME, DESCRIPTION, SWITCH_INTERFACE) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",  (id_name,timestamp,status, uptime_sec,uptime,uptime_sec, location, device_type, max_id_name, zone, space, device_name, description, switch_interface))
                 con.commit()
             except lite.Error, e:
                 logger.error("sqlite error: %s" % e)
