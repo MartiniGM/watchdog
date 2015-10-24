@@ -28,7 +28,7 @@ send_ok_timer_software = time.time()
 USE_SOCKETS = 1
 
 # set TCP watchdog IP and port here
-host = '10.42.16.222'
+host = '10.42.16.17'
 remote_ip = ""
 this_ip = ""
 port = 6666
@@ -63,6 +63,7 @@ signal.signal(signal.SIGINT, signal_handler)
 def get_ip_address(ifname):
     try:
         if os.name == 'nt':
+            import socket
 #        hostname = socket.gethostname()
 #        IP = socket.gethostbyname(hostname)
 #        print IP
@@ -139,8 +140,6 @@ def socket_connect():
         try:
             watchsock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
             remote_ip = socket.gethostbyname( host )
-            this_ip = get_ip_address('eth0')
-            print "send from " + this_ip
         except socket.error as e:
             print 'Failed to create socket: %s' % e
             return 0
@@ -426,6 +425,9 @@ if (USE_SOCKETS):
     status = 0
     while (status == 0):
         status = socket_connect()
+
+this_ip = get_ip_address('eth0')
+print "send from " + this_ip
     
 #use serial2pipe to split the Arduino output into two named pipes, then attach
 #the following to one of the pipes, and the other to the program to be 
@@ -434,18 +436,18 @@ if (USE_SOCKETS):
 # builds a list to step through the arduinos.
 # Leave this list blank (as below) to monitor only this Pi.
 arduinolist = []
-arduino1 = Arduino("./watchdog_pipe1", 1, 0.0, 40.0, 100.0)
-arduino2 = Arduino("./watchdog_pipe2", 1, 0.0, 40.0, 100.0)
+#arduino1 = Arduino("./watchdog_pipe1", 1, 0.0, 40.0, 100.0)
+#arduino2 = Arduino("./watchdog_pipe2", 1, 0.0, 40.0, 100.0)
 #arduino3 = Arduino("./chest_wd_pipe", 1, 0.0, 40.0, 100.0)
-arduinolist.append(arduino1)
-arduinolist.append(arduino2)
+#arduinolist.append(arduino1)
+#arduinolist.append(arduino2)
 #arduinolist.append(arduino3)
 
 # builds a list to step through the software on this Pi.
 # Leave this list blank to skip software monitoring.
 softwarelist = []
 softwarelist.append(("GV-VMS.exe", ""))
-softwarelist.append(("Max.exe", ""))
+#softwarelist.append(("Max.exe", ""))
 
 while 1:
     # if there's nothing connected we still want to monitor this Pi or PC. send OKAY every N seconds.
