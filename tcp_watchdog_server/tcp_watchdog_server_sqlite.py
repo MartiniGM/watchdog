@@ -598,6 +598,7 @@ if __name__ == "__main__":
     try:
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         server_socket.bind(("0.0.0.0", PORT))
+        server_socket.settimeout(5.0)
     except socket.error, e:
         print "socket error: " + e
         
@@ -653,31 +654,36 @@ if __name__ == "__main__":
 #            print data
             parse_data_sqlite(data)
             periodic_timer = time.time()
-
-        data, address = server_socket.recvfrom(1024)
-        print data
-        if (data):
-            print "-----Client (%s) connected, sent %s" % (address, data)
+        
+        try:
+            data, address = server_socket.recvfrom(1024)
+            print data
+            if (data):
+                print "-----Client (%s) connected, sent %s" % (address, data)
             #######################
             # DATA RECEIVED
             #######################
             # at this point we got data, so log it
             
-            if data.count("ERRPI") + data.count("ERRDUINO") > 1:
+                if data.count("ERRPI") + data.count("ERRDUINO") > 1:
                 # we may get more than one message at a time
                 # due to the way TCP works. If so, split 'em.
-                datas = re.split('(ERR)', data)
-                for data in datas:
-                    if data != "" and data != "ERR":
-                        data2 = "ERR"+data
-                        logger.debug("line is " + data2)
-                        data3 = listify_data(data2)
-                        sql_data_sqlite(data3, "ARDUINOS")
-                        # otherwise, just log one message
+                    datas = re.split('(ERR)', data)
+                    for data in datas:
+                        if data != "" and data != "ERR":
+                            data2 = "ERR"+data
+                            logger.debug("line is " + data2)
+                            data3 = listify_data(data2)
+                            sql_data_sqlite(data3, "ARDUINOS")
+            # otherwise, just log one message
+                else:
+                    data2 = listify_data(data)
+                    sql_data_sqlite(data2, "ARDUINOS")
             else:
-                data2 = listify_data(data)
-                sql_data_sqlite(data2, "ARDUINOS")
-                        
+                continue
+        except socket.timeout:
+#            print "socket timeout"
+            continue
     ##################
     # EXIT
     ##################                
