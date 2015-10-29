@@ -386,11 +386,11 @@ EVICES WHERE ID_NAME LIKE\
 # creates a Pi status update with current timestamp (as list of tuples)
 # and sends it to sql_data_sqlite
 
-def pi_status_update_sqlite(addr, status):
+def pi_status_update_sqlite(addr, status, ip):
     id_name = addr
     timestamp = str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
     data = [(id_name, timestamp, status, 0, "unknown")]
-    sql_data_sqlite(data, "DEVICES")
+    sql_data_sqlite(data, "DEVICES", ip)
 
 ############################################################
 # listify_data()
@@ -418,18 +418,30 @@ def listify_data(data):
 # parses data (as a list of tuples, either from SQLite or listify_data) a
 # and updates SQLite
 
-def sql_data_sqlite(data, pi_or_arduino):
+def sql_data_sqlite(data, pi_or_arduino, ip):
     global con
     if len(data) == 0:
         return
     logger.debug(data)
     datalist = data[0]
-    id_name = datalist[0]
-    timestamp = datalist[1]
-    status = datalist[2]
-    new_status = return_status(status)
-    uptime_sec = datalist[3]
-    uptime = datalist[4]
+    if len(datalist) != 5:
+        print "got the IP address error"        
+        id_name = ip
+        timestamp = datalist[0]
+        status = datalist[1]
+        new_status = return_status(status)
+        uptime_sec = datalist[2]
+        uptime = datalist[3]
+    else:
+        id_name = datalist[0]
+        if (id_name[0] == '/'):
+            print "got the IP address error"
+            id_name = ip + id_name
+        timestamp = datalist[1]
+        status = datalist[2]
+        new_status = return_status(status)
+        uptime_sec = datalist[3]
+        uptime = datalist[4]
     if (len(uptime) == 0):
         # for now only loneduinos fail to send uptime as a string.
         # if so, create a string from the number of seconds rec'd
@@ -674,11 +686,11 @@ if __name__ == "__main__":
                             data2 = "ERR"+data
                             logger.debug("line is " + data2)
                             data3 = listify_data(data2)
-                            sql_data_sqlite(data3, "ARDUINOS")
+                            sql_data_sqlite(data3, "ARDUINOS", address)
             # otherwise, just log one message
                 else:
                     data2 = listify_data(data)
-                    sql_data_sqlite(data2, "ARDUINOS")
+                    sql_data_sqlite(data2, "ARDUINOS", address)
             else:
                 continue
         except socket.timeout:
