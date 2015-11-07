@@ -9,8 +9,6 @@ import time
 import select
 import datetime
 import struct
-#from contextlib import contextmanager
-#from multiprocessing.dummy import Pool as ThreadPool 
 from time import sleep
 import subprocess
 import traceback
@@ -24,7 +22,13 @@ send_ok_timer = time.time()
 send_ok_timer_pi = time.time()
 send_ok_timer_software = time.time()
 
-# comment this to turn socket messages (to the TCP watchdog server) off 
+#stuff for the remote reboot feature 
+incoming_socket_timer = time.time() #initialize timer for remote restart msgs
+incoming_socket_period = 5 #checks for msg on incoming socket every 5 seconds
+reboot_in = 0 #if this is not zero, reboot the machine in N seconds
+data = ""
+
+# change to 0 to turn off outgoing socket messages (to the TCP watchdog server)
 USE_SOCKETS = 1
 
 # set TCP watchdog IP and port here
@@ -37,10 +41,18 @@ port = 6666
 if (USE_SOCKETS):
     #create an INET, STREAMing socket
     try:
-            watchsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        watchsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     except socket.error as e:
-            print 'Failed to create socket: %s' % e
+        print 'Failed to create outgoing socket: %s' % e
 
+    try:
+        server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        server_socket.setblocking(0)
+        server_socket.bind(("0.0.0.0", PORT))
+        server_socket.settimeout(SOCKET_TIMEOUT)
+    except socket.error as e:
+        print 'Failed to create incoming socket: %s' % e
+            
 ####################
 # EXIT HANDLER
 ####################
@@ -56,6 +68,81 @@ signal.signal(signal.SIGINT, signal_handler)
 # FUNCTIONS
 ####################
 
+############################################################
+# rebootscript()
+############################################################
+#causes the machine to reboot. You better be sure! :3
+def rebootscript():
+    print "rebooting system!"
+    try:
+        if sys.platform == 'linux' or sys.platform == 'linux2':
+            command = "sudo /sbin/reboot"
+            subprocess.call(command, shell = True)
+        else:
+            if os.name == 'nt':
+            #this gives people 30 seconds to log off/close programs,
+            #then forces a reboot
+                import subprocess
+                subprocess.call(["shutdown", "-r", "-f", "-t", "30"])
+            else:
+            #not Linux or Windows so it's probably Mac OS X
+                import subprocess
+                subprocess.call(['osascript', '-e',
+                                 'tell app "System Events" to shut down'])
+    except Exception, e:
+        print "Couldn't reset system: %s" % e
+
+############################################################
+# parse_reboot_command()
+############################################################
+# takes a string, parses it for commands like:
+# "reboot now"
+# or
+# "reboot in N [second|seconds|minute|minutes]"
+# calls rebootscript() to reboot the machine if the command is valid
+def parse_reboot_command(data):
+    global reboot_in
+    try:
+    # at this point we got data, so do something with it
+        if ("reboot now" in data):
+            print "reboot rec'd"
+            rebootscript()
+        else:
+            if ("reboot" in data):
+                    #reboot in X seconds
+                datas = data.split()
+                print datas
+                if len(datas) < 3:
+                    print "too short!"
+                    print "Badly formatted message?"
+                    return
+                if "reboot" not in datas[0]:
+                    print "didn't see 'reboot' in %s" % datas[0]
+                    print "Badly formatted message?"
+                    return
+                if "in" not in datas[1]:
+                    print "didn't see 'in' in %s" % datas[1]
+                    print "Badly formatted message?"
+                    return
+                time_val = float(datas[2]) 
+                print "time: " + str(time_val)
+                resolution = datas[3]
+                if "seconds" in resolution:
+                    print "sleep %s seconds, then reboot..." % str(time_val)
+                    reboot_in = time_val
+                else:
+                    if "minute" in resolution:
+                        print "sleep %s minutes, then reboot..." % str(time_val)
+                        reboot_in = (time_val * 60)
+                    else:
+                        print "unknown resolution. sleep %s seconds, then reboot..." % time_val
+                        reboot_in = (time_val)
+            else:
+                print "Unknown command"
+    except Exception, e:
+        print "error in parse_reboot_command"
+
+        
 ############################################################
 # get_ip_address()
 ############################################################
@@ -216,21 +303,52 @@ def process_exists(proc_name):
 # pi_scan()
 ############################################################
 # Sends OKAY messages every N seconds for this Pi/PC
+# Receives "reboot in X [seconds | minutes] messages from Max or the server
 def pi_scan():
      global send_ok_timer_pi
      global send_ok_period
      sleep(0.005) #otherwise it eats every CPU :3
      #delete/tweak this if you're getting lag
+
+     try:
+         if reboot_in != 0:
+             if (time.time() - reboot_timer > reboot_in):
+                 print "rebooting"
+                 reboot_in = 0
+                 rebootscript()
+            periodic_timer = time.time()
+     except Exception, e:
+         print "timing/reboot error %s" % e
+
      try:
          if (time.time() - send_ok_timer_pi > send_ok_period + 30):
              send_ok_now("PI", "ERRPI_ACKCLEAR", "")
              send_ok_timer_pi = time.time()
      except Exception, e:
-         for frame in traceback.extract_tb(sys.exc_info()[2]):
-             fname,lineno,fn,text = frame
-             print "     in %s on line %d" % (fname, lineno)
-         print "FAILURE in pi_scan! %s" % e
+        print "FAILURE in pi_scan! %s" % e
+        for frame in traceback.extract_tb(sys.exc_info()[2]):
+            fname,lineno,fn,text = frame
+            print "     in %s on line %d" % (fname, lineno)
 
+    try:
+        data = ""
+        r,w,x = select([server_socket],[],[],0)
+        if server_socket in r:
+            data, address = server_socket.recvfrom(1024)
+            if (data):
+                print "-----Server (%s) connected, sent %s" % (address, data)
+            #######################
+            # DATA RECEIVED
+            #######################
+                parse_reboot_command(data)
+    except socket.timeout:
+        continue        
+    except Exception, e:
+        print "FAILURE in pi_scan for server socket! %s" % e
+        for frame in traceback.extract_tb(sys.exc_info()[2]):
+            fname,lineno,fn,text = frame
+            print "     in %s on line %d" % (fname, lineno)
+    
 ############################################################
 # software_scan()
 ############################################################
