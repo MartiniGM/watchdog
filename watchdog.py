@@ -24,8 +24,10 @@ send_ok_timer_software = time.time()
 
 #stuff for the remote reboot feature 
 incoming_socket_timer = time.time() #initialize timer for remote restart msgs
+reboot_timer = time.time() #initialize timer
 incoming_socket_period = 5 #checks for msg on incoming socket every 5 seconds
 reboot_in = 0 #if this is not zero, reboot the machine in N seconds
+PORT = 6666 #UDP port to listen for reboot commands
 data = ""
 
 # change to 0 to turn off outgoing socket messages (to the TCP watchdog server)
@@ -49,7 +51,7 @@ if (USE_SOCKETS):
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         server_socket.setblocking(0)
         server_socket.bind(("0.0.0.0", PORT))
-        server_socket.settimeout(SOCKET_TIMEOUT)
+#        server_socket.settimeout(SOCKET_TIMEOUT)
     except socket.error as e:
         print 'Failed to create incoming socket: %s' % e
             
@@ -76,6 +78,7 @@ def rebootscript():
     print "rebooting system!"
     try:
         if sys.platform == 'linux' or sys.platform == 'linux2':
+            import subprocess
             command = "sudo /sbin/reboot"
             subprocess.call(command, shell = True)
         else:
@@ -105,7 +108,6 @@ def parse_reboot_command(data):
     try:
     # at this point we got data, so do something with it
         if ("reboot now" in data):
-            print "reboot rec'd"
             rebootscript()
         else:
             if ("reboot" in data):
@@ -113,35 +115,34 @@ def parse_reboot_command(data):
                 datas = data.split()
                 print datas
                 if len(datas) < 3:
+                    print "Bad msg format, should be 'reboot now' or 'reboot in X [seconds|minutes]'"
                     print "too short!"
-                    print "Badly formatted message?"
                     return
                 if "reboot" not in datas[0]:
+                    print "Bad msg format, should be 'reboot now' or 'reboot in X [seconds|minutes]'"
                     print "didn't see 'reboot' in %s" % datas[0]
-                    print "Badly formatted message?"
                     return
                 if "in" not in datas[1]:
+                    print "Bad msg format, should be 'reboot now' or 'reboot in X [seconds|minutes]'"
                     print "didn't see 'in' in %s" % datas[1]
-                    print "Badly formatted message?"
                     return
                 time_val = float(datas[2]) 
-                print "time: " + str(time_val)
+#                print "time: " + str(time_val)
                 resolution = datas[3]
                 if "seconds" in resolution:
-                    print "sleep %s seconds, then reboot..." % str(time_val)
+                    print "wait for %s seconds, then reboot..." % str(time_val)
                     reboot_in = time_val
                 else:
                     if "minute" in resolution:
-                        print "sleep %s minutes, then reboot..." % str(time_val)
+                        print "wait for %s minutes, then reboot..." % str(time_val)
                         reboot_in = (time_val * 60)
                     else:
-                        print "unknown resolution. sleep %s seconds, then reboot..." % time_val
+                        print "unknown time resolution. sleep %s seconds, then reboot..." % time_val
                         reboot_in = (time_val)
             else:
                 print "Unknown command"
     except Exception, e:
         print "error in parse_reboot_command"
-
         
 ############################################################
 # get_ip_address()
@@ -305,34 +306,35 @@ def process_exists(proc_name):
 # Sends OKAY messages every N seconds for this Pi/PC
 # Receives "reboot in X [seconds | minutes] messages from Max or the server
 def pi_scan():
-     global send_ok_timer_pi
-     global send_ok_period
-     sleep(0.005) #otherwise it eats every CPU :3
+    global send_ok_timer_pi
+    global send_ok_period
+    global reboot_in
+    global reboot_timer
+    sleep(0.005) #otherwise it eats every CPU :3
      #delete/tweak this if you're getting lag
-
-     try:
-         if reboot_in != 0:
-             if (time.time() - reboot_timer > reboot_in):
-                 print "rebooting"
-                 reboot_in = 0
-                 rebootscript()
-            periodic_timer = time.time()
-     except Exception, e:
-         print "timing/reboot error %s" % e
-
-     try:
-         if (time.time() - send_ok_timer_pi > send_ok_period + 30):
-             send_ok_now("PI", "ERRPI_ACKCLEAR", "")
-             send_ok_timer_pi = time.time()
-     except Exception, e:
+    
+    try:
+        if reboot_in != 0:
+            if (time.time() - reboot_timer > reboot_in):
+                print "rebooting"
+                reboot_in = 0
+                reboot_timer = time.time()
+                rebootscript()
+    except Exception, e:
+        print "timing/reboot error %s" % e
+        
+    try:
+        if (time.time() - send_ok_timer_pi > send_ok_period + 30):
+            send_ok_now("PI", "ERRPI_ACKCLEAR", "")
+            send_ok_timer_pi = time.time()
+    except Exception, e:
         print "FAILURE in pi_scan! %s" % e
         for frame in traceback.extract_tb(sys.exc_info()[2]):
             fname,lineno,fn,text = frame
             print "     in %s on line %d" % (fname, lineno)
-
     try:
         data = ""
-        r,w,x = select([server_socket],[],[],0)
+        r,w,x = select.select([server_socket],[],[],0)
         if server_socket in r:
             data, address = server_socket.recvfrom(1024)
             if (data):
@@ -342,7 +344,7 @@ def pi_scan():
             #######################
                 parse_reboot_command(data)
     except socket.timeout:
-        continue        
+        return
     except Exception, e:
         print "FAILURE in pi_scan for server socket! %s" % e
         for frame in traceback.extract_tb(sys.exc_info()[2]):
@@ -554,8 +556,8 @@ print "send from " + this_ip
 # builds a list to step through the arduinos.
 # Leave this list blank (as below) to monitor only this Pi.
 arduinolist = []
-#arduino1 = Arduino("./watchdog_pipe1", 1, 0.0, 40.0, 100.0)
-#arduino2 = Arduino("./watchdog_pipe2", 1, 0.0, 40.0, 100.0)
+arduino1 = Arduino("./watchdog_pipe1", 1, 0.0, 40.0, 100.0)
+arduino2 = Arduino("./watchdog_pipe2", 1, 0.0, 40.0, 100.0)
 #arduino3 = Arduino("./chest_wd_pipe", 1, 0.0, 40.0, 100.0)
 #arduinolist.append(arduino1)
 #arduinolist.append(arduino2)
@@ -565,7 +567,7 @@ arduinolist = []
 # Leave this list blank to skip software monitoring.
 softwarelist = []
 softwarelist.append(("GV-VMS.exe", ""))
-#softwarelist.append(("Max.exe", ""))
+softwarelist.append(("Max.exe", ""))
 
 while 1:
     # if there's nothing connected we still want to monitor this Pi or PC. send OKAY every N seconds.
