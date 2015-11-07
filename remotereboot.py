@@ -6,6 +6,7 @@ from select import select
 import sys
 import signal 
 import time
+import os
 
 PORT = 6666 # port number to watch
 SOCKET_TIMEOUT = .005 # timeout in seconds
