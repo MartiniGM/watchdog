@@ -38,7 +38,12 @@ def rebootscript():
         command = "sudo /sbin/reboot"
         subprocess.call(command, shell = True)
     else:
-        print "platform not yet supported"
+        if os.name == 'nt':
+            #this gives people 30 seconds to log off, then forces reboot
+            import subprocess
+            subprocess.call(["shutdown", "-r", "-f", "-t", "30"])
+        else:
+            print "platform not yet supported"
 
 def parse_reboot_command(data):
     global reboot_in
