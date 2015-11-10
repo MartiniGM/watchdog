@@ -62,7 +62,9 @@ googleSheetDict = {}
 list_of_lists = []
 
 # load google sheet every hour. it's a bit slow to get the data back so it doesn't reload often, but if you want to trigger it immediately just restart the program
-loadGoogleSheetEvery = 3600 #seconds
+LOADSHEET_SLOW = 3600 #seconds, once the initial load gets at least 1 row
+LOADSHEET_FAST = 200 #seconds, as long as all loads have failed
+loadGoogleSheetEvery = LOADSHEET_FAST
 loadGoogleSheetTimer = time.time()
 
 # set this to 0 to turn off Google spreadsheets and use local database only
@@ -108,6 +110,7 @@ def open_googlesheet():
         global googleSheetKey
         global googleWorksheet
         global list_of_lists
+        global loadGoogleSheetEvery 
         json_key = json.load(open(json_file))
         scope = ['https://spreadsheets.google.com/feeds']
         
@@ -125,7 +128,7 @@ def open_googlesheet():
         for frame in traceback.extract_tb(sys.exc_info()[2]):
             fname,lineno,fn,text = frame
             logger.error( "     in %s on line %d" % (fname, lineno))
-
+            
 #['IP ADDRESS', 'Mac Address', 'Hostname', 'Device Name', 'Device Type', 'Zone', 'Space', 'Location Details', 'Description', 'Flow Chart LInk', 'Order', 'Switch Interface']
     try:
         #create searchable dictionary with ID_NAME as the key!
@@ -137,7 +140,14 @@ def open_googlesheet():
         #for keys,values in googleSheetDict.items():
         #    print(keys)
         #    print(values)
-        logger.info("     Google Sheets load OK, %s rows loaded" % googleSheetLen)
+        if googleSheetLen == 0:
+            # set slower loads after load gets at least one row
+            # if not, try to reload much more often.
+            loadGoogleSheetEvery = LOADSHEET_FAST #seconds
+            logger.info("     Google Sheets load failed? %s rows loaded" % googleSheetLen)      
+        else:
+            loadGoogleSheetEvery = LOADSHEET_SLOW #seconds
+            logger.info("     Google Sheets load OK, %s rows loaded" % googleSheetLen)
     except Exception, e:
         logger.error("error when iterating over Google sheet %s with json file %s: %s" % (googleSheetKey, json_file, e))
         for frame in traceback.extract_tb(sys.exc_info()[2]):
