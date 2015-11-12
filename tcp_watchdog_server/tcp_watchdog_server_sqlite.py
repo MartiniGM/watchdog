@@ -409,7 +409,7 @@ def return_last_reset(new_uptime, last_uptime, id_name):
   #  print "*******************last check is " + str(last_reset_timestamp_check) + " uptime is " + str(uptime_sec)
     if (last_reset_timestamp_check == None and uptime_sec != None):
         #get the uptime and subtract from the current time to create baseline ts
-        last_reset_time = datetime.datetime.now() - datetime.timedelta(seconds=int(uptime_sec))
+        last_reset_time = datetime.datetime.now() - datetime.timedelta(seconds=int(float(uptime_sec)))
         last_reset_timestamp = str(last_reset_time.strftime("%b %d, %Y %H:%M:%S"))
 #        print "*****************NOW SETTING BLANK RESET TS TO: " + str(last_reset_timestamp) 
         return last_reset_timestamp
@@ -422,7 +422,7 @@ def return_last_reset(new_uptime, last_uptime, id_name):
             print "new uptime " + str(new_uptime) + " old uptime " + str(last_uptime)
             if (int(float(new_uptime)) < int(float(last_uptime))):
                 #detected a device reset since the last time we checked the uptime
-                last_reset_time = datetime.datetime.now() - datetime.timedelta(seconds=int(new_uptime))
+                last_reset_time = datetime.datetime.now() - datetime.timedelta(seconds=int(float(new_uptime)))
                 last_reset_timestamp = str(last_reset_time.strftime("%b %d, %Y %H:%M:%S"))
                 logger.warning (id_name + " **DEVICE RESET** detected at " + last_reset_timestamp)
                 logger.debug("old uptime" + str(last_uptime) + ",new uptime " + str(new_uptime))
@@ -543,7 +543,7 @@ def sql_data_sqlite(data, pi_or_arduino, ip):
     if (len(uptime) == 0):
         # for now only loneduinos fail to send uptime as a string.
         # if so, create a string from the number of seconds rec'd
-        sec = int(uptime_sec)
+        sec = int(float(uptime_sec))
         mins = sec/60
         hours = mins/60
         days = hours / 24
