@@ -190,7 +190,7 @@ def get_item_googlesheet(id_name, item_name):
 def save_googlesheet_backup():
     global googleSheetDict
     for key in googleSheetDict:
-        (location, device_type, zone, space, device_name, description, switch_interface, mac_address, hostname, flow_chart_link, order) = get_items_from_googlesheet(key)
+        (location, device_type, zone, space, device_name, description, switch_interface, mac_address, hostname, flow_chart_link, order) = get_items_from_googlesheet_forsave(key)
 #        print (location, device_type, zone, space, device_name, description, switch_interface, mac_address, hostname, flow_chart_link, order)
         try:
             cur = con.cursor()
@@ -223,10 +223,10 @@ def get_item_from_googlesheet_backup(ip_address, item_name):
         return "" #blank item, will show as None in SQL
             
 ############################################################
-#get_items_from_googlesheet()
+#get_items_from_googlesheet_forsave()
 ############################################################
 #gets all googlesheet items from one row of the GS dict 
-def get_items_from_googlesheet_broken(id_name):
+def get_items_from_googlesheet_forsave(id_name):
 #otherwise try to read them from the googlesheet dictionary
     device_type = get_item_googlesheet(id_name, "Device Type")
     location = get_item_googlesheet(id_name, "Location Details")
@@ -248,43 +248,43 @@ def get_items_from_googlesheet_broken(id_name):
 #gets all googlesheet items from the GS backup. If that fails, get the
 #current values from the sqlite DB.
 def get_items_from_googlesheet(id_name):
-    location = get_item_googlesheet(id_name, "LOCATION")
+    location = get_item_googlesheet(id_name, "Location Details")
     if location == "" or location is None:
         location = get_item_from_googlesheet_backup(id_name, "LOCATION")
         if location == "" or location is None:
             location = get_item_sqlite(id_name, "LOCATION")
             
-    device_type = get_item_googlesheet(id_name, "DEVICE_TYPE")
+    device_type = get_item_googlesheet(id_name, "Device Type")
     if device_type == "" or device_type is None:
         device_type = get_item_from_googlesheet_backup(id_name, "DEVICE_TYPE")
         if device_type == "" or device_type is None:
             device_type = get_item_sqlite(id_name, "DEVICE_TYPE")
     
-    zone = get_item_googlesheet(id_name, "ZONE")
+    zone = get_item_googlesheet(id_name, "Zone")
     if zone == "" or zone is None:
         zone = get_item_from_googlesheet_backup(id_name, "ZONE")
         if zone == "" or zone is None:
             zone = get_item_sqlite(id_name, "ZONE")
 
-    space = get_item_googlesheet(id_name, "SPACE")
+    space = get_item_googlesheet(id_name, "Space")
     if space == "" or space is None:
         space = get_item_from_googlesheet_backup(id_name, "SPACE")
         if space == "" or space is None:
             space = get_item_sqlite(id_name, "SPACE")
 
-    device_name = get_item_googlesheet(id_name, "DEVICE_NAME")
+    device_name = get_item_googlesheet(id_name, "Device Name")
     if device_name == "" or device_name is None:
         device_name = get_item_from_googlesheet_backup(id_name, "DEVICE_NAME")
         if device_name == "" or device_name is None:
             device_name = get_item_sqlite(id_name, "DEVICE_NAME")
 
-    description = get_item_googlesheet(id_name,  "DESCRIPTION")
+    description = get_item_googlesheet(id_name,  "Description")
     if description == "" or description is None:
         description = get_item_from_googlesheet_backup(id_name,  "DESCRIPTION")
         if description == "" or description is None:
             description = get_item_sqlite(id_name, "DESCRIPTION")
 
-    switch_interface = get_item_googlesheet(id_name, "SWITCH_INTERFACE")
+    switch_interface = get_item_googlesheet(id_name, "Switch Interface")
     if switch_interface == "" or switch_interface is None:
         switch_interface = get_item_from_googlesheet_backup(id_name, "SWITCH_INTERFACE")
         if switch_interface == "" or switch_interface is None:
