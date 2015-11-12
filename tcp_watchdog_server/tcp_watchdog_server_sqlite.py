@@ -35,6 +35,11 @@ WINDOWS_DB_FILENAME = 'c:\\watchdog\\tcp_watchdog_server\\demosdb.db'
 #and for Linux & OSX, I just used the local directory (where this file is) 
 LINUX_OSX_DB_FILENAME = 'demosdb.db'
 
+# set this to 0 to turn off Google spreadsheets and use local database only
+# (f.ex if Google ever breaks the API!)
+# if 0 (or if there are errors loading the google sheet), the program will default to using the googlesheet_backup table in the SQLite DB. If that fails, it will write back any existing values from the DB.
+USE_GOOGLE_SHEETS = 1
+
 # json file to hold Google credentials.
 # ----> DO NOT EVER UPLOAD the .json file to public access (github)! <----
 json_file = 'mwsheets-91347531e5f4.json.secret'
@@ -43,16 +48,6 @@ json_file = 'mwsheets-91347531e5f4.json.secret'
 # URL for the google sheet. this can be public
 googleSheetKey = "1kHAcbAo8saNSTBc7ffidzrwu_FGK3FaBpmh7rO7hT-U"
 googleWorksheetName = "Networked Devices" #name of the tab on the google sheet
-
-# give a filename for the watchdog's log file here
-LOG_FILENAME = 'tcp_watchdog_server.out'
-
-PORT = 6666 # port number to watch
-
-# give the size for each rolling log segment, in bytes
-LOG_SIZE = 2000000 #2 MB, in bytes
-# give the number of rolling log segments to record before the log rolls over
-LOG_NUM_BACKUPS = 5 # five .out files before they roll over
 
 # dictionary to load Google spreadsheet into (for device types and descriptions)
 googleSheetDict = {}
@@ -64,10 +59,15 @@ LOADSHEET_FAST = 200 #seconds, as long as all loads have failed
 loadGoogleSheetEvery = LOADSHEET_FAST #starts with fast loads until it succeeds
 loadGoogleSheetTimer = time.time()
 
-# set this to 0 to turn off Google spreadsheets and use local database only
-# (f.ex if Google ever breaks the API!)
-# if 0 (or if there are errors loading the google sheet), the program will default to using the googlesheet_backup table in the SQLite DB. If that fails, it will write back any existing values from the DB.
-USE_GOOGLE_SHEETS = 1
+# give a filename for the watchdog's log file here
+LOG_FILENAME = 'tcp_watchdog_server.out'
+
+PORT = 6666 # port number to watch
+
+# give the size for each rolling log segment, in bytes
+LOG_SIZE = 2000000 #2 MB, in bytes
+# give the number of rolling log segments to record before the log rolls over
+LOG_NUM_BACKUPS = 5 # five .out files before they roll over
 
 ####################
 # EXIT HANDLER
@@ -161,7 +161,7 @@ def open_googlesheet():
 def get_item_googlesheet(id_name, item_name):
     global googleSheetDict
     if (bool(googleSheetDict) == False):
-        logger.error( "empty dictionary in get_item_googlesheet! Did you remember to call open_googlesheet?")
+        logger.error( "empty dictionary in get_item_googlesheet! Please check google sheets access?")
         return ""
     header_item = googleSheetDict["IP ADDRESS"]
     try:
@@ -202,12 +202,31 @@ def save_googlesheet_backup():
                 print "     in %s on line %d" % (fname, lineno)
             print " sqlite error: %s" % e
             con.rollback()
-    
+
+############################################################
+# get_item_googlesheet_backup()
+############################################################        
+# returns a row from googlesheet backup, given an ip_address
+def get_item_from_googlesheet_backup(ip_address, item_name):
+    global con
+    try:
+        cur = con.cursor()
+        query = "SELECT %s FROM GOOGLESHEET_BACKUP WHERE IP_ADDRESS LIKE ?" % item_name
+        cur.execute(query, ('%'+ip_address+'%',))
+        data = cur.fetchall()
+        for row in data:
+            return row[0]
+    except lite.Error, e:
+        if con:
+            con.rollback()
+        print(" SQL error! %s" % e)
+        return "" #blank item, will show as None in SQL
+            
 ############################################################
 #get_items_from_googlesheet()
 ############################################################
 #gets all googlesheet items from one row of the GS dict 
-def get_items_from_googlesheet(id_name):
+def get_items_from_googlesheet_broken(id_name):
 #otherwise try to read them from the googlesheet dictionary
     device_type = get_item_googlesheet(id_name, "Device Type")
     location = get_item_googlesheet(id_name, "Location Details")
@@ -224,38 +243,52 @@ def get_items_from_googlesheet(id_name):
     return (location, device_type, zone, space, device_name, description, switch_interface, mac_address, hostname, flow_chart_link, order) #return items from googlesheet dictionary
 
 ############################################################
-#get_items_from_googlesheet_backup()
+#get_items_from_googlesheet()
 ############################################################
 #gets all googlesheet items from the GS backup. If that fails, get the
 #current values from the sqlite DB.
-def get_items_from_googlesheet_backup(id_name):
-    location = get_item_from_googlesheet_backup(id_name, "LOCATION")
-    if location == "":
-        location = get_item_sqlite(id_name, "LOCATION")
+def get_items_from_googlesheet(id_name):
+    location = get_item_googlesheet(id_name, "LOCATION")
+    if location == "" or location is None:
+        location = get_item_from_googlesheet_backup(id_name, "LOCATION")
+        if location == "" or location is None:
+            location = get_item_sqlite(id_name, "LOCATION")
+            
+    device_type = get_item_googlesheet(id_name, "DEVICE_TYPE")
+    if device_type == "" or device_type is None:
+        device_type = get_item_from_googlesheet_backup(id_name, "DEVICE_TYPE")
+        if device_type == "" or device_type is None:
+            device_type = get_item_sqlite(id_name, "DEVICE_TYPE")
+    
+    zone = get_item_googlesheet(id_name, "ZONE")
+    if zone == "" or zone is None:
+        zone = get_item_from_googlesheet_backup(id_name, "ZONE")
+        if zone == "" or zone is None:
+            zone = get_item_sqlite(id_name, "ZONE")
 
-    device_type = get_item_from_googlesheet_backup(id_name, "DEVICE_TYPE")
-    if device_type == "":
-        device_type = get_item_sqlite(id_name, "DEVICE_TYPE")
+    space = get_item_googlesheet(id_name, "SPACE")
+    if space == "" or space is None:
+        space = get_item_from_googlesheet_backup(id_name, "SPACE")
+        if space == "" or space is None:
+            space = get_item_sqlite(id_name, "SPACE")
 
-    zone = get_item_from_googlesheet_backup(id_name, "ZONE")
-    if zone == "":
-        zone = get_item_sqlite(id_name, "ZONE")
+    device_name = get_item_googlesheet(id_name, "DEVICE_NAME")
+    if device_name == "" or device_name is None:
+        device_name = get_item_from_googlesheet_backup(id_name, "DEVICE_NAME")
+        if device_name == "" or device_name is None:
+            device_name = get_item_sqlite(id_name, "DEVICE_NAME")
 
-    space = get_item_from_googlesheet_backup(id_name, "SPACE")
-    if space == "":
-        space = get_item_sqlite(id_name, "SPACE")
+    description = get_item_googlesheet(id_name,  "DESCRIPTION")
+    if description == "" or description is None:
+        description = get_item_from_googlesheet_backup(id_name,  "DESCRIPTION")
+        if description == "" or description is None:
+            description = get_item_sqlite(id_name, "DESCRIPTION")
 
-    device_name = get_item_from_googlesheet_backup(id_name, "DEVICE_NAME")
-    if device_name == "":
-        device_name = get_item_sqlite(id_name, "DEVICE_NAME")
-
-    description = get_item_from_googlesheet_backup(id_name,  "DESCRIPTION")
-    if description == "":
-        description = get_item_sqlite(id_name, "DESCRIPTION")
-
-    switch_interface = get_item_from_googlesheet_backup(id_name, "SWITCH_INTERFACE")
-    if switch_interface == "":
-        switch_interface = get_item_sqlite(id_name, "SWITCH_INTERFACE")
+    switch_interface = get_item_googlesheet(id_name, "SWITCH_INTERFACE")
+    if switch_interface == "" or switch_interface is None:
+        switch_interface = get_item_from_googlesheet_backup(id_name, "SWITCH_INTERFACE")
+        if switch_interface == "" or switch_interface is None:
+            switch_interface = get_item_sqlite(id_name, "SWITCH_INTERFACE")
 
     return (location, device_type, zone, space, device_name, description, switch_interface) #return items, either from GS backup or as-is from the database
 
@@ -267,31 +300,17 @@ def get_items_from_googlesheet_backup(id_name):
 # for use with Max (Cycling '74)
 # otherwise does nothing
 def get_all_from_googlesheet(id_name):
-    if (USE_GOOGLE_SHEETS != 1):
+#    if (USE_GOOGLE_SHEETS != 1):
         # if googlesheets are off, read these back from the GS backup or from the database as they already exist
-        try:
-            (location, device_type, zone, space, device_name, description, switch_interface) = get_items_from_googlesheet_backup(id_name)
-        except:
-            print "get_all_from_googlesheet error: %s" % e
-            for frame in traceback.extract_tb(sys.exc_info()[2]):
-                fname,lineno,fn,text = frame
-                print "     in %s on line %d" % (fname, lineno)
-            return (location, device_type, zone, space, device_name, description, switch_interface, id_name) #return items as-is on error
-    else:
-        #otherwise try to read them from the googlesheet dictionary
-        try:
-            (location, device_type, zone, space, device_name, description, switch_interface, mac_address, hostname, flow_chart_link, order) = get_items_from_googlesheet(id_name)        
-        except:
-            print "couldn't read items from googlesheet"
-            try:
-                (location, device_type, zone, space, device_name, description, switch_interface) = get_items_from_googlesheet_backup(id_name)
-            except:
-                print "get_all_from_googlesheet error: %s" % e
-                for frame in traceback.extract_tb(sys.exc_info()[2]):
-                    fname,lineno,fn,text = frame
-                    print "     in %s on line %d" % (fname, lineno)
-                return (location, device_type, zone, space, device_name, description, switch_interface, id_name) #return items as-is on error
-
+    try:
+        (location, device_type, zone, space, device_name, description, switch_interface) = get_items_from_googlesheet(id_name)
+    except Exception, e:
+        print "get_all_from_googlesheet error: %s" % e
+        for frame in traceback.extract_tb(sys.exc_info()[2]):
+            fname,lineno,fn,text = frame
+            print "     in %s on line %d" % (fname, lineno)
+        return ("", "", "", "", "", "", "", id_name)
+    
     #got data back and all is well. now parse max_id_name and return
     parent_child_list = id_name.split('/', 1)
     if len(parent_child_list) > 1:
