@@ -10,6 +10,8 @@ with con:
     
     cur = con.cursor()    
 
+#locations table
+    
     cur.execute("SELECT * FROM LOCATIONS")
 
     rows = cur.fetchall()
@@ -18,6 +20,18 @@ with con:
     for row in rows:
         print str(row[0]) + " " + str(row[1])
 
+#googlesheet backup table
+        
+    cur.execute("SELECT * FROM GOOGLESHEET_BACKUP")
+
+    rows = cur.fetchall()
+
+    print "GOOGLESHEET_BACKUP:"
+    for row in rows:
+        print row
+
+#main device table
+        
     cur.execute("SELECT * FROM DEVICES")
 
     rows = cur.fetchall()
