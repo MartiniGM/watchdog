@@ -1,5 +1,5 @@
 #!/usr/bin/python 
-import socket, select
+import socket
 import sqlite3 as lite
 import datetime
 import time
@@ -37,20 +37,17 @@ LINUX_OSX_DB_FILENAME = 'demosdb.db'
 
 # json file to hold Google credentials.
 # ----> DO NOT EVER UPLOAD the .json file to public access (github)! <----
-json_file = 'mwsheets-91347531e5f4.json.secret'  #srsly DO NOT UPLOAD THE .JSON FILE
+json_file = 'mwsheets-91347531e5f4.json.secret'
+# ----> srsly DO NOT DO NOT DO NOT UPLOAD THE .JSON FILE <----
 
 # URL for the google sheet. this can be public
 googleSheetKey = "1kHAcbAo8saNSTBc7ffidzrwu_FGK3FaBpmh7rO7hT-U"
 googleWorksheetName = "Networked Devices" #name of the tab on the google sheet
 
-#googleSheetURL = 'https://docs.google.com/spreadsheets/d/1wv_s-CBKj56u9JbZtQA-E-dy5efrS9xPLvFu-TqD-xE/edit#gid=0'
-
 # give a filename for the watchdog's log file here
 LOG_FILENAME = 'tcp_watchdog_server.out'
 
 PORT = 6666 # port number to watch
-NUM_QUEUED_CONNECTIONS = 10 # number of backlogged connections
-SOCKET_TIMEOUT = 5.0 # timeout in seconds
 
 # give the size for each rolling log segment, in bytes
 LOG_SIZE = 2000000 #2 MB, in bytes
@@ -64,12 +61,12 @@ list_of_lists = []
 # load google sheet every hour. it's a bit slow to get the data back so it doesn't reload often, but if you want to trigger it immediately just restart the program
 LOADSHEET_SLOW = 3600 #seconds, once the initial load gets at least 1 row
 LOADSHEET_FAST = 200 #seconds, as long as all loads have failed
-loadGoogleSheetEvery = LOADSHEET_FAST
+loadGoogleSheetEvery = LOADSHEET_FAST #starts with fast loads until it succeeds
 loadGoogleSheetTimer = time.time()
 
 # set this to 0 to turn off Google spreadsheets and use local database only
 # (f.ex if Google ever breaks the API!)
-# if 0 (or if there are errors loading the google sheet), the program will default to using the existing value of DEVICE_TYPE and LOCATION in the SQLite DB.
+# if 0 (or if there are errors loading the google sheet), the program will default to using the googlesheet_backup table in the SQLite DB. If that fails, it will write back any existing values from the DB.
 USE_GOOGLE_SHEETS = 1
 
 ####################
@@ -120,7 +117,6 @@ def open_googlesheet():
         sh = gc.open_by_key(googleSheetKey)
         googleWorksheet = sh.worksheet(googleWorksheetName)
         
-#        googleWorksheet = gc.open_by_url(googleSheetURL).sheet1
         list_of_lists = googleWorksheet.get_all_values()
 
     except Exception, e:
@@ -146,8 +142,11 @@ def open_googlesheet():
             loadGoogleSheetEvery = LOADSHEET_FAST #seconds
             logger.info("     Google Sheets load failed? %s rows loaded" % googleSheetLen)      
         else:
+            #the load got at least one row. Save everything in the DB 
             loadGoogleSheetEvery = LOADSHEET_SLOW #seconds
             logger.info("     Google Sheets load OK, %s rows loaded" % googleSheetLen)
+            save_googlesheet_backup()
+            
     except Exception, e:
         logger.error("error when iterating over Google sheet %s with json file %s: %s" % (googleSheetKey, json_file, e))
         for frame in traceback.extract_tb(sys.exc_info()[2]):
@@ -185,6 +184,82 @@ def get_item_googlesheet(id_name, item_name):
         return ""
 
 ############################################################
+#save_googlesheet_backup()
+############################################################
+#dumps all rows of the google sheet to the GOOGLESHEET_BACKUP sqlite table
+def save_googlesheet_backup():
+    global googleSheetDict
+    for key in googleSheetDict:
+        (location, device_type, zone, space, device_name, description, switch_interface, mac_address, hostname, flow_chart_link, order) = get_items_from_googlesheet(key)
+#        print (location, device_type, zone, space, device_name, description, switch_interface, mac_address, hostname, flow_chart_link, order)
+        try:
+            cur = con.cursor()
+            cur.execute("INSERT OR REPLACE INTO GOOGLESHEET_BACKUP(IP_ADDRESS, LOCATION, DEVICE_TYPE, ZONE, SPACE, DEVICE_NAME, DESCRIPTION, SWITCH_INTERFACE, MAC_ADDRESS, HOSTNAME, FLOW_CHART_LINK, GS_ORDER) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (key, location, device_type, zone, space, device_name, description, switch_interface, mac_address, hostname, flow_chart_link, order))
+            con.commit()
+        except lite.Error, e:
+            for frame in traceback.extract_tb(sys.exc_info()[2]):
+                fname,lineno,fn,text = frame
+                print "     in %s on line %d" % (fname, lineno)
+            print " sqlite error: %s" % e
+            con.rollback()
+    
+############################################################
+#get_items_from_googlesheet()
+############################################################
+#gets all googlesheet items from one row of the GS dict 
+def get_items_from_googlesheet(id_name):
+#otherwise try to read them from the googlesheet dictionary
+    device_type = get_item_googlesheet(id_name, "Device Type")
+    location = get_item_googlesheet(id_name, "Location Details")
+    zone = get_item_googlesheet(id_name, "Zone")
+    space = get_item_googlesheet(id_name, "Space")
+    device_name = get_item_googlesheet(id_name, "Device Name")
+    description = get_item_googlesheet(id_name, "Description")
+    switch_interface = get_item_googlesheet(id_name, "Switch Interface")
+    mac_address = get_item_googlesheet(id_name, "Mac Address")
+    hostname = get_item_googlesheet(id_name, "Hostname")
+    flow_chart_link = get_item_googlesheet(id_name, "Flow Chart LInk")
+    order = get_item_googlesheet(id_name, "Order")
+    
+    return (location, device_type, zone, space, device_name, description, switch_interface, mac_address, hostname, flow_chart_link, order) #return items from googlesheet dictionary
+
+############################################################
+#get_items_from_googlesheet_backup()
+############################################################
+#gets all googlesheet items from the GS backup. If that fails, get the
+#current values from the sqlite DB.
+def get_items_from_googlesheet_backup(id_name):
+    location = get_item_from_googlesheet_backup(id_name, "LOCATION")
+    if location == "":
+        location = get_item_sqlite(id_name, "LOCATION")
+
+    device_type = get_item_from_googlesheet_backup(id_name, "DEVICE_TYPE")
+    if device_type == "":
+        device_type = get_item_sqlite(id_name, "DEVICE_TYPE")
+
+    zone = get_item_from_googlesheet_backup(id_name, "ZONE")
+    if zone == "":
+        zone = get_item_sqlite(id_name, "ZONE")
+
+    space = get_item_from_googlesheet_backup(id_name, "SPACE")
+    if space == "":
+        space = get_item_sqlite(id_name, "SPACE")
+
+    device_name = get_item_from_googlesheet_backup(id_name, "DEVICE_NAME")
+    if device_name == "":
+        device_name = get_item_sqlite(id_name, "DEVICE_NAME")
+
+    description = get_item_from_googlesheet_backup(id_name,  "DESCRIPTION")
+    if description == "":
+        description = get_item_sqlite(id_name, "DESCRIPTION")
+
+    switch_interface = get_item_from_googlesheet_backup(id_name, "SWITCH_INTERFACE")
+    if switch_interface == "":
+        switch_interface = get_item_sqlite(id_name, "SWITCH_INTERFACE")
+
+    return (location, device_type, zone, space, device_name, description, switch_interface) #return items, either from GS backup or as-is from the database
+
+############################################################
 #get_all_from_googlesheet()
 ############################################################
 # queries the google spreadsheet dict for type, location, zone, space,
@@ -192,6 +267,58 @@ def get_item_googlesheet(id_name, item_name):
 # for use with Max (Cycling '74)
 # otherwise does nothing
 def get_all_from_googlesheet(id_name):
+    if (USE_GOOGLE_SHEETS != 1):
+        # if googlesheets are off, read these back from the GS backup or from the database as they already exist
+        try:
+            (location, device_type, zone, space, device_name, description, switch_interface) = get_items_from_googlesheet_backup(id_name)
+        except:
+            print "get_all_from_googlesheet error: %s" % e
+            for frame in traceback.extract_tb(sys.exc_info()[2]):
+                fname,lineno,fn,text = frame
+                print "     in %s on line %d" % (fname, lineno)
+            return (location, device_type, zone, space, device_name, description, switch_interface, id_name) #return items as-is on error
+    else:
+        #otherwise try to read them from the googlesheet dictionary
+        try:
+            (location, device_type, zone, space, device_name, description, switch_interface, mac_address, hostname, flow_chart_link, order) = get_items_from_googlesheet(id_name)        
+        except:
+            print "couldn't read items from googlesheet"
+            try:
+                (location, device_type, zone, space, device_name, description, switch_interface) = get_items_from_googlesheet_backup(id_name)
+            except:
+                print "get_all_from_googlesheet error: %s" % e
+                for frame in traceback.extract_tb(sys.exc_info()[2]):
+                    fname,lineno,fn,text = frame
+                    print "     in %s on line %d" % (fname, lineno)
+                return (location, device_type, zone, space, device_name, description, switch_interface, id_name) #return items as-is on error
+
+    #got data back and all is well. now parse max_id_name and return
+    parent_child_list = id_name.split('/', 1)
+    if len(parent_child_list) > 1:
+        (parent, child) = parent_child_list
+        if (len(device_type) > 0):
+            max_id_name = str(parent) + "/" + str(device_type) + "/" + str(child)
+        else:
+            max_id_name = str(parent) + "/" + "UNKNOWN" + "/" + str(child)
+    else:
+        parent = id_name
+        child = ""
+        if (len(device_type) > 0):
+            max_id_name = str(parent) + "/" + str(device_type) 
+        else:
+            max_id_name = str(parent) + "/" + "UNKNOWN"
+    print "parent " + parent + " child " + child
+    print "max_id_name " + max_id_name
+    return (location, device_type, zone, space, device_name, description, switch_interface, max_id_name) #return items from googlesheet dictionary
+    
+############################################################
+#get_all_from_googlesheet_old()
+############################################################
+# queries the google spreadsheet dict for type, location, zone, space,
+# device name, and description. then returns them along with the MAX_ID_NAME
+# for use with Max (Cycling '74)
+# otherwise does nothing
+def get_all_from_googlesheet_old(id_name):
     if (USE_GOOGLE_SHEETS != 1):
         # if googlesheets are off, read these back from the database as they already exist
         location = get_item_sqlite(id_name, "LOCATION")
@@ -273,8 +400,8 @@ def return_last_reset(new_uptime, last_uptime, id_name):
             last_reset_timestamp = get_item_sqlite(id_name, "LAST_RESET_TIMESTAMP")
             return last_reset_timestamp
         else:
-#            print "new uptime " + str(new_uptime) + " old uptime " + str(last_uptime)
-            if (int(new_uptime) < int(last_uptime)):
+            print "new uptime " + str(new_uptime) + " old uptime " + str(last_uptime)
+            if (int(float(new_uptime)) < int(float(last_uptime))):
                 #detected a device reset since the last time we checked the uptime
                 last_reset_time = datetime.datetime.now() - datetime.timedelta(seconds=int(new_uptime))
                 last_reset_timestamp = str(last_reset_time.strftime("%b %d, %Y %H:%M:%S"))
@@ -344,64 +471,6 @@ def get_item_sqlite(id_name, item_name):
         print(" SQL error! %s" % e)
         return "" #blank item, will show as None in SQL
     
-############################################################
-# get_item_sqlite()
-############################################################        
-# returns location/description string, given an id_name
-
-def get_item_sqlite2(id_name, item_name):
-    global con
-    try:
-        cur = con.cursor()
-        if (item_name == "LOCATION"):
-            cur.execute("SELECT ID_NAME, LOCATION FROM DEVICES WHERE ID_NAME LIKE\
-            ?", ('%'+id_name+'%',))
-        else:
-            if (item_name == "LAST_UPTIME_SEC"):
-                cur.execute("SELECT ID_NAME, LAST_UPTIME_SEC FROM DEVICES WHERE ID_NAME LIKE\
-                ?", ('%'+id_name+'%',))
-            else:
-                if (item_name == "UPTIME_SEC"):
-                    cur.execute("SELECT ID_NAME, UPTIME_SEC FROM DEVICES WHERE ID_NAME LIKE\
-                    ?", ('%'+id_name+'%',))
-                else:
-                    if (item_name == "LAST_RESET_TIMESTAMP"):
-                        cur.execute("SELECT ID_NAME, LAST_RESET_TIMESTAMP FROM DEVICES WHERE ID_NAME LIKE\
-                        ?", ('%'+id_name+'%',))                    
-                    else:
-                        if (item_name == "DEVICE_TYPE"):
-                            cur.execute("SELECT ID_NAME, DEVICE_TYPE FROM DEVIC\
-ES WHERE ID_NAME LIKE\
-                        ?", ('%'+id_name+'%',))
-                        else:
-                            if (item_name == "MAX_ID_NAME"):
-                                cur.execute("SELECT ID_NAME, MAX_ID_NAME FROM D\
-EVICES WHERE ID_NAME LIKE\
-                        ?", ('%'+id_name+'%',))
-                            else:
-                                logger.warning("Unknown item_name in get_item_sqlite: %s" % item_name)
-                                return "" #blank item, will show as None in SQL
-        data = cur.fetchall()
-        for row in data:
-            return row[1]
-    except lite.Error, e:
-        if con:
-            con.rollback()
-        logger.error(" SQL error! %s" % e)
-        return "" #blank item, will show as None in SQL
-
-############################################################
-# pi_status_update_sqlite()
-############################################################        
-# creates a Pi status update with current timestamp (as list of tuples)
-# and sends it to sql_data_sqlite
-
-def pi_status_update_sqlite(addr, status, ip):
-    id_name = addr
-    timestamp = str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
-    data = [(id_name, timestamp, status, 0, "unknown")]
-    sql_data_sqlite(data, "DEVICES", ip)
-
 ############################################################
 # listify_data()
 ############################################################            
@@ -479,10 +548,13 @@ def sql_data_sqlite(data, pi_or_arduino, ip):
     # insert & commit, otherwise rollback
     try:
         cur = con.cursor()
-        cur.execute("INSERT OR REPLACE INTO DEVICES(ID_NAME, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME, LAST_UPTIME_SEC, LOCATION, DEVICE_TYPE, MAX_ID_NAME, ZONE, SPACE, DEVICE_NAME, DESCRIPTION, SWITCH_INTERFACE) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",  (id_name,timestamp,status, uptime_sec,uptime,uptime_sec, location, device_type, max_id_name, zone, space, device_name, description, switch_interface))
+        cur.execute("INSERT OR REPLACE INTO DEVICES(ID_NAME, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME, LAST_UPTIME_SEC, LOCATION, DEVICE_TYPE, LAST_RESET_TIMESTAMP, MAX_ID_NAME, ZONE, SPACE, DEVICE_NAME, DESCRIPTION, SWITCH_INTERFACE) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",  (id_name,timestamp,status, uptime_sec,uptime,uptime_sec, location, device_type, last_reset_timestamp, max_id_name, zone, space, device_name, description, switch_interface))
         con.commit()
     except lite.Error, e:
         logger.error(" sqlite error: %s" % e)
+        for frame in traceback.extract_tb(sys.exc_info()[2]):
+            fname,lineno,fn,text = frame
+            print "     in %s on line %d" % (fname, lineno)
         con.rollback()
         
 ############################################################
@@ -501,6 +573,7 @@ def parse_data_sqlite(data):
         status = row[2]
         new_status = return_status(status)
 #        location = get_item_sqlite(id_name, "LOCATION")
+        last_reset_timestamp = get_item_sqlite(id_name, "LAST_RESET_TIMESTAMP")
         uptime_sec = row[3]
         uptime = row[4]
         time_cur = datetime.datetime.now()
@@ -515,16 +588,18 @@ def parse_data_sqlite(data):
 #            logger.debug("More than %d minutes for %s" % (periodic_period / 60, id_name))
             timestamp = str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
             status = "NONRESPONSIVE"
-            table = "DEVICES"
             #also get location, device type, and max name from google sheet
             #            (location, device_type, max_id_name) = get_type_location_and_max_name(id_name)
             (location, device_type, zone, space, device_name, description, switch_interface, max_id_name) = get_all_from_googlesheet(id_name)
             logger.info(id_name + " silent for " + str(total_seconds) + " seconds, setting " + status + " with uptime " + uptime)
             try:
                 cur = con.cursor()
-                cur.execute("INSERT OR REPLACE INTO DEVICES(ID_NAME, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME, LAST_UPTIME_SEC, LOCATION, DEVICE_TYPE, MAX_ID_NAME, ZONE, SPACE, DEVICE_NAME, DESCRIPTION, SWITCH_INTERFACE) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",  (id_name,timestamp,status, uptime_sec,uptime,uptime_sec, location, device_type, max_id_name, zone, space, device_name, description, switch_interface))
+                cur.execute("INSERT OR REPLACE INTO DEVICES(ID_NAME, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME, LAST_UPTIME_SEC, LOCATION, DEVICE_TYPE, LAST_RESET_TIMESTAMP, MAX_ID_NAME, ZONE, SPACE, DEVICE_NAME, DESCRIPTION, SWITCH_INTERFACE) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",  (id_name,timestamp,status, uptime_sec,uptime,uptime_sec, location, device_type, last_reset_timestamp, max_id_name, zone, space, device_name, description, switch_interface))
                 con.commit()
             except lite.Error, e:
+                for frame in traceback.extract_tb(sys.exc_info()[2]):
+                    fname,lineno,fn,text = frame
+                    print "     in %s on line %d" % (fname, lineno)
                 logger.error("sqlite error: %s" % e)
                 con.rollback()
         else:
@@ -543,6 +618,9 @@ def parse_data_sqlite(data):
             cur.execute("INSERT OR REPLACE INTO SYSTEM_INFO(ID_NAME, NUM_DEVICES, NUM_OKAY_DEVICES, PERCENT_OKAY) values (?, ?, ?, ?)",  (info_id_name, num_total, num_okay, percent_okay))
             con.commit()
         except lite.Error, e:
+            for frame in traceback.extract_tb(sys.exc_info()[2]):
+                fname,lineno,fn,text = frame
+                print "     in %s on line %d" % (fname, lineno)
             logger.error("sqlite error: %s" % e)
             con.rollback()
                 
@@ -554,9 +632,6 @@ def parse_data_sqlite(data):
 
 if __name__ == "__main__":
       
-    CONNECTION_LIST = []    # list of socket clients
-    RECV_BUFFER = 4096      # Advisable to keep it as an exponent of 2
-
     ##################
     # LOGGING SETUP
     ##################
@@ -622,33 +697,8 @@ if __name__ == "__main__":
         server_socket.bind(("0.0.0.0", PORT))
         server_socket.settimeout(5.0)
     except socket.error, e:
-        print "socket error: " + e
+        print "socket error: %s" % e
         
-    #    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-#    server_socket.settimeout(SOCKET_TIMEOUT) 
- 
-    # check and turn on TCP keepalive -- this ensures that we'll get 
-    # disconnect errors from clients that go away#
-#    x = server_socket.getsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE)
-#    if (x == 0):
-#        x = server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
-
-        # overrides value (in seconds) for the TCP keepalives. Only works on linux, not on windows
-        # 60 secs to 1st timeout, 4 retries @ 15 secs per = 2 mins til timeout
-#        if (os.name == 'linux'):
-#            server_socket.setsockopt(socket.SOL_TCP, socket.TCP_KEEPIDLE, 60)
-            # overrides value shown by sysctl net.ipv4.tcp_keepalive_probes
-#            server_socket.setsockopt(socket.SOL_TCP, socket.TCP_KEEPCNT, 4)
-            # overrides value shown by sysctl net.ipv4.tcp_keepalive_intvl
-#            server_socket.setsockopt(socket.SOL_TCP, socket.TCP_KEEPINTVL, 15)
-    
-#    server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-#    server_socket.bind(("0.0.0.0", PORT))
-#    server_socket.listen(NUM_QUEUED_CONNECTIONS)
- 
-    # Add server socket to the list of readable connections
-#    CONNECTION_LIST.append(server_socket)
- 
     logger.info ("     Watchdog server started on port " + str(PORT))
 
     #######################
