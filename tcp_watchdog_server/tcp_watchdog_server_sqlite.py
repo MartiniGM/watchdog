@@ -315,19 +315,19 @@ def get_all_from_googlesheet(id_name):
     parent_child_list = id_name.split('/', 1)
     if len(parent_child_list) > 1:
         (parent, child) = parent_child_list
-        if (len(device_type) > 0):
+        if (device_type is not None and len(device_type) > 0):
             max_id_name = str(parent) + "/" + str(device_type) + "/" + str(child)
         else:
             max_id_name = str(parent) + "/" + "UNKNOWN" + "/" + str(child)
     else:
         parent = id_name
         child = ""
-        if (len(device_type) > 0):
+        if (device_type is not None and len(device_type) > 0):
             max_id_name = str(parent) + "/" + str(device_type) 
         else:
             max_id_name = str(parent) + "/" + "UNKNOWN"
-    print "parent " + parent + " child " + child
-    print "max_id_name " + max_id_name
+    #print "parent " + parent + " child " + child
+    #print "max_id_name " + max_id_name
     return (location, device_type, zone, space, device_name, description, switch_interface, max_id_name) #return items from googlesheet dictionary
     
 ############################################################
@@ -372,8 +372,8 @@ def get_all_from_googlesheet_old(id_name):
                 max_id_name = str(parent) + "/" + str(device_type) 
             else:
                  max_id_name = str(parent) + "/" + "UNKNOWN"
-        print "parent " + parent + " child " + child
-        print "max_id_name " + max_id_name
+        #print "parent " + parent + " child " + child
+        #print "max_id_name " + max_id_name
         return (location, device_type, zone, space, device_name, description, switch_interface, max_id_name) #return items from googlesheet dictionary
     except Exception, e:
         #if the googlesheet read fails, read them from the database
@@ -419,7 +419,7 @@ def return_last_reset(new_uptime, last_uptime, id_name):
             last_reset_timestamp = get_item_sqlite(id_name, "LAST_RESET_TIMESTAMP")
             return last_reset_timestamp
         else:
-            print "new uptime " + str(new_uptime) + " old uptime " + str(last_uptime)
+            #print "new uptime " + str(new_uptime) + " old uptime " + str(last_uptime)
             if (int(float(new_uptime)) < int(float(last_uptime))):
                 #detected a device reset since the last time we checked the uptime
                 last_reset_time = datetime.datetime.now() - datetime.timedelta(seconds=int(float(new_uptime)))
@@ -748,7 +748,7 @@ if __name__ == "__main__":
         
         try:
             data, address = server_socket.recvfrom(1024)
-            print data
+            #print data
             if (data):
                 print "-----Client (%s) connected, sent %s" % (address, data)
             #######################
