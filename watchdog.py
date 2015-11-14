@@ -13,6 +13,40 @@ from time import sleep
 import subprocess
 import traceback
 
+##############################
+# INSTRUCTIONS 
+##############################
+# To monitor programs on linux or mac os: run "ps aux", find your process in the list, and then cut-n-paste it like so:
+# ps aux 
+#...
+# root      2156  0.0  0.1   3808  1760 ?        Ss   18:08   0:00 /usr/sbin/cron
+# pi        2201  0.0  0.0   3352   880 ?        S    18:08   0:00 /home/pi/RUNNING/builds/piezo
+# pi        2202  1.7  0.8  10868  7872 ?        S    18:08   0:04 /usr/bin/python /home/pi/RUNNING/scripts/watchdog.py
+# pi        2203  0.5  0.6  17112  6328 ?        Sl   18:08   0:01 /usr/bin/python /home/pi/RUNNING/scripts/do-audio.py
+# pi        2204  0.0  0.0   3348   908 ?        S    18:08   0:00 /home/pi/RUNNING/builds/laser
+#...
+# Copy the last part of the output above for the program you want to monitor, and paste it below like so:
+# softwarelist.append("/home/pi/RUNNING/builds/piezo")
+# softwarelist.append("/home/pi/RUNNING/builds/laser")
+# Then just save this file and run it ("python /path/to/watchdog.py &")!
+#
+# on Windows:
+# Hit ctrl-alt-del and choose Task Manager, then look on the Applications tab to find the program name.
+# Then copy/paste or enter it as shown:   
+# softwarelist.append("Max.exe")
+# softwarelist.append("NV-DVR.exe")
+# Then just save this file and run it (run "cmd" to get a command window, then enter "python /path/to/watchdog.py")!
+#
+
+##############################
+# ADD MONITORED SOFTWARE HERE
+##############################
+softwarelist = []
+softwarelist.append("/home/pi/RUNNING/builds/piezo")
+softwarelist.append("/home/pi/RUNNING/builds/laser")
+softwarelist.append("/home/pi/RUNNING/builds/chest")
+softwarelist.append("/home/pi/RUNNING/scripts/do-audio.py")
+
 ####################
 # GLOBALS & SETTINGS
 ####################
@@ -361,7 +395,7 @@ def software_scan(software_list):
      sleep(0.005) #otherwise it eats every CPU :3
      try:
          if (time.time() - send_ok_timer_software > send_ok_period + 15):
-             for (proc_name, proc_path ) in software_list:
+             for (proc_name) in software_list:
                  print "Scanning " + proc_name 
                  if (process_exists(proc_name)):
                      print "Exists!"
@@ -375,163 +409,6 @@ def software_scan(software_list):
              fname,lineno,fn,text = frame
              print "     in %s on line %d" % (fname, lineno)
              print "Error in software_scan(): %s" % e
-
-############################################################
-# class Arduino:
-############################################################        
-#class with all internal variables & its own named pipe for each Arduino
-class Arduino:
-    def __init__(self, port, pin, timeout, wdtime, dogtime):
-
- # port: input pipe filename, from Arduino (i.e. "/path/to/watchdog_pipe")
- # pin: GPIO output pin number to connect to Arduino reset (i.e. 1, 20)
- # timeout: seconds to serial timeout. set to 0 for non-blocking.
- # wdtime: seconds to firing watchdog (i.e. 10.0)
- # dogtime: seconds between subsequent watchdogs, to prevent reset loops (60)
- 
-        print "new Arduino object with port: " + port + " pin: " + str(pin) + " serial timeout: " + str(timeout) 
-        print "                        watchdog sec: " + str(wdtime) + " watchdog timeout: " + str(dogtime)
-        self.port = port
-        self.pin = pin
-        self.wdtime = wdtime
-        self.dogtime = dogtime
-        self.start = time.time()
-        self.failstart = time.time()
-        self.wdtimerstart = time.time()
-        self.send_ok_timer = time.time()
-        self.set_failstart = 0
-        self.textln = ""
-        self.not_open = 1
-        self.last_len = 0
-        self.send_ok = 1;
-        try:
-            if os.name != 'nt':
-                self.pipein = os.open(self.port, os.O_RDONLY | os.O_NONBLOCK)
-            else:
-                self.pipein = os.open(self.port, os.O_RDONLY)
-        except Exception, e:
-            print "Failed to open %s : %s!" % (self.port, e)
-
-####################
-# openPort()
-####################  
-# this opens the named pipe
-    def openPort(self):
-        if (self.not_open):
-            try:
-                if os.name != 'nt':
-                    self.pipein = os.open(self.port, os.O_RDONLY | os.O_NONBLOCK)
-                else:
-                    self.pipein = os.open(self.port, os.O_RDONLY)           
-            except Exception, e:
-                print "Failed to open %s : %s!" % (self.port, e)
-            else:
-                self.not_open = 0;
-
-####################
-# watchdog()
-####################   
-# this sends the watchdog message (errcode) via TCP
-    def watchdog(self, errcode):
-        global this_ip
-#        print("Watchdog called on port " + self.port + " Time since last dog: " + str(time.time() - self.wdtimerstart))
-        if (time.time() - self.wdtimerstart > self.dogtime):
-            self.wdtimerstart = time.time();
-            self.send_ok = 1; #this tells the watchdog to send an ACKCLEAR
-                              #on the next good read
-            uptime_string, uptime_seconds = get_uptime()
-            print("^^^^^WATCHDOG ACTIVE^^^^^:"+ os.path.basename(self.port) + " " + str(uptime_seconds) + " " + uptime_string)
-#str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S")))
-            if (USE_SOCKETS):
-                try:
-                    ip = this_ip
-                    message = errcode + " " + ip + "/" + os.path.basename(self.port) + " " + str(uptime_seconds) + " " + uptime_string
-                    print message
-                    watchsock.sendto(message, (remote_ip, port))
-                except socket.error as e:
-                    # tries to reconnect every time round the loop
-                    print "Send failed! %s" % e
-                    try:
-                        if (status == 1):
-                            print message
-                            watchsock.sendto(message, (remote_ip, port)) 
-                        else:
-                            print "failed to send 1" + message
-                    except Exception, e:
-                        # tries to reconnect every time round the loop
-                        print "Send failed! %s" % e
-
-####################
-# scan()
-####################                          
-# this is the main scan loop for each arduino. Gets data over the pipe, and 
-# either resets the watchdog timer due to good data, or waits til it expires
-# and triggers the watchdog.
-    def scan(self):
-            global send_ok_timer
-            global send_ok_timer_pi
-            global send_ok_period
-            sleep(0.005) #otherwise it eats every CPU :3
-                         #delete/tweak this if you're getting lag
-            try:
-# try block creates, opens, and reads serials. if any failures, retry.
-                self.openPort()
-                #it's difficult to get non-blocking pipes in Python, but the 
-                #following works!
-                r,w,x = select.select([self.pipein],[],[],0)
-                if self.pipein in r:
-                    self.textln=os.read(self.pipein, 1)
-                    #ignore 0xFFs sent by serial line failure
-                    if (self.textln == 0xFF):
-                        print "Ignoring 0xFF"
-                        self.last_len = 0
-                    else:
-                        if (len(self.textln) != 0):
-                        #sends the OK message for the connected Arduino
-#                            if (self.send_ok == 1):
-#                                print "timer " + str(time.time() - self.send_ok_timer) + " period " + str(send_ok_period)
-#                                if (time.time() - self.send_ok_timer > send_ok_period):
-#                                    self.send_ok_now("ARDUINO")
-#                                    self.send_ok_timer = time.time()
-#                                    self.send_ok = 0;
-                            self.last_len = len(self.textln)
-                        else:
-                            self.last_len = 0
-                else:
-                    self.last_len = 0
-            except Exception, e:
-                print "PIPE FAILURE! %s" % e
-                self.not_open = 1
-                if (self.set_failstart == 0):
-                    self.failstart = time.time() # records time of failure
-                    self.set_failstart = 1 
-                # ^ sets a failure code to keep from rewriting the failure time over & over
-                if (time.time() - self.failstart > self.wdtime):
-                    # if it's been so long since serial failure, pop the watchdog
-                    print "top dog on " + self.port
-#                    self.watchdog("ERRDUINO_DISCON")
-#                    DISCON isn't used now so change this to BROKENPIPE
-                    self.watchdog("ERRDUINO_BROKENPIPE")
-
-            #From here down, we got a read-success    
-            self.set_failstart = 0  # clears the failure code in case we failed earlier 
-            if (self.last_len != 0):
-#                print "Got data on port " + os.path.basename(self.port) + " in sec:" + str(time.time() - self.start).split('.')[0] + "  " + self.textln 
-                self.start = time.time()
-                if (USE_SOCKETS):
-                #sends ERRPI_ACKCLEAR every X seconds
-                    if (time.time() - send_ok_timer_pi > send_ok_period + 30):
-                        send_ok_now("PI", "ERRPI_ACKCLEAR", "")
-                        send_ok_timer_pi = time.time()
-            else: 
-                    # because the Pi itself is still up even when its arduinos are not, we need to duplicate this here or we will never hear back from the pi is all arduinos are down
-                if (time.time() - send_ok_timer_pi > send_ok_period + 30):
-                    send_ok_now("PI", "ERRPI_ACKCLEAR", "")
-                    send_ok_timer_pi = time.time()
-                 #print "Warning! no data on port " + self.port + " in sec: " + str(time.time() - self.start)
-                #likewise, if it's been too long since we saw data, pop the watchdog
-                if (time.time() - self.start > self.wdtime):
-                    self.watchdog("ERRDUINO_NOREPLY")
 
 ###################################
 # main() - main scan loop
@@ -549,39 +426,8 @@ if (USE_SOCKETS):
 this_ip = get_ip_address('eth0')
 print "send from " + this_ip
     
-#use serial2pipe to split the Arduino output into two named pipes, then attach
-#the following to one of the pipes, and the other to the program to be 
-#monitored!
-
-# builds a list to step through the arduinos.
-# Leave this list blank (as below) to monitor only this Pi.
-arduinolist = []
-arduino1 = Arduino("./watchdog_pipe1", 1, 0.0, 40.0, 100.0)
-arduino2 = Arduino("./watchdog_pipe2", 1, 0.0, 40.0, 100.0)
-#arduino3 = Arduino("./chest_wd_pipe", 1, 0.0, 40.0, 100.0)
-#arduinolist.append(arduino1)
-#arduinolist.append(arduino2)
-#arduinolist.append(arduino3)
-
-# builds a list to step through the software on this Pi.
-# Leave this list blank to skip software monitoring.
-softwarelist = []
-softwarelist.append(("GV-VMS.exe", ""))
-softwarelist.append(("Max.exe", ""))
-
 while 1:
-    # if there's nothing connected we still want to monitor this Pi or PC. send OKAY every N seconds.
-    if (len(arduinolist) == 0):
-        pi_scan()
-    # otherwise go through the list and monitor each connected arduino.
-    else:
-        if (len(arduinolist) == 1):
-            arduino1.scan()
-        else:
-            for l in arduinolist:
-                l.scan()
-
-    #same for the list of software. treat software just like a device!
+    pi_scan()
     software_scan(softwarelist)
 
-# seventh version. sends UDP messages
+# eighth version. removed serial2pipe
