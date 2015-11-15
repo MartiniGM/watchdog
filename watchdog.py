@@ -266,8 +266,23 @@ def socket_connect():
             print 'Failed to create socket: %s' % e
             return 0
         else:
-            print 'Socket created: ' + host + ' on ip ' + remote_ip
+            print ('Socket created. Messages will be sent to: ' + remote_ip),
+            sys.stdout.flush()
             return 1
+
+############################################################
+# print_startup_message()
+############################################################
+# prints the ID name of every device to be monitored, so the user can copy it to the Master Doc
+def print_startup_message(software_list):
+    global this_ip
+    print "Now monitoring:"
+    print this_ip
+    for (proc_name) in software_list:
+        if (proc_name[0] == '/'):
+            print this_ip + str(proc_name)
+        else:
+            print this_ip + "/" + str(proc_name)
 
 ############################################################
 # send_ok_now()
@@ -277,6 +292,9 @@ def socket_connect():
 # connected devices -- serial2pipe does that
 def send_ok_now(pi_or_arduino, status, append_string):
     global this_ip
+
+    print ('.'),
+    sys.stdout.flush()
     if (USE_SOCKETS):
         try:
             if (pi_or_arduino == "PI"):
@@ -285,8 +303,10 @@ def send_ok_now(pi_or_arduino, status, append_string):
                 if (len(str(append_string)) == 0):
                     message = status + " " + ip + " " + str(uptime_seconds) + " " + str(uptime_string)                         
                 else:
-                    message = status + " " + ip + "/" + str(append_string) + " " + str(uptime_seconds) + " " + str(uptime_string)
-                print message
+                    if append_string[0] != '/':
+                        message = status + " " + ip + "/" + str(append_string) + " " + str(uptime_seconds) + " " + str(uptime_string)
+                    else:
+                        message = status + " " + ip + str(append_string) + " " + str(uptime_seconds) + " " + str(uptime_string)
                 watchsock.sendto(message, (remote_ip, port))
         except socket.error as e:
             print "Send failed! %s" % e
@@ -396,13 +416,13 @@ def software_scan(software_list):
      try:
          if (time.time() - send_ok_timer_software > send_ok_period + 15):
              for (proc_name) in software_list:
-                 print "Scanning " + proc_name 
+                 #print "Scanning " + proc_name 
                  if (process_exists(proc_name)):
-                     print "Exists!"
+                    # print "Exists!"
                      send_ok_now("PI", "ERRPI_ACKCLEAR", proc_name)
                  else:
                      send_ok_now("PI", "ERRPI_NOREPLY", proc_name)
-                     print "Is Down!"
+#                     print proc_name + " is down!"
              send_ok_timer_software = time.time()
      except Exception, e:
          for frame in traceback.extract_tb(sys.exc_info()[2]):
@@ -424,10 +444,14 @@ if (USE_SOCKETS):
         status = socket_connect()
 
 this_ip = get_ip_address('eth0')
-print "send from " + this_ip
-    
+print "from: " + this_ip
+sys.stdout.flush()
+
+print_startup_message(softwarelist)
+
 while 1:
     pi_scan()
     software_scan(softwarelist)
+    print_startup_message = 0
 
-# eighth version. removed serial2pipe
+# eighth version. removed serial2pipe, improved output
