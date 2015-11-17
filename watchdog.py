@@ -12,6 +12,8 @@ import struct
 from time import sleep
 import subprocess
 import traceback
+import logging
+import logging.handlers
 
 ##############################
 # INSTRUCTIONS 
@@ -64,6 +66,16 @@ reboot_in = 0 #if this is not zero, reboot the machine in N seconds
 PORT = 6666 #UDP port to listen for reboot commands
 data = ""
 
+# give a filename for the watchdog's log file here
+if os.name == 'nt':
+    LOG_FILENAME = 'c:\watchdog\watchdog.out'
+else:
+    LOG_FILENAME = '/home/pi/RUNNING/scripts/watchdog.out'
+# give the size for each rolling log segment, in bytes
+LOG_SIZE = 2000000 #2 MB, in bytes
+# give the number of rolling log segments to record before the log rolls over
+LOG_NUM_BACKUPS = 2 # two .out files before they roll over
+
 # change to 0 to turn off outgoing socket messages (to the TCP watchdog server)
 USE_SOCKETS = 1
 
@@ -79,7 +91,7 @@ if (USE_SOCKETS):
     try:
         watchsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     except socket.error as e:
-        print 'Failed to create outgoing socket: %s' % e
+        logger.error( 'Failed to create outgoing socket: %s' % e )
 
     try:
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -87,14 +99,14 @@ if (USE_SOCKETS):
         server_socket.bind(("0.0.0.0", PORT))
 #        server_socket.settimeout(SOCKET_TIMEOUT)
     except socket.error as e:
-        print 'Failed to create incoming socket: %s' % e
+        logger.error( 'Failed to create incoming socket: %s' % e )
             
 ####################
 # EXIT HANDLER
 ####################
 # ensures we can kill the script with ctrl-C for testing
 def signal_handler(signal, frame):
-    print('Exiting...')
+    logger.info('Exiting...')
     watchsock.close()
     os._exit(0) 
 
@@ -103,6 +115,41 @@ signal.signal(signal.SIGINT, signal_handler)
 ####################
 # FUNCTIONS
 ####################
+
+def setup_logger():
+    global logger
+    # defines log levels for the log file. Default is 'info' and above.
+    # Run program with "debug" on the command line for extra debugging output
+    LEVELS = { 'debug':logging.DEBUG,
+               'info':logging.INFO,
+               'warning':logging.WARNING,
+               'error':logging.ERROR,
+               'critical':logging.CRITICAL,
+               }
+
+    # default log level is info (prints info, warning, error, etc).
+    # run with "tcp_watchdog_sqlite.py debug" to print/log debug messages
+    if len(sys.argv) > 1:
+        level_name = sys.argv[1]
+        level = LEVELS.get(level_name, logging.NOTSET)
+        logging.basicConfig(level=level)
+    else:
+        level = LEVELS.get('info', logging.NOTSET)
+        logging.basicConfig(level=level)
+    
+    # creates our logger with the settings above/below
+    logger = logging.getLogger('WDLog')
+    
+    # Add the log message handler to the logger. Creates a rolling/circular log
+    # with LOG_NUM_BACKUPS backups, each of size LOG_SIZE bytes
+    handler = logging.handlers.RotatingFileHandler(LOG_FILENAME,
+                                                   maxBytes=LOG_SIZE,
+                                                   backupCount=LOG_NUM_BACKUPS)
+
+# sets the message & timestamp format for the log
+    frmt = logging.Formatter('%(asctime)s - %(message)s',"%d/%m/%Y %H:%M:%S")
+    handler.setFormatter(frmt)
+    logger.addHandler(handler)
 
 ############################################################
 # rebootscript()
@@ -127,7 +174,7 @@ def rebootscript():
                 subprocess.call(['osascript', '-e',
                                  'tell app "System Events" to shut down'])
     except Exception, e:
-        print "Couldn't reset system: %s" % e
+        logger.error( "Couldn't reset system: %s" % e, exc_info=True )
 
 ############################################################
 # parse_reboot_command()
@@ -139,6 +186,7 @@ def rebootscript():
 # calls rebootscript() to reboot the machine if the command is valid
 def parse_reboot_command(data):
     global reboot_in
+    global reboot_timer
     try:
     # at this point we got data, so do something with it
         if ("reboot now" in data):
@@ -164,19 +212,26 @@ def parse_reboot_command(data):
 #                print "time: " + str(time_val)
                 resolution = datas[3]
                 if "seconds" in resolution:
+                    logger.info("wait for %s seconds, then reboot..." % str(time_val))
                     print "wait for %s seconds, then reboot..." % str(time_val)
                     reboot_in = time_val
+                    reboot_timer = time.time() #initialize timer
                 else:
                     if "minute" in resolution:
                         print "wait for %s minutes, then reboot..." % str(time_val)
+                        logger.info("wait for %s minutes, then reboot..." % str(time_val))
                         reboot_in = (time_val * 60)
+                        reboot_timer = time.time() #initialize timer
                     else:
-                        print "unknown time resolution. sleep %s seconds, then reboot..." % time_val
+                        logger.info("unknown time resolution. sleep %s seconds, then reboot..." % str(time_val))
+                        print "unknown time resolution. sleep %s seconds, then reboot..." % str(time_val)
                         reboot_in = (time_val)
+                        reboot_timer = time.time() #initialize timer
             else:
                 print "Unknown command"
+                logger.info("Unknown command")
     except Exception, e:
-        print "error in parse_reboot_command"
+        logger.error( "error in parse_reboot_command", exc_info=True)
         
 ############################################################
 # get_ip_address()
@@ -211,7 +266,7 @@ def get_ip_address(ifname):
             #            print local_ip_address
                 return local_ip_address
     except Exception, e:
-        print "error in get_ip_address: %s" % e
+        logger.error ("error in get_ip_address: %s" % e, exc_info=True)
         return ""
 
 ############################################################
@@ -245,7 +300,7 @@ def get_uptime():
 #                print uptime_string
                 return (uptime_string, uptime_seconds)
     except Exception, e:
-        print "error getting uptime, %s" % e 
+        logger.error( "error getting uptime, %s" % e, exc_info=True)
         return ("", 0)
 
 ############################################################
@@ -263,7 +318,7 @@ def socket_connect():
             watchsock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
             remote_ip = socket.gethostbyname( host )
         except socket.error as e:
-            print 'Failed to create socket: %s' % e
+            logger.error( 'Failed to create socket: %s' % e, exc_info=True)
             return 0
         else:
             print ('Socket created. Messages will be sent to: ' + remote_ip),
@@ -276,13 +331,17 @@ def socket_connect():
 # prints the ID name of every device to be monitored, so the user can copy it to the Master Doc
 def print_startup_message(software_list):
     global this_ip
-    print "Now monitoring:"
-    print this_ip
+    logger.info("Now monitoring:")
+#    print "Now monitoring:"
+#    print this_ip
+    logger.info(this_ip)
     for (proc_name) in software_list:
         if (proc_name[0] == '/'):
-            print this_ip + str(proc_name)
+#            print this_ip + str(proc_name)
+            logger.info(this_ip + str(proc_name))
         else:
-            print this_ip + "/" + str(proc_name)
+#            print this_ip + "/" + str(proc_name)
+            logger.info(this_ip + "/" + str(proc_name))
 
 ############################################################
 # send_ok_now()
@@ -309,7 +368,7 @@ def send_ok_now(pi_or_arduino, status, append_string):
                         message = status + " " + ip + str(append_string) + " " + str(uptime_seconds) + " " + str(uptime_string)
                 watchsock.sendto(message, (remote_ip, port))
         except socket.error as e:
-            print "Send failed! %s" % e
+            logger.error( "Send failed! %s" % e, exc_info=True)
             for frame in traceback.extract_tb(sys.exc_info()[2]):
                 fname,lineno,fn,text = frame
                 print "     in %s on line %d" % (fname, lineno)
@@ -320,7 +379,7 @@ def send_ok_now(pi_or_arduino, status, append_string):
                     print "failed to send"
                  #put retry here
         except IOError as e:
-            print "failed to send %s " % e
+            logger.error( "failed to send %s " % e, exc_info=True)
                  #put retry here
         
 ############################################################
@@ -370,19 +429,20 @@ def pi_scan():
     try:
         if reboot_in != 0:
             if (time.time() - reboot_timer > reboot_in):
-                print "rebooting"
+#                print "rebooting"
+                logger.info("rebooting")
                 reboot_in = 0
                 reboot_timer = time.time()
                 rebootscript()
     except Exception, e:
-        print "timing/reboot error %s" % e
+        logger.error( "timing/reboot error %s" % e, exc_info=True)
         
     try:
         if (time.time() - send_ok_timer_pi > send_ok_period + 30):
             send_ok_now("PI", "ERRPI_ACKCLEAR", "")
             send_ok_timer_pi = time.time()
     except Exception, e:
-        print "FAILURE in pi_scan! %s" % e
+        logger.error( "FAILURE in pi_scan! %s" % e, exc_info=True)
         for frame in traceback.extract_tb(sys.exc_info()[2]):
             fname,lineno,fn,text = frame
             print "     in %s on line %d" % (fname, lineno)
@@ -392,7 +452,8 @@ def pi_scan():
         if server_socket in r:
             data, address = server_socket.recvfrom(1024)
             if (data):
-                print "-----Server (%s) connected, sent %s" % (address, data)
+                logger.info("-----Server (%s) connected, sent %s" % (address, data))
+#                print "-----Server (%s) connected, sent %s" % (address, data)
             #######################
             # DATA RECEIVED
             #######################
@@ -400,7 +461,7 @@ def pi_scan():
     except socket.timeout:
         return
     except Exception, e:
-        print "FAILURE in pi_scan for server socket! %s" % e
+        logger.error( "FAILURE in pi_scan for server socket! %s" % e, exc_info=True)
         for frame in traceback.extract_tb(sys.exc_info()[2]):
             fname,lineno,fn,text = frame
             print "     in %s on line %d" % (fname, lineno)
@@ -428,7 +489,7 @@ def software_scan(software_list):
          for frame in traceback.extract_tb(sys.exc_info()[2]):
              fname,lineno,fn,text = frame
              print "     in %s on line %d" % (fname, lineno)
-             print "Error in software_scan(): %s" % e
+             logger.error( "Error in software_scan(): %s" % e, exc_info=True)
 
 ###################################
 # main() - main scan loop
@@ -436,6 +497,8 @@ def software_scan(software_list):
 
 print "starting in 2 seconds..."
 time.sleep(2); # give arduinos time to start
+
+setup_logger()
 
 #set up serial connection...
 if (USE_SOCKETS):
