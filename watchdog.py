@@ -44,10 +44,10 @@ import logging.handlers
 # ADD MONITORED SOFTWARE HERE
 ##############################
 softwarelist = []
-softwarelist.append("/home/pi/RUNNING/builds/piezo")
-softwarelist.append("/home/pi/RUNNING/builds/laser")
-softwarelist.append("/home/pi/RUNNING/builds/chest")
-softwarelist.append("/home/pi/RUNNING/scripts/do-audio.py")
+#softwarelist.append("/home/pi/RUNNING/builds/piezo")
+#softwarelist.append("/home/pi/RUNNING/builds/laser")
+#softwarelist.append("/home/pi/RUNNING/builds/chest")
+#softwarelist.append("/home/pi/RUNNING/scripts/do-audio.py")
 
 ####################
 # GLOBALS & SETTINGS
@@ -68,7 +68,10 @@ PORT = 6666 #UDP port to listen for reboot commands
 data = ""
 
 # give a filename for the watchdog's log file here
-LOG_FILENAME = '/home/pi/RUNNING/scripts/watchdog.out'
+if os.name == 'nt':
+    LOG_FILENAME = 'c:\watchdog\watchdog.out'
+else:
+    LOG_FILENAME = '/home/pi/RUNNING/scripts/watchdog.out'
 # give the size for each rolling log segment, in bytes
 LOG_SIZE = 2000000 #2 MB, in bytes
 # give the number of rolling log segments to record before the log rolls over
