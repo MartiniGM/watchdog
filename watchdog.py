@@ -63,14 +63,12 @@ incoming_socket_timer = time.time() #initialize timer for remote restart msgs
 reboot_timer = time.time() #initialize timer
 incoming_socket_period = 5 #checks for msg on incoming socket every 5 seconds
 reboot_in = 0 #if this is not zero, reboot the machine in N seconds
+reboot_cmd = "" #either 'reboot' or 'halt'
 PORT = 6666 #UDP port to listen for reboot commands
 data = ""
 
 # give a filename for the watchdog's log file here
-if os.name == 'nt':
-    LOG_FILENAME = 'c:\watchdog\watchdog.out'
-else:
-    LOG_FILENAME = '/home/pi/RUNNING/scripts/watchdog.out'
+LOG_FILENAME = '/home/pi/RUNNING/scripts/watchdog.out'
 # give the size for each rolling log segment, in bytes
 LOG_SIZE = 2000000 #2 MB, in bytes
 # give the number of rolling log segments to record before the log rolls over
@@ -156,23 +154,46 @@ def setup_logger():
 ############################################################
 #causes the machine to reboot. You better be sure! :3
 def rebootscript():
-    print "rebooting system!"
+    global reboot_cmd
+    if ("reboot" in reboot_cmd):
+        logger.info( "rebooting system!" )
+    else:
+        if ("halt" in reboot_cmd):
+            logger.info( "halting system!" )
     try:
         if sys.platform == 'linux' or sys.platform == 'linux2':
             import subprocess
-            command = "sudo /sbin/reboot"
+            if ("reboot" in reboot_cmd): 
+                command = "sudo /sbin/reboot"
+            else:
+                if ("halt" in reboot_cmd):
+                    command = "sudo /sbin/halt"
+                else:
+                    logger.error("Didn't recognize %s in rebootscript" % reboot_cmd)
             subprocess.call(command, shell = True)
         else:
             if os.name == 'nt':
             #this gives people 30 seconds to log off/close programs,
             #then forces a reboot
                 import subprocess
-                subprocess.call(["shutdown", "-r", "-f", "-t", "30"])
+                if ("reboot" in reboot_cmd):
+                    subprocess.call(["shutdown", "-r", "-f", "-t", "15", "-c", "MEOW WOLF"])
+                else:
+                    if ("halt" in reboot_cmd):
+                        subprocess.call(["shutdown", "-s", "-f", "-t", "15", "-c", "MEOW WOLF"])
+                    else:
+                        logger.error("Didn't recognize %s in rebootscript" % reboot_cmd)
             else:
             #not Linux or Windows so it's probably Mac OS X
                 import subprocess
-                subprocess.call(['osascript', '-e',
-                                 'tell app "System Events" to shut down'])
+                if ("reboot" in reboot_cmd):
+                    subprocess.call(['osascript', '-e',
+                                     'tell app "System Events" to restart'])
+                    if ("halt" in reboot_cmd):
+                        subprocess.call(['osascript', '-e',
+                                         'tell app "System Events" to shut down'])
+                    else:
+                        logger.error("Didn't recognize %s in rebootscript" % reboot_cmd)
     except Exception, e:
         logger.error( "Couldn't reset system: %s" % e, exc_info=True )
 
@@ -187,12 +208,15 @@ def rebootscript():
 def parse_reboot_command(data):
     global reboot_in
     global reboot_timer
+    global reboot_cmd
     try:
     # at this point we got data, so do something with it
-        if ("reboot now" in data):
+        if ("reboot now" in data or "halt now" in data):
+            datas = data.split()
+            reboot_cmd = datas[0]
             rebootscript()
         else:
-            if ("reboot" in data):
+            if ("reboot" in data or "halt" in data):
                     #reboot in X seconds
                 datas = data.split()
                 print datas
@@ -200,14 +224,15 @@ def parse_reboot_command(data):
                     print "Bad msg format, should be 'reboot now' or 'reboot in X [seconds|minutes]'"
                     print "too short!"
                     return
-                if "reboot" not in datas[0]:
-                    print "Bad msg format, should be 'reboot now' or 'reboot in X [seconds|minutes]'"
-                    print "didn't see 'reboot' in %s" % datas[0]
+                if "reboot" not in datas[0] and "halt" not in datas[0]:
+                    print "Bad msg format, should be '[reboot|halt] now' or '[reboot|halt] in X [seconds|minutes]'"
+                    print "didn't see 'reboot' or 'halt' in %s" % datas[0]
                     return
                 if "in" not in datas[1]:
-                    print "Bad msg format, should be 'reboot now' or 'reboot in X [seconds|minutes]'"
+                    print "Bad msg format, should be '[reboot|halt] now' or '[reboot|halt] in X [seconds|minutes]'"
                     print "didn't see 'in' in %s" % datas[1]
                     return
+                reboot_cmd = datas[0]
                 time_val = float(datas[2]) 
 #                print "time: " + str(time_val)
                 resolution = datas[3]
