@@ -44,10 +44,10 @@ import logging.handlers
 # ADD MONITORED SOFTWARE HERE
 ##############################
 softwarelist = []
-#softwarelist.append("/home/pi/RUNNING/builds/piezo")
-#softwarelist.append("/home/pi/RUNNING/builds/laser")
-#softwarelist.append("/home/pi/RUNNING/builds/chest")
-#softwarelist.append("/home/pi/RUNNING/scripts/do-audio.py")
+softwarelist.append("/home/pi/RUNNING/builds/piezo")
+softwarelist.append("/home/pi/RUNNING/builds/laser")
+softwarelist.append("/home/pi/RUNNING/builds/chest")
+softwarelist.append("/home/pi/RUNNING/scripts/do-audio.py")
 
 ####################
 # GLOBALS & SETTINGS
@@ -242,19 +242,25 @@ def parse_reboot_command(data):
                 if "seconds" in resolution:
                     logger.info("wait for %s seconds, then reboot..." % str(time_val))
                     print "wait for %s seconds, then reboot..." % str(time_val)
+                    if (reboot_in == 0):
+                        #only reset timer if it's not already going
+                        reboot_timer = time.time() #initialize timer
                     reboot_in = time_val
-                    reboot_timer = time.time() #initialize timer
                 else:
                     if "minute" in resolution:
                         print "wait for %s minutes, then reboot..." % str(time_val)
                         logger.info("wait for %s minutes, then reboot..." % str(time_val))
+                        if (reboot_in == 0):
+                        #only reset timer if it's not already going
+                            reboot_timer = time.time() #initialize timer
                         reboot_in = (time_val * 60)
-                        reboot_timer = time.time() #initialize timer
                     else:
                         logger.info("unknown time resolution. sleep %s seconds, then reboot..." % str(time_val))
                         print "unknown time resolution. sleep %s seconds, then reboot..." % str(time_val)
+                        if (reboot_in == 0):
+                        #only reset timer if it's not already going
+                            reboot_timer = time.time() #initialize timer
                         reboot_in = (time_val)
-                        reboot_timer = time.time() #initialize timer
             else:
                 print "Unknown command"
                 logger.info("Unknown command")
