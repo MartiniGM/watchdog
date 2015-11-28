@@ -166,7 +166,6 @@ def get_item_googlesheet(id_name, item_name):
     header_item = googleSheetDict["IP ADDRESS"]
     try:
         item_id = header_item.index(item_name)
-#        print "item_id " + str(item_id) + " for " + id_name
         our_item = googleSheetDict[id_name]
 #        print our_item
         return str(our_item[item_id])
@@ -290,7 +289,13 @@ def get_items_from_googlesheet(id_name):
         if switch_interface == "" or switch_interface is None:
             switch_interface = get_item_sqlite(id_name, "SWITCH_INTERFACE")
 
-    return (location, device_type, zone, space, device_name, description, switch_interface) #return items, either from GS backup or as-is from the database
+    mac_address = get_item_googlesheet(id_name, "Mac Address")
+    if mac_address == "" or mac_address is None:
+        mac_address = get_item_from_googlesheet_backup(id_name, "MAC_ADDRESS")
+        if mac_address == "" or mac_address is None:
+            mac_address = get_item_sqlite(id_name, "MAC_ADDRESS")
+            
+    return (location, device_type, zone, space, device_name, description, switch_interface, mac_address) #return items, either from GS backup or as-is from the database
 
 ############################################################
 #get_all_from_googlesheet()
@@ -303,7 +308,7 @@ def get_all_from_googlesheet(id_name):
 #    if (USE_GOOGLE_SHEETS != 1):
         # if googlesheets are off, read these back from the GS backup or from the database as they already exist
     try:
-        (location, device_type, zone, space, device_name, description, switch_interface) = get_items_from_googlesheet(id_name)
+        (location, device_type, zone, space, device_name, description, switch_interface, mac_address) = get_items_from_googlesheet(id_name)
     except Exception, e:
         print "get_all_from_googlesheet error: %s" % e
         for frame in traceback.extract_tb(sys.exc_info()[2]):
@@ -328,7 +333,7 @@ def get_all_from_googlesheet(id_name):
             max_id_name = str(parent) + "/" + "UNKNOWN"
     #print "parent " + parent + " child " + child
     #print "max_id_name " + max_id_name
-    return (location, device_type, zone, space, device_name, description, switch_interface, max_id_name) #return items from googlesheet dictionary
+    return (location, device_type, zone, space, device_name, description, switch_interface, max_id_name, mac_address) #return items from googlesheet dictionary
     
 ############################################################
 #get_all_from_googlesheet_old()
@@ -563,11 +568,11 @@ def sql_data_sqlite(data, pi_or_arduino, ip):
     last_uptime = uptime_sec
     #also get location, device type, and max name from google sheet
     #    (location, device_type, max_id_name) = get_type_location_and_max_name(id_name)
-    (location, device_type, zone, space, device_name, description, switch_interface, max_id_name) = get_all_from_googlesheet(id_name)
+    (location, device_type, zone, space, device_name, description, switch_interface, max_id_name, mac_address) = get_all_from_googlesheet(id_name)
     # insert & commit, otherwise rollback
     try:
         cur = con.cursor()
-        cur.execute("INSERT OR REPLACE INTO DEVICES(ID_NAME, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME, LAST_UPTIME_SEC, LOCATION, DEVICE_TYPE, LAST_RESET_TIMESTAMP, MAX_ID_NAME, ZONE, SPACE, DEVICE_NAME, DESCRIPTION, SWITCH_INTERFACE) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",  (id_name,timestamp,status, uptime_sec,uptime,uptime_sec, location, device_type, last_reset_timestamp, max_id_name, zone, space, device_name, description, switch_interface))
+        cur.execute("INSERT OR REPLACE INTO DEVICES(ID_NAME, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME, LAST_UPTIME_SEC, LOCATION, DEVICE_TYPE, LAST_RESET_TIMESTAMP, MAX_ID_NAME, ZONE, SPACE, DEVICE_NAME, DESCRIPTION, SWITCH_INTERFACE, MAC_ADDRESS) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",  (id_name,timestamp,status, uptime_sec,uptime,uptime_sec, location, device_type, last_reset_timestamp, max_id_name, zone, space, device_name, description, switch_interface, mac_address))
         con.commit()
     except lite.Error, e:
         logger.error(" sqlite error: %s" % e)
@@ -609,11 +614,11 @@ def parse_data_sqlite(data):
             status = "NONRESPONSIVE"
             #also get location, device type, and max name from google sheet
             #            (location, device_type, max_id_name) = get_type_location_and_max_name(id_name)
-            (location, device_type, zone, space, device_name, description, switch_interface, max_id_name) = get_all_from_googlesheet(id_name)
+            (location, device_type, zone, space, device_name, description, switch_interface, max_id_name, mac_address) = get_all_from_googlesheet(id_name)
             logger.info(id_name + " silent for " + str(total_seconds) + " seconds, setting " + status + " with uptime " + uptime)
             try:
                 cur = con.cursor()
-                cur.execute("INSERT OR REPLACE INTO DEVICES(ID_NAME, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME, LAST_UPTIME_SEC, LOCATION, DEVICE_TYPE, LAST_RESET_TIMESTAMP, MAX_ID_NAME, ZONE, SPACE, DEVICE_NAME, DESCRIPTION, SWITCH_INTERFACE) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",  (id_name,timestamp,status, uptime_sec,uptime,uptime_sec, location, device_type, last_reset_timestamp, max_id_name, zone, space, device_name, description, switch_interface))
+                cur.execute("INSERT OR REPLACE INTO DEVICES(ID_NAME, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME, LAST_UPTIME_SEC, LOCATION, DEVICE_TYPE, LAST_RESET_TIMESTAMP, MAX_ID_NAME, ZONE, SPACE, DEVICE_NAME, DESCRIPTION, SWITCH_INTERFACE, MAC_ADDRESS) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",  (id_name,timestamp,status, uptime_sec,uptime,uptime_sec, location, device_type, last_reset_timestamp, max_id_name, zone, space, device_name, description, switch_interface, mac_address))
                 con.commit()
             except lite.Error, e:
                 for frame in traceback.extract_tb(sys.exc_info()[2]):
