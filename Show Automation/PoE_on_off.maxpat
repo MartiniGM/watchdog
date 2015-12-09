@@ -4,12 +4,12 @@
 		"appversion" : 		{
 			"major" : 7,
 			"minor" : 0,
-			"revision" : 5,
+			"revision" : 6,
 			"architecture" : "x86",
 			"modernui" : 1
 		}
 ,
-		"rect" : [ 187.0, 149.0, 640.0, 480.0 ],
+		"rect" : [ 107.0, 153.0, 640.0, 480.0 ],
 		"bglocked" : 0,
 		"openinpresentation" : 0,
 		"default_fontsize" : 12.0,
@@ -37,6 +37,19 @@
 		"style" : "",
 		"subpatcher_template" : "",
 		"boxes" : [ 			{
+				"box" : 				{
+					"id" : "obj-2",
+					"linecount" : 3,
+					"maxclass" : "comment",
+					"numinlets" : 1,
+					"numoutlets" : 0,
+					"patching_rect" : [ 219.0, 33.0, 229.0, 47.0 ],
+					"style" : "",
+					"text" : "we need to fix the firewall so this works. try the \"PoE\" location under network prefs if you want to test it for now "
+				}
+
+			}
+, 			{
 				"box" : 				{
 					"id" : "obj-17",
 					"maxclass" : "comment",
@@ -67,9 +80,9 @@
 					"numinlets" : 2,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
-					"patching_rect" : [ 29.0, 156.0, 401.0, 22.0 ],
+					"patching_rect" : [ 29.0, 156.0, 454.0, 22.0 ],
 					"style" : "",
-					"text" : "/Users/Aesir/Documents/watchdog/set_power.exp auto FastEthernet2/0/5"
+					"text" : "/Users/Aesir/Documents/watchdog/set_power.exp auto 10.42.0.8 FastEthernet1/0/5"
 				}
 
 			}
@@ -92,9 +105,9 @@
 					"numinlets" : 2,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
-					"patching_rect" : [ 20.0, 102.0, 407.0, 22.0 ],
+					"patching_rect" : [ 20.0, 102.0, 461.0, 22.0 ],
 					"style" : "",
-					"text" : "/Users/Aesir/Documents/watchdog/set_power.exp never FastEthernet2/0/5"
+					"text" : "/Users/Aesir/Documents/watchdog/set_power.exp never 10.42.0.8 FastEthernet1/0/5"
 				}
 
 			}

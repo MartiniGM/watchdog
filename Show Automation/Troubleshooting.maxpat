@@ -9,7 +9,7 @@
 			"modernui" : 1
 		}
 ,
-		"rect" : [ 178.0, 117.0, 921.0, 496.0 ],
+		"rect" : [ 41.0, 133.0, 921.0, 480.0 ],
 		"bglocked" : 0,
 		"openinpresentation" : 1,
 		"default_fontsize" : 12.0,
@@ -47,7 +47,7 @@
 					"presentation" : 1,
 					"presentation_rect" : [ 391.5, 41.0, 280.0, 22.0 ],
 					"style" : "",
-					"text" : "\"standalone demos pi\""
+					"text" : "\"NVR recording software\""
 				}
 
 			}
@@ -163,19 +163,6 @@
 							}
 , 							{
 								"box" : 								{
-									"id" : "obj-9",
-									"maxclass" : "newobj",
-									"numinlets" : 2,
-									"numoutlets" : 2,
-									"outlettype" : [ "", "" ],
-									"patching_rect" : [ 119.0, 77.0, 57.0, 22.0 ],
-									"style" : "",
-									"text" : "zl slice 2"
-								}
-
-							}
-, 							{
-								"box" : 								{
 									"id" : "obj-2",
 									"maxclass" : "newobj",
 									"numinlets" : 1,
@@ -207,8 +194,8 @@
 									"maxclass" : "inlet",
 									"numinlets" : 0,
 									"numoutlets" : 1,
-									"outlettype" : [ "list" ],
-									"patching_rect" : [ 119.0, 27.0, 30.0, 30.0 ],
+									"outlettype" : [ "" ],
+									"patching_rect" : [ 138.0, 72.0, 30.0, 30.0 ],
 									"style" : ""
 								}
 
@@ -216,7 +203,7 @@
  ],
 						"lines" : [ 							{
 								"patchline" : 								{
-									"destination" : [ "obj-9", 0 ],
+									"destination" : [ "obj-36", 0 ],
 									"disabled" : 0,
 									"hidden" : 0,
 									"source" : [ "obj-1", 0 ]
@@ -274,15 +261,6 @@
 									"disabled" : 0,
 									"hidden" : 0,
 									"source" : [ "obj-7", 0 ]
-								}
-
-							}
-, 							{
-								"patchline" : 								{
-									"destination" : [ "obj-36", 0 ],
-									"disabled" : 0,
-									"hidden" : 0,
-									"source" : [ "obj-9", 1 ]
 								}
 
 							}
@@ -746,7 +724,7 @@
 					"maxclass" : "inlet",
 					"numinlets" : 0,
 					"numoutlets" : 1,
-					"outlettype" : [ "list" ],
+					"outlettype" : [ "" ],
 					"patching_rect" : [ 81.0, 2.0, 30.0, 30.0 ],
 					"style" : ""
 				}
@@ -763,7 +741,7 @@
 					"presentation" : 1,
 					"presentation_rect" : [ 38.5, 41.0, 343.0, 22.0 ],
 					"style" : "",
-					"text" : "10.42.16.53"
+					"text" : "10.42.96.4/GV-VMS.exe"
 				}
 
 			}
@@ -807,7 +785,7 @@
 					"patching_rect" : [ 69.0, 489.0, 518.0, 38.0 ],
 					"presentation" : 1,
 					"presentation_linecount" : 2,
-					"presentation_rect" : [ 71.5, 405.0, 518.0, 38.0 ],
+					"presentation_rect" : [ 71.5, 402.0, 518.0, 38.0 ],
 					"style" : "",
 					"text" : "<----- click here to log in remotely. \nIf you get a blank window, close it, wait 30 seconds, and then try again."
 				}
@@ -822,7 +800,7 @@
 					"outlettype" : [ "bang" ],
 					"patching_rect" : [ 36.0, 496.0, 24.0, 24.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 38.5, 412.0, 24.0, 24.0 ],
+					"presentation_rect" : [ 38.5, 409.0, 24.0, 24.0 ],
 					"style" : ""
 				}
 
@@ -838,7 +816,7 @@
 					"patching_rect" : [ 36.0, 442.0, 523.0, 38.0 ],
 					"presentation" : 1,
 					"presentation_linecount" : 2,
-					"presentation_rect" : [ 38.5, 358.0, 523.0, 38.0 ],
+					"presentation_rect" : [ 38.5, 355.0, 523.0, 38.0 ],
 					"style" : "",
 					"text" : "5) Ask on slack's tech channel if you don't know what to do now.\nClick below to open a window to this device, if you know how to fix it."
 				}
@@ -870,7 +848,7 @@
 					"numoutlets" : 0,
 					"patching_rect" : [ 36.0, 339.0, 395.0, 22.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 38.5, 255.0, 395.0, 22.0 ],
+					"presentation_rect" : [ 38.5, 259.0, 395.0, 22.0 ],
 					"style" : "",
 					"text" : "3) Wait at least one minute for the device to restart."
 				}
@@ -1037,7 +1015,33 @@
 				}
 
 			}
- ]
+ ],
+		"dependency_cache" : [ 			{
+				"name" : "rebootDevice.maxpat",
+				"bootpath" : "~/Documents/Max 7/Library/Show Automation",
+				"type" : "JSON",
+				"implicit" : 1
+			}
+, 			{
+				"name" : "watchGod.js",
+				"bootpath" : "~/Documents/Max 7/Library/watchdog",
+				"type" : "TEXT",
+				"implicit" : 1
+			}
+, 			{
+				"name" : "remoteLogin.maxpat",
+				"bootpath" : "~/Documents/Max 7/Library/Show Automation",
+				"type" : "JSON",
+				"implicit" : 1
+			}
+, 			{
+				"name" : "getDescription.maxpat",
+				"bootpath" : "~/Documents/Max 7/Library/Show Automation",
+				"type" : "JSON",
+				"implicit" : 1
+			}
+ ],
+		"embedsnapshot" : 0
 	}
 
 }
