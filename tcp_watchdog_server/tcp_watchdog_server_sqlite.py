@@ -27,7 +27,7 @@ from oauth2client.client import SignedJwtAssertionCredentials
 # every N seconds the watchdog will compare timestamps for all entries in the 
 # database to the current time, and set NONRESPONSIVE if each hasn't replied
 # within this time period.
-periodic_period = 120 #seconds 
+periodic_period = 90 #seconds 
 periodic_timer = time.time() #initialize timer
 
 # give a filename for the watchdog's SQLite database here, on Windows
@@ -200,8 +200,10 @@ def save_googlesheet_backup():
                 fname,lineno,fn,text = frame
                 print "     in %s on line %d" % (fname, lineno)
             print " sqlite error: %s" % e
-            con.rollback()
-
+            try:
+                con.rollback()
+            except Exception, e:
+                logger.error(" Can't rollback! %s" % e)
 ############################################################
 # get_item_googlesheet_backup()
 ############################################################        
@@ -217,7 +219,10 @@ def get_item_from_googlesheet_backup(ip_address, item_name):
             return row[0]
     except lite.Error, e:
         if con:
-            con.rollback()
+            try:
+                con.rollback()
+            except Exception, e:
+                logger.error(" Can't rollback! %s" % e)
         print(" SQL error! %s" % e)
         return "" #blank item, will show as None in SQL
             
@@ -491,8 +496,11 @@ def get_item_sqlite(id_name, item_name):
             return row[1]
     except lite.Error, e:
         if con:
-            con.rollback()
-        print(" SQL error! %s" % e)
+            print(" SQL error! %s" % e)
+            try:
+                con.rollback()
+            except Exception, e:
+                logger.error(" Can't rollback! %s" % e)
         return "" #blank item, will show as None in SQL
     
 ############################################################
@@ -503,17 +511,22 @@ def get_item_sqlite(id_name, item_name):
 # same functions to parse both.
 
 def listify_data(data):
-    if len(data) == 0:
-        return
-    data_list = data.split();
-    status = data_list[0]
-    new_status = return_status(status)
-    id_name = data_list[1]
-    uptime_sec = data_list[2]
-    timestamp = str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
-    strr = " "
-    uptime = strr.join(data_list[3:])
-    return [(id_name, timestamp, new_status, uptime_sec, uptime)]
+    try:
+        if len(data) == 0:
+            return
+        data_list = data.split();
+        status = data_list[0]
+        new_status = return_status(status)
+        id_name = data_list[1]
+        uptime_sec = data_list[2]
+        timestamp = str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
+        strr = " "
+        uptime = strr.join(data_list[3:])
+        return [(id_name, timestamp, new_status, uptime_sec, uptime)]
+    except Exception, e:
+        logger.error( "Error in listify_data: %s" % e)
+        logger.error( "Check the last message's formatting!")
+        return 
 
 ############################################################
 # sql_data_sqlite()
@@ -521,12 +534,17 @@ def listify_data(data):
 # parses data (as a list of tuples, either from SQLite or listify_data) a
 # and updates SQLite
 
+
 def sql_data_sqlite(data, pi_or_arduino, ip):
     global con
+    if data is None:
+        return
     if len(data) == 0:
         return
     logger.debug(data)
     datalist = data[0]
+    non_decimal = re.compile(r'[^\d.]+')
+
     if len(datalist) != 5:
         print "got the IP address error"        
         id_name = ip
@@ -534,6 +552,12 @@ def sql_data_sqlite(data, pi_or_arduino, ip):
         status = datalist[1]
         new_status = return_status(status)
         uptime_sec = datalist[2]
+        #replaces ',' etc to ensure numbers only
+        uptime_sec = non_decimal.sub('', uptime_sec)
+        #strips out dumb characters at the end of strings sent by Max
+        uptime_sec = uptime_sec.replace('\x00', '')
+        #prints with dumb characters if present
+        print(repr(uptime_sec))
         uptime = datalist[3]
     else:
         id_name = datalist[0]
@@ -544,11 +568,21 @@ def sql_data_sqlite(data, pi_or_arduino, ip):
         status = datalist[2]
         new_status = return_status(status)
         uptime_sec = datalist[3]
+        #replaces ',' etc to ensure numbers only
+        uptime_sec = non_decimal.sub('', uptime_sec)
+        #strips out dumb characters at the end of strings sent by Max
+        uptime_sec = uptime_sec.replace('\x00', '')
+        #prints with dumb characters if present
+        print(repr(uptime_sec))
         uptime = datalist[4]
     if (len(uptime) == 0):
         # for now only loneduinos fail to send uptime as a string.
         # if so, create a string from the number of seconds rec'd
-        sec = int(float(uptime_sec))
+        try:
+            sec = int(float(uptime_sec))
+        except Exception, e:
+            logger.debug("Problem converting uptime. Setting to 0")
+            sec = 0
         mins = sec/60
         hours = mins/60
         days = hours / 24
@@ -579,8 +613,11 @@ def sql_data_sqlite(data, pi_or_arduino, ip):
         for frame in traceback.extract_tb(sys.exc_info()[2]):
             fname,lineno,fn,text = frame
             print "     in %s on line %d" % (fname, lineno)
-        con.rollback()
-        
+        try:
+            con.rollback()
+        except Exception, e:
+            logger.error(" Can't rollback! %s" % e)
+            
 ############################################################
 # parse_data_sqlite()
 ############################################################        
@@ -625,7 +662,10 @@ def parse_data_sqlite(data):
                     fname,lineno,fn,text = frame
                     print "     in %s on line %d" % (fname, lineno)
                 logger.error("sqlite error: %s" % e)
-                con.rollback()
+                try:
+                    con.rollback()
+                except Exception, e:
+                    logger.error(" Can't rollback! %s" % e)
         else:
             #this item was OK if its status says OKAY
             if (new_status == "OKAY"):
@@ -646,8 +686,10 @@ def parse_data_sqlite(data):
                 fname,lineno,fn,text = frame
                 print "     in %s on line %d" % (fname, lineno)
             logger.error("sqlite error: %s" % e)
-            con.rollback()
-                
+            try:
+                con.rollback()
+            except Exception, e:
+                logger.error(" Can't rollback! %s" % e)                
 ############################################################                
 ############################################################
 # main()
