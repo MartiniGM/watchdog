@@ -350,14 +350,17 @@ def get_all_from_googlesheet(id_name):
 def get_all_from_googlesheet_old(id_name):
     if (USE_GOOGLE_SHEETS != 1):
         # if googlesheets are off, read these back from the database as they already exist
-        location = get_item_sqlite(id_name, "LOCATION")
-        device_type = get_item_sqlite(id_name, "DEVICE_TYPE")
-        zone = get_item_sqlite(id_name, "ZONE")
-        space = get_item_sqlite(id_name, "SPACE")
-        device_name = get_item_sqlite(id_name, "DEVICE_NAME")
-        description = get_item_sqlite(id_name, "DESCRIPTION")
-        switch_interface = get_item_sqlite(id_name, "SWITCH_INTERFACE")
-        return (location, device_type, zone, space, device_name, description, switch_interface, id_name) #return items as-is from the database
+        try:
+            location = get_item_sqlite(id_name, "LOCATION")
+            device_type = get_item_sqlite(id_name, "DEVICE_TYPE")
+            zone = get_item_sqlite(id_name, "ZONE")
+            space = get_item_sqlite(id_name, "SPACE")
+            device_name = get_item_sqlite(id_name, "DEVICE_NAME")
+            description = get_item_sqlite(id_name, "DESCRIPTION")
+            switch_interface = get_item_sqlite(id_name, "SWITCH_INTERFACE")
+            return (location, device_type, zone, space, device_name, description, switch_interface, id_name) #return items as-is from the database
+        except Exception, e:
+            logger.debug( )
     try:
         #otherwise try to read them from the googlesheet dictionary
         device_type = get_item_googlesheet(id_name, "Device Type")
@@ -419,7 +422,11 @@ def return_last_reset(new_uptime, last_uptime, id_name):
   #  print "*******************last check is " + str(last_reset_timestamp_check) + " uptime is " + str(uptime_sec)
     if (last_reset_timestamp_check == None and uptime_sec != None):
         #get the uptime and subtract from the current time to create baseline ts
-        last_reset_time = datetime.datetime.now() - datetime.timedelta(seconds=int(float(uptime_sec)))
+        try:
+            last_reset_time = datetime.datetime.now() - datetime.timedelta(seconds=int(float(uptime_sec)))
+        except Exception, e:
+            logger.debug("Problem converting last reset time, setting to 0")
+            last_reset_time = 0
         last_reset_timestamp = str(last_reset_time.strftime("%b %d, %Y %H:%M:%S"))
 #        print "*****************NOW SETTING BLANK RESET TS TO: " + str(last_reset_timestamp) 
         return last_reset_timestamp
@@ -430,22 +437,26 @@ def return_last_reset(new_uptime, last_uptime, id_name):
             return last_reset_timestamp
         else:
             #print "new uptime " + str(new_uptime) + " old uptime " + str(last_uptime)
-            if (int(float(new_uptime)) < int(float(last_uptime))):
+            try:
+                if (int(float(new_uptime)) < int(float(last_uptime))):
                 #detected a device reset since the last time we checked the uptime
-                last_reset_time = datetime.datetime.now() - datetime.timedelta(seconds=int(float(new_uptime)))
-                last_reset_timestamp = str(last_reset_time.strftime("%b %d, %Y %H:%M:%S"))
-                logger.warning (id_name + " **DEVICE RESET** detected at " + last_reset_timestamp)
-                logger.debug("old uptime" + str(last_uptime) + ",new uptime " + str(new_uptime))
-                return last_reset_timestamp
-            else:
+                    last_reset_time = datetime.datetime.now() - datetime.timedelta(seconds=int(float(new_uptime)))
+                    last_reset_timestamp = str(last_reset_time.strftime("%b %d, %Y %H:%M:%S"))
+                    logger.warning (id_name + " **DEVICE RESET** detected at " + last_reset_timestamp)
+                    logger.debug("old uptime" + str(last_uptime) + ",new uptime " + str(new_uptime))
+                    return last_reset_timestamp
+                else:
                 #just return the last recorded one so we can write it back to the DB
-                last_reset_timestamp = get_item_sqlite(id_name, "LAST_RESET_TIMESTAMP")
-                return last_reset_timestamp
-        
-############################################################
-#return_status()
-############################################################
-# returns new human-friendly status strings, given internal codes
+                    last_reset_timestamp = get_item_sqlite(id_name, "LAST_RESET_TIMESTAMP")
+                    return last_reset_timestamp
+            except Exception, e: 
+                print "Problem converting timestamp, returning ''"
+                return ""
+            
+            ############################################################
+            #return_status()
+            ############################################################
+            # returns new human-friendly status strings, given internal codes
 
 def return_status(stat):
     if stat is None:
@@ -674,7 +685,11 @@ def parse_data_sqlite(data):
     if (num_total == 0):
         return
     else:
-        percent_okay = (float(num_okay) / float(num_total)) * 100.0
+        try:
+            percent_okay = (float(num_okay) / float(num_total)) * 100.0
+        except Exception, e:
+            logger.debug("Problem converting percent okay, setting to 0")
+            percent_okay = 0.0
         info_id_name = "SYSTEM_INFO"
         logger.info(">>>>>>>>>>System Info: total is %d, okay %d, %d%% OK" % (num_total, num_okay, percent_okay))
         try:
