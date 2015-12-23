@@ -57,7 +57,7 @@ if __name__ == "__main__":
                         help='name of sqlite table (i.e. velostat)' )
     parser.add_argument('--row', '-r',
                         type=str,
-                        help='name of primary row to be returned (-s) or sorted by (-m)' )
+                        help='name of primary row to be returned (-s) or sorted by (-m), (i.e. value)' )
     parser.add_argument('--id_name', '-i',
                         type=str,
                         help='name of id to search for (i.e. squirell)' )
@@ -152,7 +152,7 @@ if __name__ == "__main__":
             #get all!
         try:
             cur = con.cursor()
-            query = "SELECT %s,time FROM %s WHERE name LIKE ? ORDER BY (time) DESC LIMIT 1;" % (row_name, table_name) 
+            query = "SELECT %s,time FROM %s WHERE name LIKE ? and type='mean' ORDER BY (time) DESC LIMIT 1;" % (row_name, table_name) 
             cur.execute(query, ('%'+id_name+'%',))
             data = cur.fetchall()
             for row in data:
