@@ -22,7 +22,7 @@ sendSlack()
       \"text\": \"$MSG\",
       \"channel\": \"#network\",
       \"username\": \"cricket\",
-      \"icon_emoji\": \":floppy_disk:\"}" ###<WEBHOOK>### 
+      \"icon_emoji\": \":floppy_disk:\"}" https://hooks.slack.com/services/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
 }
 
 sendSMS()
@@ -54,13 +54,7 @@ do
         # schedule me in exponential time
         at now +$(($DELAY * 2)) minutes -f $MYDIR/$0 >> $LOG
       else
-      if [ $DELAY -ne $INITIAL_DELAY ]
-      then
-        MSG="something came back up!"
         DELAY=$INITIAL_DELAY
-        sendSMS $MSG
-        sendSlack $MSG
-      fi
       fi
     done
   fi
