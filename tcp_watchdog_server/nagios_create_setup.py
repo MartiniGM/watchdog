@@ -4,6 +4,7 @@ import sqlite3 as lite
 import datetime
 import time
 import os
+import errno
 import re
 import logging
 import logging.handlers
@@ -25,11 +26,12 @@ from oauth2client.client import SignedJwtAssertionCredentials
 ####################                
 
 # nagios destination directory. Should be something like /etc/nagios/objects
-nagios_dir = "/tmp/nagios/objects/"
-teensy_dir = "teensy"
+nagios_dir = "/tmp/nagios/objects/hosts/"
+teensy_dir = "arduinos"
 arduino_dir = "arduinos"
 pi_dir = "pis"
 windows_dir = "windows"
+switch_dir = "switch"
 
 device_type_item_id = 5
 hostname_item_id = 4
@@ -225,6 +227,17 @@ def subfinder(mylist, pattern):
         return []
 
 ############################################################
+#makes sure paths exist
+############################################################    
+def mkdir_p(path):
+    try:
+        os.makedirs(path)
+    except OSError as exc: # Python >2.5
+        if exc.errno == errno.EEXIST and os.path.isdir(path):
+            pass
+        else: raise
+    
+############################################################
 #urlify - sanitizes hostname for use in a filename
 ############################################################
 def urlify(s):
@@ -241,11 +254,11 @@ def urlify(s):
 ############################################################ 
 def do_teensys(mylist):
     for item in mylist:
-        do_a_host(item, "teensy", "linux-server", teensy_dir)
+        do_a_host(item, "teensy", "arduinos", teensy_dir)
 
 def do_arduinos(mylist):
     for item in mylist:
-        do_a_host(item, "arduino", "linux-server", arduino_dir)
+        do_a_host(item, "arduino", "arduinos", arduino_dir)
 
 def do_pis(mylist):
     for item in mylist:
@@ -257,7 +270,7 @@ def do_windows(mylist):
 
 def do_switch(mylist):
     for item in mylist:
-        return
+        do_a_host(item, "switch", "generic-switch", switch_dir)       
         #do this l8r
         
 ############################################################
@@ -300,6 +313,7 @@ def do_a_host(mylist, compare, group_name, dir_to_use):
                 filename = directory + hostname + ".cfg"
                 
             print "OK " + filename + " " + alias + " " + hostname + " " + ip_address + " " + device_type
+            mkdir_p(directory)
             target = open(filename, 'w')
             target.write("define host{\n")
             target.write("use                     %s,host-pnp\n" % group_name)
