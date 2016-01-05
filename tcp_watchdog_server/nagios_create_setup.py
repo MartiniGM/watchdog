@@ -25,7 +25,8 @@ from oauth2client.client import SignedJwtAssertionCredentials
 # GLOBALS & SETTINGS
 ####################                
 
-# nagios destination directory. Should be something like /etc/nagios/objects
+# nagios destination directory. Should be something like /tmp/nagios/objects/hosts.
+# DO NOT use the nagios directory itself, it's way safer to create them in tmp and copy them over!
 nagios_dir = "/tmp/nagios/objects/hosts/"
 teensy_dir = "arduinos"
 arduino_dir = "arduinos"
@@ -250,6 +251,16 @@ def urlify(s):
     return s
 
 ############################################################
+#urlify - sanitizes hostname for use in a filename
+############################################################
+def urlify_allow_spaces(s):
+    # Replace '.' with '_' (in case this is an IP address)
+    s = re.sub(r"[.]", '_', s)
+    # Remove all non-word characters (except numbers, letters, dash/underscore)
+    s = re.sub(r"[^-_\w\s]", '', s)
+    return s
+
+############################################################
 #do_teensys: takes a list of lists, creates .cfg files for teensys in the list
 ############################################################ 
 def do_teensys(mylist):
@@ -284,8 +295,8 @@ def do_a_host(mylist, compare, group_name, dir_to_use):
             directory = nagios_dir + dir_to_use
 
             hostname = mylist[hostname_item_id]
+            original_hostname = hostname
             hostname = urlify(hostname)
-            alias = hostname + ": " + mylist[description_item_id]
             ip_address = mylist[ip_address_item_id]
             device_type = mylist[device_type_item_id]
 #            compare = "teensy"
@@ -303,10 +314,13 @@ def do_a_host(mylist, compare, group_name, dir_to_use):
                 return -1
 
             if "default" in hostname.lower():
+                original_hostname = ip_address
                 ip_to_append = urlify(ip_address)
                 hostname = ip_to_append
                 print "Found 'default' in hostname, creating one for %s IP address: %s" % (hostname, str(mylist))
-            
+
+            alias = urlify_allow_spaces(mylist[description_item_id]) + " " + original_hostname
+
             if '/' not in directory[-1]:
                 filename = directory + '/' + hostname + ".cfg"
             else:
@@ -318,6 +332,7 @@ def do_a_host(mylist, compare, group_name, dir_to_use):
             target.write("define host{\n")
             target.write("use                     %s,host-pnp\n" % group_name)
             target.write("host_name               %s\n" % hostname)
+#            target.write("host_name               %s\n" % alias)
             target.write("alias                   %s\n" % alias)
             target.write("address                 %s\n" % ip_address)
             target.write("}\n")

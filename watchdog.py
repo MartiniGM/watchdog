@@ -49,6 +49,12 @@ softwarelist.append("/home/pi/RUNNING/builds/laser")
 softwarelist.append("/home/pi/RUNNING/builds/chest")
 softwarelist.append("/home/pi/RUNNING/scripts/do-audio.py")
 
+#############################
+# ADD UPS FILE (apcupsd.status) here
+#############################
+upslist = []
+upslist.append("/Users/Aesir/Documents/watchdog/tcp_watchdog_server/upcstatus.txt")
+
 ####################
 # GLOBALS & SETTINGS
 ####################
@@ -57,6 +63,7 @@ send_ok_period = 30 #sends ERRPI_ACKCLEAR every 30s
 send_ok_timer = time.time()
 send_ok_timer_pi = time.time()
 send_ok_timer_software = time.time()
+send_ok_timer_ups = time.time()
 
 #stuff for the remote reboot feature 
 incoming_socket_timer = time.time() #initialize timer for remote restart msgs
@@ -525,6 +532,43 @@ def software_scan(software_list):
              print "     in %s on line %d" % (fname, lineno)
              logger.error( "Error in software_scan(): %s" % e, exc_info=True)
 
+def ups_ok(ups_file):
+    try:
+        with open(ups_file, 'r') as infile:
+            for line in infile:
+                if 'STATUS' in line:
+                    line_split = line.split()
+                    if line_split[2] != 'ONLINE':
+                        print "BAD STATUS: " + line_split[2]
+                        return False
+                    else:
+                        print "HAPPY STATUS: " + line_split[2]
+                        return True
+    except Exception, e:
+        logger.error( "ups check error: %s" % e, exc_info=True)
+        return False
+                        
+def ups_scan(upslist):
+    global send_ok_timer_ups
+    global send_ok_period
+    sleep(0.005) #otherwise it eats every CPU :3
+    try:
+        if (time.time() - send_ok_timer_ups > send_ok_period + 15):
+            for (ups_file) in ups_list:
+                #print "Scanning " + proc_name 
+                if (ups_ok(ups_file)):
+                    # print "Exists!"
+                    send_ok_now("PI", "ERRPI_ACKCLEAR", "ups")
+                else:
+                    send_ok_now("PI", "ERRPI_NOREPLY", "ups")
+                    #                     print proc_name + " is down!"
+            send_ok_timer_ups = time.time()
+    except Exception, e:
+        for frame in traceback.extract_tb(sys.exc_info()[2]):
+            fname,lineno,fn,text = frame
+            print "     in %s on line %d" % (fname, lineno)
+            logger.error( "Error in ups_scan(): %s" % e, exc_info=True)
+             
 ###################################
 # main() - main scan loop
 ###################################     
@@ -549,6 +593,7 @@ print_startup_message(softwarelist)
 while 1:
     pi_scan()
     software_scan(softwarelist)
+    ups_scan(upslist)
     print_startup_message = 0
 
 # eighth version. removed serial2pipe, improved output
