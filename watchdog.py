@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import serial
+#import serial
 import socket 
 import sys
 import os, re
@@ -52,14 +52,13 @@ softwarelist = []
 #softwarelist.append("/home/pi/RUNNING/builds/piezo")
 #softwarelist.append("/home/pi/RUNNING/builds/laser")
 #softwarelist.append("/home/pi/RUNNING/builds/chest")
-softwarelist.append("/home/pi/RUNNING/scripts/do-audio.py")
+#softwarelist.append("/home/pi/RUNNING/scripts/do-audio.py")
 
 #############################
 # ADD UPS FILE (apcupsd.status) here
 #############################
 upslist = []
-upslist.append("/Users/Guest/watchdog/tcp_watchdog_server/upcstatus.txt")
-#upslist.append("/Users/Aesir/Documents/watchdog/tcp_watchdog_server/upcstatus.txt")
+upslist.append("/var/log/apcupsd.status")
 
 ####################
 # GLOBALS & SETTINGS
@@ -81,7 +80,7 @@ data = ""
 if os.name == 'nt':
     LOG_FILENAME = 'c:\watchdog\watchdog.out'
 else:
-    LOG_FILENAME = '/home/pi/RUNNING/scripts/watchdog.out'
+    LOG_FILENAME = '/home/tech/RUNNING/scripts/watchdog.out'
 LOCAL_LOG_FILENAME = 'watchdog.out' #if the above doesn't work, we'll use this
 
 # give the size for each rolling log segment, in bytes
@@ -95,7 +94,7 @@ USE_SOCKETS = 1
 # set TCP watchdog IP and port here
 host = '10.42.16.17'
 # set this machine's default IP in case the network goes down & it forgets :l  
-this_default_ip = "10.42.34.14"
+this_default_ip = "10.42.32.2"
 remote_ip = ""
 this_ip = ""
 port = 6666
