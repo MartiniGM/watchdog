@@ -1,8 +1,61 @@
+#!/usr/bin/python
+import socket 
+import sys
+import os, re
+import time
+import signal
+import select
+import datetime
+import struct
+from time import sleep
+import subprocess
+import traceback
+
 # set TCP watchdog IP and port here
 host = '10.42.16.17'
+# set this machine's default IP in case the network goes down & it forgets :l  
+this_default_ip = "10.42.34.14"
+
+msg_to_send = "NONRESPONSIVE" # messages should be "OKAY" or "NONRESPONSIVE"
+this_ups = "ups1" # ID to send
 remote_ip = ""
 this_ip = ""
 port = 6666
+USE_SOCKETS = 1
+
+############################################################
+# get_uptime()
+############################################################
+# returns this Pi's uptime in seconds and as formatted string
+def get_uptime():
+    try:
+        if sys.platform == 'linux' or sys.platform == 'linux2':
+            with open('/proc/uptime', 'r') as f:
+                uptime_seconds = float(f.readline().split()[0])
+                uptime_string = str(datetime.timedelta(seconds = uptime_seconds))
+                uptime_string = uptime_string.split('.')[0]
+                #            print "UPTIME STR: " + uptime_string
+                return (uptime_string, uptime_seconds)
+        else:
+            if os.name == 'nt':
+                import win32api
+                uptime_seconds = win32api.GetTickCount() / 1000
+                uptime_string = str(datetime.timedelta(seconds = uptime_seconds))
+                uptime_string = uptime_string.split('.')[0]
+                #print uptime_string
+                return (uptime_string, uptime_seconds)
+            else: # mac os probably
+                output = subprocess.check_output(['sysctl', '-n', 'kern.boottime']).strip()
+                boottime = re.search('sec = (\d+),', output).group(1)
+                uptime_seconds = datetime.timedelta(seconds=float(boottime)).seconds
+#                print uptime_seconds
+                uptime_string = str(datetime.timedelta(seconds = uptime_seconds))
+                uptime_string = uptime_string.split('.')[0]
+#                print uptime_string
+                return (uptime_string, uptime_seconds)
+    except Exception, e:
+        print( "error getting uptime, %s" % e)
+        return ("", 0)
 
 ############################################################
 # send_ok_now()
@@ -29,7 +82,7 @@ def send_ok_now(pi_or_arduino, status, append_string):
                         message = status + " " + ip + str(append_string) + " " + str(uptime_seconds) + " " + str(uptime_string)
                 watchsock.sendto(message, (remote_ip, port))
         except socket.error as e:
-            print( "Send failed! %s" % e, exc_info=True)
+            print( "Send failed! %s" % e)
             for frame in traceback.extract_tb(sys.exc_info()[2]):
                 fname,lineno,fn,text = frame
                 print "     in %s on line %d" % (fname, lineno)
@@ -40,7 +93,7 @@ def send_ok_now(pi_or_arduino, status, append_string):
                     print "failed to send"
                  #put retry here
         except IOError as e:
-            print( "failed to send %s " % e, exc_info=True)
+            print( "failed to send %s " % e)
                  #put retry here
 
 ############################################################
@@ -76,8 +129,8 @@ def get_ip_address(ifname):
             #            print local_ip_address
                 return local_ip_address
     except Exception, e:
-        print ("error in get_ip_address: %s" % e, exc_info=True)
-        return ""
+        print ("error in get_ip_address: %s" % e)
+        return this_default_ip
 
 ############################################################
 # socket_connect()
@@ -94,7 +147,7 @@ def socket_connect():
             watchsock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
             remote_ip = socket.gethostbyname( host )
         except socket.error as e:
-            print( 'Failed to create socket: %s' % e, exc_info=True)
+            print( 'Failed to create socket: %s' % e)
             return 0
         else:
             print ('Socket created. Messages will be sent to: ' + remote_ip),
@@ -107,10 +160,10 @@ def socket_connect():
                  
 this_ip = get_ip_address('eth0')
 socket_connect()
-send_ok_now("PI", "ERRPI_NOREPLY", "ups")
+#sends a trio of messages via UDP, either OKAY or NONRESPONSIVE
+send_ok_now("PI", msg_to_send, this_ups)
 time.sleep(1)
-send_ok_now("PI", "ERRPI_NOREPLY", "ups")
+send_ok_now("PI", msg_to_send, this_ups)
 time.sleep(1)
-send_ok_now("PI", "ERRPI_NOREPLY", "ups")
+send_ok_now("PI", msg_to_send, this_ups)
 time.sleep(1)
-                
