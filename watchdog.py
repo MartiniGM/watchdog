@@ -36,16 +36,16 @@ import logging.handlers
 #
 
 ##############################
-# ADD MONITORED SOFTWARE HERE
+# ADD MONITORED SOFTWARE HERE. leave the list empty by default
 ##############################
 softwarelist = []
-softwarelist.append("/home/pi/RUNNING/builds/piezo")
+#softwarelist.append("/home/pi/RUNNING/builds/piezo")
 #softwarelist.append("/home/pi/RUNNING/builds/laser")
 #softwarelist.append("/home/pi/RUNNING/builds/chest")
 #softwarelist.append("/home/pi/RUNNING/scripts/do-audio.py")
 
 #############################
-# ADD UPS FILE (apcupsd.status) here
+# ADD UPS FILE (apcupsd.status) here. leave the list empty by default
 #############################
 upslist = []
 #upslist.append("/var/log/apcupsd.status")
