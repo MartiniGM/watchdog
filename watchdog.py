@@ -17,31 +17,21 @@ import logging.handlers
 ##############################
 # INSTRUCTIONS 
 ##############################
-# To monitor programs on linux or mac os: run "ps aux", find your process in the list, and then cut-n-paste it like so:
-# ps aux 
-#...
-# root      2156  0.0  0.1   3808  1760 ?        Ss   18:08   0:00 /usr/sbin/cron
-# pi        2201  0.0  0.0   3352   880 ?        S    18:08   0:00 /home/pi/RUNNING/builds/piezo
-# pi        2202  1.7  0.8  10868  7872 ?        S    18:08   0:04 /usr/bin/python /home/pi/RUNNING/scripts/watchdog.py
-# pi        2203  0.5  0.6  17112  6328 ?        Sl   18:08   0:01 /usr/bin/python /home/pi/RUNNING/scripts/do-audio.py
-# pi        2204  0.0  0.0   3348   908 ?        S    18:08   0:00 /home/pi/RUNNING/builds/laser
-#...
-# Copy the last part of the output above for the program you want to monitor, and paste it below like so:
+# ON LINUX / PIS:
+# watchdog.py will autodetect programs added to crontab ("crontab -l" to list or "crontab -e" to edit). Add additional programs by hand below if you want (via "ps aux") like so:
 # softwarelist.append("/home/pi/RUNNING/builds/piezo")
 # softwarelist.append("/home/pi/RUNNING/builds/laser")
 # Then just save this file and run it ("python /path/to/watchdog.py &")!
 #
-# on Windows:
+# OR ON WINDOWS:
 # Hit ctrl-alt-del and choose Task Manager, then look on the Applications tab to find the program name.
 # Then copy/paste or enter it as shown:   
 # softwarelist.append("Max.exe")
 # softwarelist.append("NV-DVR.exe")
-
-#To monitor a UPS, enter the path to the UPS status (upcstatus.txt) file, like so:
+#
+#To monitor a UPS on linux or windows, enter the path to the UPS status (upcstatus.txt) file, like so:
 #upslist = []
 #upslist.append("/Users/Aesir/Documents/watchdog/tcp_watchdog_server/upcstatus.txt")
-
-#
 # Then just save this file and run it (run "cmd" to get a command window, then enter "python /path/to/watchdog.py")!
 #
 
@@ -49,7 +39,7 @@ import logging.handlers
 # ADD MONITORED SOFTWARE HERE
 ##############################
 softwarelist = []
-#softwarelist.append("/home/pi/RUNNING/builds/piezo")
+softwarelist.append("/home/pi/RUNNING/builds/piezo")
 #softwarelist.append("/home/pi/RUNNING/builds/laser")
 #softwarelist.append("/home/pi/RUNNING/builds/chest")
 #softwarelist.append("/home/pi/RUNNING/scripts/do-audio.py")
@@ -60,11 +50,28 @@ softwarelist = []
 upslist = []
 upslist.append("/var/log/apcupsd.status")
 
-####################
-# GLOBALS & SETTINGS
-####################
+########################################################################
+# SET HOST IP & OUR IP, plus msg send frequency and a filename for the log file
+########################################################################
+# set watchdog server's IP and port here
+host = '10.42.16.17'
+port = 6666
+# set this machine's IP in case the network goes down & it forgets :l  
+this_default_ip = "10.42.32.2"
+send_ok_period = 30 #sends OKAY every N seconds
 
-send_ok_period = 30 #sends ERRPI_ACKCLEAR every 30s
+# give a filename for the watchdog's log file here
+if os.name == 'nt':
+    LOG_FILENAME = 'c:\watchdog\watchdog.out'
+else:
+    LOG_FILENAME = '/home/tech/RUNNING/scripts/watchdog.out'
+LOCAL_LOG_FILENAME = 'watchdog.out' #if the above doesn't work, we'll use this
+
+##################################################################
+# OTHER GLOBALS & SETTINGS (don't change these)
+##################################################################
+
+#initializes timers
 send_ok_timer_pi = time.time()
 send_ok_timer_software = time.time()
 send_ok_timer_ups = time.time()
@@ -76,28 +83,17 @@ reboot_cmd = "" #either 'reboot' or 'halt'
 PORT = 6666 #UDP port to listen for reboot commands
 data = ""
 
-# give a filename for the watchdog's log file here
-if os.name == 'nt':
-    LOG_FILENAME = 'c:\watchdog\watchdog.out'
-else:
-    LOG_FILENAME = '/home/tech/RUNNING/scripts/watchdog.out'
-LOCAL_LOG_FILENAME = 'watchdog.out' #if the above doesn't work, we'll use this
-
 # give the size for each rolling log segment, in bytes
 LOG_SIZE = 2000000 #2 MB, in bytes
 # give the number of rolling log segments to record before the log rolls over
 LOG_NUM_BACKUPS = 2 # two .out files before they roll over
 
-# change to 0 to turn off outgoing socket messages (to the TCP watchdog server)
+# change to 0 to turn off outgoing socket messages (to the UDP watchdog server)
 USE_SOCKETS = 1
 
-# set TCP watchdog IP and port here
-host = '10.42.16.17'
-# set this machine's default IP in case the network goes down & it forgets :l  
-this_default_ip = "10.42.32.2"
+#variables for IP addresses
 remote_ip = ""
 this_ip = ""
-port = 6666
 
 # creates a socket up-front, just to initialize it 
 if (USE_SOCKETS):
@@ -111,7 +107,6 @@ if (USE_SOCKETS):
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         server_socket.setblocking(0)
         server_socket.bind(("0.0.0.0", PORT))
-#        server_socket.settimeout(SOCKET_TIMEOUT)
     except socket.error as e:
         print( 'Failed to create incoming socket: %s' % e )
             
@@ -130,6 +125,10 @@ signal.signal(signal.SIGINT, signal_handler)
 # FUNCTIONS
 ####################
 
+####################
+# setup_logger()
+####################
+# sets up circular error logging
 def setup_logger():
     global logger
     # defines log levels for the log file. Default is 'info' and above.
@@ -142,7 +141,7 @@ def setup_logger():
                }
 
     # default log level is info (prints info, warning, error, etc).
-    # run with "tcp_watchdog_sqlite.py debug" to print/log debug messages
+    # run with "watchdog.py debug" to print/log debug messages
     if len(sys.argv) > 1:
         level_name = sys.argv[1]
         level = LEVELS.get(level_name, logging.NOTSET)
@@ -163,15 +162,59 @@ def setup_logger():
         handler = logging.handlers.RotatingFileHandler(LOCAL_LOG_FILENAME,
                                                        maxBytes=LOG_SIZE,
                                                        backupCount=LOG_NUM_BACKUPS)
-        # sets the message & timestamp format for the log
+        # sets the message & timestamp format for the log, if exception
         frmt = logging.Formatter('%(asctime)s - %(message)s',"%d/%m/%Y %H:%M:%S")
         handler.setFormatter(frmt)
         logger.addHandler(handler)
-    # sets the message & timestamp format for the log
+    # sets the message & timestamp format for the log, normal completion
     frmt = logging.Formatter('%(asctime)s - %(message)s',"%d/%m/%Y %H:%M:%S")
     handler.setFormatter(frmt)
     logger.addHandler(handler)
 
+####################
+# autodetect_this_ip()
+####################
+#checks /etc/network/interfaces and gets the default ip address, if any
+def autodetect_this_ip():
+    global this_default_ip
+    try:
+        command = ["cat", "/etc/network/interfaces"]
+        p = subprocess.Popen(command, stdout=subprocess.PIPE)
+        for line in p.stdout:
+            line_entries = line.split()
+            if len(line_entries) >= 1:
+                if line_entries[0] == "address":
+                    if len(line_entries) >= 2:
+                        this_default_ip = line_entries[1]
+    except Exception, e:
+       logger.error( "autodetect_this_ip error: %s" % e, exc_info=True)
+
+####################
+# autodetect_softwarelist()
+####################       
+def autodetect_softwarelist():
+    #runs crontab -l, adds everything with "@reboot" to the monitored list
+    #only autodetects on linux/pis -- set up PCs by hand.
+    global softwarelist
+    if sys.platform == 'linux' or sys.platform == 'linux2':
+        try:
+            command = ["crontab", "-l"]
+            p = subprocess.Popen(command, stdout=subprocess.PIPE)
+            for line in p.stdout:
+                line_entries = line.split()
+                #add program to monitored list if it starts at reboot
+                if len(line_entries) >= 1:
+                    if line_entries[0] == "@reboot":
+                    #but don't add yourself
+                        if len(line_entries) >= 2:
+                            if "watchdog.py" not in line_entries[1]:
+                        #and don't add duplicate entries
+                                if line_entries[1] not in softwarelist:
+                                    softwarelist.append(line_entries[1])
+
+        except Exception, e:
+            logger.error( "autodetect_softwarelist error: %s" % e, exc_info=True)
+            
 ############################################################
 # rebootscript()
 ############################################################
@@ -196,7 +239,7 @@ def rebootscript():
             subprocess.call(command, shell = True)
         else:
             if os.name == 'nt':
-            #this gives people 30 seconds to log off/close programs,
+            #this gives people 15 seconds to log off/close programs,
             #then forces a reboot
                 import subprocess
                 if ("reboot" in reboot_cmd):
@@ -240,7 +283,7 @@ def parse_reboot_command(data):
             rebootscript()
         else:
             if ("reboot" in data or "halt" in data):
-                    #reboot in X seconds
+                #reboot in X seconds
                 datas = data.split()
                 print datas
                 if len(datas) < 3:
@@ -257,7 +300,6 @@ def parse_reboot_command(data):
                     return
                 reboot_cmd = datas[0]
                 time_val = float(datas[2]) 
-#                print "time: " + str(time_val)
                 resolution = datas[3]
                 if "seconds" in resolution:
                     logger.info("wait for %s seconds, then reboot..." % str(time_val))
@@ -295,14 +337,9 @@ def get_ip_address(ifname):
     try:
         if os.name == 'nt':
             import socket
-#        hostname = socket.gethostname()
-#        IP = socket.gethostbyname(hostname)
-#        print IP
-#        return(IP)
             s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             s.connect(('8.8.8.8', 0))  # connecting to a UDP address doesn't send packets
             local_ip_address = s.getsockname()[0]
-            #        print local_ip_address
             if local_ip_address == None or local_ip_address == "":
                 return this_default_ip
             else:
@@ -344,7 +381,6 @@ def get_uptime():
                 uptime_seconds = float(f.readline().split()[0])
                 uptime_string = str(datetime.timedelta(seconds = uptime_seconds))
                 uptime_string = uptime_string.split('.')[0]
-                #            print "UPTIME STR: " + uptime_string
                 return (uptime_string, uptime_seconds)
         else:
             if os.name == 'nt':
@@ -352,16 +388,13 @@ def get_uptime():
                 uptime_seconds = win32api.GetTickCount() / 1000
                 uptime_string = str(datetime.timedelta(seconds = uptime_seconds))
                 uptime_string = uptime_string.split('.')[0]
-                #print uptime_string
                 return (uptime_string, uptime_seconds)
             else: # mac os probably
                 output = subprocess.check_output(['sysctl', '-n', 'kern.boottime']).strip()
                 boottime = re.search('sec = (\d+),', output).group(1)
                 uptime_seconds = datetime.timedelta(seconds=float(boottime)).seconds
-#                print uptime_seconds
                 uptime_string = str(datetime.timedelta(seconds = uptime_seconds))
                 uptime_string = uptime_string.split('.')[0]
-#                print uptime_string
                 return (uptime_string, uptime_seconds)
     except Exception, e:
         logger.error( "error getting uptime, %s" % e, exc_info=True)
@@ -370,7 +403,7 @@ def get_uptime():
 ############################################################
 # socket_connect()
 ############################################################   
-# connects to the TCP watchdog. See host/port above. Run in a loop to retry
+# connects to the UDP watchdog. See host/port above. Run in a loop to retry
 def socket_connect():
     global watchsock
     global host
@@ -396,32 +429,24 @@ def socket_connect():
 def print_startup_message(software_list, ups_list):
     global this_ip
     logger.info("Now monitoring:")
-#    print "Now monitoring:"
-#    print this_ip
     logger.info(this_ip)
     for (proc_name) in software_list:
         if (proc_name[0] == '/'):
-#            print this_ip + str(proc_name)
             logger.info(this_ip + str(proc_name))
         else:
-#            print this_ip + "/" + str(proc_name)
             logger.info(this_ip + "/" + str(proc_name))
     i = 0
     for (ups_name) in ups_list:
         i = i + 1
         if (ups_list[0] == '/'):
-#            print this_ip + str(proc_name)
             logger.info(this_ip + "ups" + str(i))
         else:
-#            print this_ip + "/" + str(proc_name)
             logger.info(this_ip + "/" + "ups" + str(i))
 
 ############################################################
 # send_ok_now()
 ############################################################ 
-# this sends an OK message (ERRDUINO_ACKCLEAR or ERRPI_ACKCLEAR) via TCP
-# moved this up because for now watchdog.py doesn't send OK msgs for
-# connected devices -- serial2pipe does that
+# this sends an OK message ("OKAY" or "NONRESPONSIVE") via UDP
 def send_ok_now(pi_or_arduino, status, append_string):
     global this_ip
 
@@ -450,15 +475,13 @@ def send_ok_now(pi_or_arduino, status, append_string):
                     watchsock.sendto(message, (remote_ip, port))
                 else:
                     print "failed to send"
-                 #put retry here
         except IOError as e:
             logger.error( "failed to send %s " % e, exc_info=True)
-                 #put retry here
         
 ############################################################
 # process_exists()
 ############################################################   
-# returns True if this process is running, False if not.
+# returns True if proc_name is a running process, False if not.
 def process_exists(proc_name):
     if (os.name != 'nt'):
 #linux or mac type
@@ -502,7 +525,6 @@ def pi_scan():
     try:
         if reboot_in != 0:
             if (time.time() - reboot_timer > reboot_in):
-#                print "rebooting"
                 logger.info("rebooting")
                 reboot_in = 0
                 reboot_timer = time.time()
@@ -512,7 +534,7 @@ def pi_scan():
         
     try:
         if (time.time() - send_ok_timer_pi > send_ok_period + 30):
-            send_ok_now("PI", "ERRPI_ACKCLEAR", "")
+            send_ok_now("PI", "OKAY", "")
             send_ok_timer_pi = time.time()
     except Exception, e:
         logger.error( "FAILURE in pi_scan! %s" % e, exc_info=True)
@@ -526,7 +548,6 @@ def pi_scan():
             data, address = server_socket.recvfrom(1024)
             if (data):
                 logger.info("-----Server (%s) connected, sent %s" % (address, data))
-#                print "-----Server (%s) connected, sent %s" % (address, data)
             #######################
             # DATA RECEIVED
             #######################
@@ -550,13 +571,10 @@ def software_scan(software_list):
      try:
          if (time.time() - send_ok_timer_software > send_ok_period + 15):
              for (proc_name) in software_list:
-                 #print "Scanning " + proc_name 
                  if (process_exists(proc_name)):
-                    # print "Exists!"
-                     send_ok_now("PI", "ERRPI_ACKCLEAR", proc_name)
+                     send_ok_now("PI", "OKAY", proc_name)
                  else:
-                     send_ok_now("PI", "ERRPI_NOREPLY", proc_name)
-#                     print proc_name + " is down!"
+                     send_ok_now("PI", "NONRESPONSIVE", proc_name)
              send_ok_timer_software = time.time()
      except Exception, e:
          for frame in traceback.extract_tb(sys.exc_info()[2]):
@@ -564,6 +582,10 @@ def software_scan(software_list):
              print "     in %s on line %d" % (fname, lineno)
              logger.error( "Error in software_scan(): %s" % e, exc_info=True)
 
+############################################################
+# ups_ok()
+############################################################
+# checks the UPS on this PC. returns True (UPS is ONLINE) or false (not ONLINE)
 def ups_ok(ups_file):
     try:
         with open(ups_file, 'r') as infile:
@@ -579,8 +601,12 @@ def ups_ok(ups_file):
     except Exception, e:
         logger.error( "ups check error: %s" % e, exc_info=True)
         return False
-                        
-def ups_scan(ups_list):
+
+############################################################
+# ups_scan()
+############################################################
+# checks UPSes on this PC, sends OKAY to the watchdog server for each UPS if it's online, otherwise sends NONRESPONSIVE  
+def ups_scan(ups_list):    
     global send_ok_timer_ups
     global send_ok_period
     sleep(0.005) #otherwise it eats every CPU :3
@@ -589,13 +615,10 @@ def ups_scan(ups_list):
             i = 0
             for (ups_file) in ups_list:
                 i = i + 1
-                #print "Scanning " + proc_name 
                 if (ups_ok(ups_file)):
-                    # print "Exists!"
-                    send_ok_now("PI", "ERRPI_ACKCLEAR", "ups" + str(i))
+                    send_ok_now("PI", "OKAY", "ups" + str(i))
                 else:
-                    send_ok_now("PI", "ERRPI_NOREPLY", "ups" + str(i))
-                    #                     print proc_name + " is down!"
+                    send_ok_now("PI", "NONRESPONSIVE", "ups" + str(i))
             send_ok_timer_ups = time.time()
     except Exception, e:
         for frame in traceback.extract_tb(sys.exc_info()[2]):
@@ -610,7 +633,9 @@ def ups_scan(ups_list):
 print "starting in 2 seconds..."
 time.sleep(2); # give arduinos time to start
 
-setup_logger()
+setup_logger() # sets up watchdog log file
+autodetect_softwarelist() #autogens monitored list from "crontab -l"
+autodetect_this_ip() #sets the default IP in case we don't get one below
 
 #set up serial connection...
 if (USE_SOCKETS):
@@ -618,16 +643,16 @@ if (USE_SOCKETS):
     while (status == 0):
         status = socket_connect()
 
-this_ip = get_ip_address('eth0')
+this_ip = get_ip_address('eth0') #grabs current IP address
 print "from: " + this_ip
 sys.stdout.flush()
 
-print_startup_message(softwarelist, upslist)
+print_startup_message(softwarelist, upslist) #prints the stuff to be monitored
 
 while 1:
-    pi_scan()
-    software_scan(softwarelist)
-    ups_scan(upslist)
+    pi_scan() #sends OK messages for this machine
+    software_scan(softwarelist) #sends OK/NONRES for monitored software
+    ups_scan(upslist) #sends OK/NONRES for the attached UPS, if any
     print_startup_message = 0
 
-# ninth version. does ups scanning, fixed blank IP address bug
+# tenth version. does ups scanning on PCs & software/crontab autodetect on Pis
