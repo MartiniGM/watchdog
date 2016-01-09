@@ -1,0 +1,24 @@
+#!/usr/bin/expect -f
+# usage: ./install_pi_watchdog 10.42.24.42
+
+set ip [lindex $argv 0]
+#DO NOT upload these files to github, they have our passwords in them!
+set pass1 [read [open "pi_passphrase1.secret" r]]
+
+set timeout -1
+eval spawn ssh -oConnectTimeout=20 -oStrictHostKeyChecking=no -oCheckHostIP=no pi@$ip
+match_max 100000
+set prompt ":|#|\\\$"
+interact -o -nobuffer -re $prompt return
+send -- "$pass1\r"
+interact -o -nobuffer -re $prompt return
+send -- "if cd /home/pi/watchdog; then git pull; else git clone https://github.com/MeowWolf/watchdog /home/pi/watchdog; fi\r"
+interact -o -nobuffer -re $prompt return
+send -- "cp /home/pi/watchdog/watchdog.py /home/pi/RUNNING/scripts\r"
+interact -o -nobuffer -re $prompt return
+send -- "/home/pi/watchdog/add_watchdog_to_crontab.sh\r"
+interact -o -nobuffer -re $prompt return
+send -- "if pidof -x watchdog.py >/dev/null; then echo 'Process already running'; else '/home/pi/RUNNING/scripts/watchdog.py > /dev/null & fi\r"
+interact -o -nobuffer -re $prompt return
+send -- "exit\r"
+expect eof
