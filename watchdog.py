@@ -48,7 +48,7 @@ softwarelist.append("/home/pi/RUNNING/builds/piezo")
 # ADD UPS FILE (apcupsd.status) here
 #############################
 upslist = []
-upslist.append("/var/log/apcupsd.status")
+#upslist.append("/var/log/apcupsd.status")
 
 ########################################################################
 # SET HOST IP & OUR IP, plus msg send frequency and a filename for the log file
