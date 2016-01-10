@@ -177,17 +177,18 @@ def setup_logger():
 #checks /etc/network/interfaces and gets the default ip address, if any
 def autodetect_this_ip():
     global this_default_ip
-    try:
-        command = ["cat", "/etc/network/interfaces"]
-        p = subprocess.Popen(command, stdout=subprocess.PIPE)
-        for line in p.stdout:
-            line_entries = line.split()
-            if len(line_entries) >= 1:
-                if line_entries[0] == "address":
-                    if len(line_entries) >= 2:
-                        this_default_ip = line_entries[1]
-    except Exception, e:
-       logger.error( "autodetect_this_ip error: %s" % e, exc_info=True)
+    if sys.platform == 'linux' or sys.platform == 'linux2':
+        try:
+            command = ["cat", "/etc/network/interfaces"]
+            p = subprocess.Popen(command, stdout=subprocess.PIPE)
+            for line in p.stdout:
+                line_entries = line.split()
+                if len(line_entries) >= 1:
+                    if line_entries[0] == "address":
+                        if len(line_entries) >= 2:
+                            this_default_ip = line_entries[1]
+        except Exception, e:
+            logger.error( "autodetect_this_ip error: %s" % e, exc_info=True)
 
 ####################
 # autodetect_softwarelist()
