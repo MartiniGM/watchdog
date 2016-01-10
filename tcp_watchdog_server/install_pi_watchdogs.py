@@ -24,11 +24,8 @@ from oauth2client.client import SignedJwtAssertionCredentials
 device_type_item_id = 5
 hostname_item_id = 4
 ip_address_item_id = 1
-description_item_id = 9
 
-# set this to 0 to turn off Google spreadsheets and use local database only
-# (f.ex if Google ever breaks the API!)
-# if 0 (or if there are errors loading the google sheet), the program will default to using the googlesheet_backup table in the SQLite DB. If that fails, it will write back any existing values from the DB.
+# set this to 0 to turn off Google spreadsheets, if so this does nothing!
 USE_GOOGLE_SHEETS = 1
 
 # json file to hold Google credentials.
@@ -43,12 +40,6 @@ googleWorksheetName = "Networked Devices" #name of the tab on the google sheet
 # dictionary to load Google spreadsheet into (for device types and descriptions)
 googleSheetDict = {}
 list_of_lists = []
-
-# load google sheet every hour. it's a bit slow to get the data back so it doesn't reload often, but if you want to trigger it immediately just restart the program
-LOADSHEET_SLOW = 3600 #seconds, once the initial load gets at least 1 row
-LOADSHEET_FAST = 200 #seconds, as long as all loads have failed
-loadGoogleSheetEvery = LOADSHEET_FAST #starts with fast loads until it succeeds
-loadGoogleSheetTimer = time.time()
 
 ####################
 # EXIT HANDLER
@@ -71,7 +62,7 @@ signal.signal(signal.SIGINT, signal_handler)
 ############################################################
 #open_googlesheet()
 ############################################################
-# opens Google spreadsheet for later use. Call every hour or so to refresh the data from the Google sheet, then use get_item_googlesheet to access the data as often as you like in the interim.
+# opens Google spreadsheet for later use. then use get_item_googlesheet to access the data as often as you like
 # use our JSON credentials to open the Google Drive sheet
 def open_googlesheet():
 # if we're not loading the Google sheet, just return
@@ -107,20 +98,11 @@ def open_googlesheet():
         #create searchable dictionary with ID_NAME as the key!
         googleSheetDict = defaultdict(list)
         for listy in list_of_lists:
-            #googleSheetDict[listy[0]] += listy[1:]
             googleSheetDict[listy[1]] += listy[2:]
         googleSheetLen = len(googleSheetDict)    
-        #for keys,values in googleSheetDict.items():
-        #    print(keys)
-        #    print(values)
         if googleSheetLen == 0:
-            # set slower loads after load gets at least one row
-            # if not, try to reload much more often.
-            loadGoogleSheetEvery = LOADSHEET_FAST #seconds
             print("     Google Sheets load failed? %s rows loaded" % googleSheetLen)      
         else:
-            #the load got at least one row. Save everything in the DB 
-            loadGoogleSheetEvery = LOADSHEET_SLOW #seconds
             print("     Google Sheets load OK, %s rows loaded" % googleSheetLen)
             
     except Exception, e:
@@ -278,6 +260,7 @@ if __name__ == "__main__":
                 print "ids: device %d hostname %d ip_address %d alias %d" % (device_type_item_id, hostname_item_id, ip_address_item_id, alias_item_id)
                 #sorts by device type
                 list_of_lists.sort(key=lambda x: x[5])
+                #creates list of pis
                 print "PIS"
                 pi_list = subfinder(list_of_lists, "berry")
                 print pi_list
@@ -286,7 +269,7 @@ if __name__ == "__main__":
             except Exception, e:
                 print("Hit error in main: %s" % e)
 
-            #then steps over each list, creating nagios setup files
+            #then steps over each list, installing the watchdog
             try:
                 do_pis(pi_list)
             except Exception, e:
