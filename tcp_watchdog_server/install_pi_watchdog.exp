@@ -9,16 +9,18 @@ set timeout -1
 eval spawn ssh -oConnectTimeout=20 -oStrictHostKeyChecking=no -oCheckHostIP=no pi@$ip
 match_max 100000
 set prompt ":|#|\\\$"
-interact -o -nobuffer -re $prompt return
+interact -o -nobuffer "password:" return
 send -- "$pass1\r"
 interact -o -nobuffer -re $prompt return
 send -- "if cd /home/pi/watchdog; then git pull; else git clone https://github.com/MeowWolf/watchdog /home/pi/watchdog; fi\r"
 interact -o -nobuffer -re $prompt return
 send -- "cp /home/pi/watchdog/watchdog.py /home/pi/RUNNING/scripts\r"
 interact -o -nobuffer -re $prompt return
+send -- "chmod 755 /home/pi/watchdog/add_watchdog_to_crontab.sh\r"
+interact -o -nobuffer -re $prompt return
 send -- "/home/pi/watchdog/add_watchdog_to_crontab.sh\r"
 interact -o -nobuffer -re $prompt return
-send -- "if pidof -x watchdog.py >/dev/null; then echo 'Process already running'; else '/home/pi/RUNNING/scripts/watchdog.py > /dev/null & fi\r"
+send -- "if pidof -x watchdog.py >/dev/null; then echo 'Running'; else /home/pi/RUNNING/scripts/watchdog.py > /dev/null & fi\r"
 interact -o -nobuffer -re $prompt return
 send -- "exit\r"
 expect eof
