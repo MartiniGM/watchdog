@@ -246,24 +246,63 @@ def get_items_from_googlesheet_forsave(id_name):
     
     return (location, device_type, zone, space, device_name, description, switch_interface, mac_address, hostname, flow_chart_link, order) #return items from googlesheet dictionary
 
+def is_known_pi_software(id_name):
+    sep = '/'
+    parent = id_name.split(sep, 1)[0]
+    print "parent: " + parent
+    desc = get_item_googlesheet(parent, "Description")
+    print "desc: " + desc[:15] 
+    
+    if "do-audio.py" in id_name:
+        print "found do_audio"
+        return desc[:20] + " (audio script)"  
+    if "do-video.py" in id_name:
+        print "found do_video"
+        return desc[:20] + " (video script)"  
+    if "looping-audio.sh" in id_name:
+        print "found looping audio"
+        return desc[:20] + " (looping audio 1)"
+    if "looping-audio1.sh" in id_name:
+        print "found looping audio1"
+        return desc[:20] + " (looping audio 2)"  
+    return ""
+
 ############################################################
 #get_items_from_googlesheet()
 ############################################################
 #gets all googlesheet items from the GS backup. If that fails, get the
 #current values from the sqlite DB.
 def get_items_from_googlesheet(id_name):
+    loc = ""
+    
     location = get_item_googlesheet(id_name, "Location Details")
     if location == "" or location is None:
         location = get_item_from_googlesheet_backup(id_name, "LOCATION")
         if location == "" or location is None:
-            location = get_item_sqlite(id_name, "LOCATION")
-            
+            location = get_item_sqlite(id_name, "LOCATION")        
+
+    description = get_item_googlesheet(id_name,  "Description")
+    if description == "" or description is None:
+        description = get_item_from_googlesheet_backup(id_name,  "DESCRIPTION")
+        if description == "" or description is None:
+            #new device. try to autofill
+            loc = is_known_pi_software(id_name)
+            if loc == "":
+                description = get_item_sqlite(id_name, "DESCRIPTION")
+            else:
+                print "*******set locations to: " + str(loc)
+                description = loc
+                
     device_type = get_item_googlesheet(id_name, "Device Type")
     if device_type == "" or device_type is None:
         device_type = get_item_from_googlesheet_backup(id_name, "DEVICE_TYPE")
         if device_type == "" or device_type is None:
-            device_type = get_item_sqlite(id_name, "DEVICE_TYPE")
-    
+            if loc != "":
+                print "*******set type to sfotware"
+                device_type = "Software"
+            else:
+                device_type = get_item_sqlite(id_name, "DEVICE_TYPE")
+
     zone = get_item_googlesheet(id_name, "Zone")
     if zone == "" or zone is None:
         zone = get_item_from_googlesheet_backup(id_name, "ZONE")
@@ -281,12 +320,6 @@ def get_items_from_googlesheet(id_name):
         device_name = get_item_from_googlesheet_backup(id_name, "DEVICE_NAME")
         if device_name == "" or device_name is None:
             device_name = get_item_sqlite(id_name, "DEVICE_NAME")
-
-    description = get_item_googlesheet(id_name,  "Description")
-    if description == "" or description is None:
-        description = get_item_from_googlesheet_backup(id_name,  "DESCRIPTION")
-        if description == "" or description is None:
-            description = get_item_sqlite(id_name, "DESCRIPTION")
 
     switch_interface = get_item_googlesheet(id_name, "Switch Interface")
     if switch_interface == "" or switch_interface is None:
