@@ -249,21 +249,21 @@ def get_items_from_googlesheet_forsave(id_name):
 def is_known_pi_software(id_name):
     sep = '/'
     parent = id_name.split(sep, 1)[0]
-    print "parent: " + parent
+#    print "parent: " + parent
     desc = get_item_googlesheet(parent, "Description")
-    print "desc: " + desc[:15] 
+#    print "desc: " + desc[:15] 
     
     if "do-audio.py" in id_name:
-        print "found do_audio"
+#        print "found do_audio"
         return desc[:20] + " (audio script)"  
     if "do-video.py" in id_name:
-        print "found do_video"
+#        print "found do_video"
         return desc[:20] + " (video script)"  
     if "looping-audio.sh" in id_name:
-        print "found looping audio"
+#        print "found looping audio"
         return desc[:20] + " (looping audio 1)"
     if "looping-audio1.sh" in id_name:
-        print "found looping audio1"
+#        print "found looping audio1"
         return desc[:20] + " (looping audio 2)"  
     return ""
 
@@ -290,7 +290,7 @@ def get_items_from_googlesheet(id_name):
             if loc == "":
                 description = get_item_sqlite(id_name, "DESCRIPTION")
             else:
-                print "*******set locations to: " + str(loc)
+#                print "*******set locations to: " + str(loc)
                 description = loc
                 
     device_type = get_item_googlesheet(id_name, "Device Type")
@@ -298,7 +298,7 @@ def get_items_from_googlesheet(id_name):
         device_type = get_item_from_googlesheet_backup(id_name, "DEVICE_TYPE")
         if device_type == "" or device_type is None:
             if loc != "":
-                print "*******set type to sfotware"
+#                print "*******set type to sfotware"
                 device_type = "Software"
             else:
                 device_type = get_item_sqlite(id_name, "DEVICE_TYPE")
@@ -590,7 +590,7 @@ def sql_data_sqlite(data, pi_or_arduino, ip):
     non_decimal = re.compile(r'[^\d.]+')
 
     if len(datalist) != 5:
-        print "got the IP address error"        
+#        print "got the IP address error"        
         id_name = ip
         timestamp = datalist[0]
         status = datalist[1]
@@ -601,12 +601,12 @@ def sql_data_sqlite(data, pi_or_arduino, ip):
         #strips out dumb characters at the end of strings sent by Max
         uptime_sec = uptime_sec.replace('\x00', '')
         #prints with dumb characters if present
-        print(repr(uptime_sec))
+#        print(repr(uptime_sec))
         uptime = datalist[3]
     else:
         id_name = datalist[0]
         if (id_name[0] == '/'):
-            print "got the IP address error"
+ #           print "got the IP address error"
             id_name = ip + id_name
         timestamp = datalist[1]
         status = datalist[2]
@@ -617,7 +617,7 @@ def sql_data_sqlite(data, pi_or_arduino, ip):
         #strips out dumb characters at the end of strings sent by Max
         uptime_sec = uptime_sec.replace('\x00', '')
         #prints with dumb characters if present
-        print(repr(uptime_sec))
+#        print(repr(uptime_sec))
         uptime = datalist[4]
     if (len(uptime) == 0):
         # for now only loneduinos fail to send uptime as a string.
