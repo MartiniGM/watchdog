@@ -67,6 +67,13 @@ else:
     LOG_FILENAME = '/home/tech/RUNNING/scripts/watchdog.out'
 LOCAL_LOG_FILENAME = 'watchdog.out' #if the above doesn't work, we'll use this
 
+# give a filename for the optional software list file.
+# file should have one line per piece of software to be monitored, like so:
+# /home/pi/RUNNING/builds/piezo
+# Max.exe
+#
+SOFTWARELIST_FILENAME = 'watchdog_softwarelist.txt'
+
 ##################################################################
 # OTHER GLOBALS & SETTINGS (don't change these)
 ##################################################################
@@ -171,6 +178,25 @@ def setup_logger():
     handler.setFormatter(frmt)
     logger.addHandler(handler)
 
+####################
+# read_softwarelist_file()
+####################
+# reads the software list file (one line per software to be monitored).
+# this ensures that 'git pull' won't clobber the custom software list.
+def read_softwarelist_file():
+    global softwarelist
+    endl = os.linesep;
+    try:
+        if os.path.exists(SOFTWARELIST_FILENAME):
+            try:
+                with open(SOFTWARELIST_FILENAME, 'r') as infile:
+                    for line in infile:
+                        #don't include newline
+                        softwarelist.append(line.rstrip(endl))
+            except Exception, e:
+                logger.warning( "optional softwarelist error: %s" % e, exc_info=True)
+    except:
+        logger.warning( "no optional softwarelist found? %s" % e, exc_info=True)   
 ####################
 # autodetect_this_ip()
 ####################
@@ -636,6 +662,7 @@ time.sleep(2); # give arduinos time to start
 
 setup_logger() # sets up watchdog log file
 autodetect_softwarelist() #autogens monitored list from "crontab -l"
+read_softwarelist_file() #appends to monitored list from optional file 
 autodetect_this_ip() #sets the default IP in case we don't get one below
 
 #set up serial connection...
