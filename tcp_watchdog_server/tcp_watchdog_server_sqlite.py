@@ -264,7 +264,11 @@ def is_known_pi_software(id_name):
         return desc[:20] + " (looping audio 1)"
     if "looping-audio1.sh" in id_name:
 #        print "found looping audio1"
-        return desc[:20] + " (looping audio 2)"  
+        return desc[:20] + " (looping audio 2)"
+    if "checkServer.sh" in id_name:
+#        print "found looping audio1"
+        return desc[:20] + " (check server)"  
+    
     return ""
 
 ############################################################
