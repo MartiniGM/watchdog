@@ -268,6 +268,9 @@ def is_known_pi_software(id_name):
     if "checkServer.sh" in id_name:
 #        print "found looping audio1"
         return desc[:20] + " (check server)"  
+    if "Max.exe" in id_name:
+#        print "found looping audio1"
+        return desc[:20] + " (Max MSP)"  
     
     return ""
 
