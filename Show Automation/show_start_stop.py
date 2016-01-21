@@ -28,6 +28,10 @@ WINDOWS_DB_FILENAME = 'c:\\watchdog\\tcp_watchdog_server\\demosdb.db'
 #and for Linux & OSX, I just used the local directory (where this file is) 
 LINUX_OSX_DB_FILENAME = '../tcp_watchdog_server/demosdb.db'
 
+###############
+# PoE, WOL, UDPSEND
+###############
+
 def set_PoE(auto_or_never, remote_ip, switch):
     import subprocess
     try:
@@ -64,6 +68,10 @@ def wake_on_lan(mac_address):
     except Exception, e:
         print( "set_PoE error: %s" % e)
 
+###############
+# START TYPES
+###############
+        
 def start_windows(mac_address):
     wake_on_lan(mac_address)
         
@@ -72,6 +80,10 @@ def start_pi(remote_ip, switch):
 
 def start_arduino(remote_ip, switch):
     set_PoE("auto", remote_ip, switch)
+
+###############
+# REBOOT TYPES
+###############
     
 def reboot_windows(remote_ip):
     udpsend("reboot now", remote_ip, 6666)
@@ -83,6 +95,10 @@ def reboot_arduino(switch_ip, switch_interface, delay):
     set_PoE("never", switch_ip, switch_interface)
     time.sleep(delay)
     set_PoE("auto", switch_ip, switch_interface)
+
+###############
+# STOP TYPES
+###############
     
 def stop_arduino(remote_ip, switch):
     set_PoE("never", remote_ip, switch)
@@ -95,6 +111,10 @@ def stop_pi(remote_ip, switch_ip, switch_interface, delay):
     time.sleep(delay)
     set_PoE("never", switch_ip, switch_interface)
 
+###############
+# CHECK FUNCTIONS
+###############
+    
 def check_remoteip(remote_ip):
     if remote_ip is None or remote_ip == "":
         print "IP not set! Exiting..."
@@ -124,6 +144,10 @@ def check_remoteip_switch(remote_ip, switch, switch_interface):
     if switch_interface is None or switch_interface == "":
         print "switch interface not set! Exiting..."
         exit
+
+###############
+# GET_ITEM 
+###############
         
 def get_item(remote_ip):
     try:
@@ -138,7 +162,7 @@ def get_item(remote_ip):
     try:
         with con:
             cur = con.cursor()
-            sql = "SELECT MAC_ADDRESS, SWITCH_INTERFACE FROM DEVICES WHERE ID_NAME LIKE '%s'" % remote_ip
+            sql = "SELECT MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE FROM DEVICES WHERE ID_NAME LIKE '%s'" % remote_ip
             cur.execute(sql)
             data = cur.fetchall()
             print data
@@ -146,71 +170,212 @@ def get_item(remote_ip):
     except lite.Error, e:
         print(" SQL error! %s" % e)   
 
-def start_show():
+###############
+# START DEVICE
+###############
+
+def start_device(switch_ip, switch_interface, device_type):        
+    if "berry" in device_type.lower(): 
+        print "start pi"
+        check_switch(switch_ip, switch_interface)
+        start_pi(switch_ip, switch_interface)
+    else:
+        if "indow" in device_type.lower():
+            print "start windows"
+            check_macaddress(mac_address)
+            start_windows(mac_address)
+        else:
+            if "duino" in device_type.lower() or "eensy" in device_type.lower():
+                print "start arduino"                    
+                check_switch(switch_ip, switch_interface)
+                start_arduino(switch_ip, switch_interface)
+            else:
+                print "WARNING: type %s not matched, exiting..." % device_type
+
+###############
+# STOP DEVICE
+###############
+def stop_device(remote_ip, switch_ip, switch_interface, device_type):
+    if "berry" in device_type.lower(): 
+        print "stop pi"
+        check_remoteip_switch(remote_ip, switch_ip, switch_interface)
+        stop_pi(remote_ip, switch_ip, switch_interface, 6)        
+    else:
+        if "indow" in device_type.lower():
+            print "stop windows"
+            check_remoteip(remote_ip)
+            stop_windows(remote_ip)
+        else:
+            if "duino" in device_type.lower() or "eensy" in device_type.lower():            
+                print "stop arduino"
+                check_switch(switch_ip, switch_interface)
+                stop_arduino(switch_ip, switch_interface)
+            else:
+                print "WARNING: type %s not matched, exiting..." % device_type
+
+###############
+# REBOOT DEVICE
+###############
+
+def reboot_device(remote_ip, switch_ip, switch_interface, device_type):
+    if "berry" in device_type.lower(): 
+        print "reboot pi"
+        check_remoteip(remote_ip)
+        reboot_pi(remote_ip)        
+    else:
+        if "indow" in device_type.lower():
+            print "reboot windows"        
+            check_remoteip(remote_ip)
+            reboot_windows(remote_ip)
+        else:
+            if "duino" in device_type.lower() or "eensy" in device_type.lower():            
+                print "reboot arduino"
+                check_switch(switch_ip, switch_interface)
+                reboot_arduino(switch_ip, switch_interface, 2)
+            else:
+                print "WARNING: type %s not matched, exiting..." % device_type
+
+###############
+# START/STOP/REBOOT SHOW
+###############            
+                
+def start_stop_reboot_show(command):
     print "start show"
+    remote_ip = ""
+    mac_address = ""
+    switch_interface = ""
+    device_type = ""
+    try:
+        # Open database connection, create cursor
+        if os.name == 'nt':
+            con = lite.connect(WINDOWS_DB_FILENAME)
+        else:
+            con = lite.connect(LINUX_OSX_DB_FILENAME)     
+    except Exception, e:
+        logger.error("Can't connect to demosdb! %s" % e)
+        
+    try:
+        with con:
+            cur = con.cursor()
+            sql = "SELECT ID_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE FROM DEVICES ORDER BY DEVICE_TYPE DESC, ID_NAME ASC" 
+            cur.execute(sql)
+            data = cur.fetchall()
+            print data
+            for item in data:
+                (remote_ip, mac_address, switch_interface, device_type) = item
+                if mac_address is None:
+                    mac_address = ""
 
-def stop_show():
-    print "stop show"
+                if switch_interface is None:
+                    switch_interface = ""
+                    switch_ip = ""
+                else:
+                    switch_group = switch_interface.split()
+                    switch_ip = switch_group[0]
+                    switch_interface = switch_group[1]
 
-def reboot_show():
-    print "reboot show"
+                if remote_ip is None:
+                    remote_ip = ""
+            
+                print "mac " + mac_address
+                print "switch ip " + switch_ip
+                print "switch interface " + switch_interface
+                print "remote_ip " + remote_ip
 
+                if command is "start":
+                    #start each item, then delay
+                    print "start it"
+                    exit
+                if command is "stop":
+                    #stop each item, then delay
+                    print "stop it"
+                    exit
+                if command is "reboot":
+                    #stop each item, then delay
+                    print "reboot it"
+                    exit
+                    
+    except lite.Error, e:
+        print(" SQL error! %s" % e)   
+
+###############
+# REBOOT NONRESPONSIVE DEVICES
+###############            
+        
 def reboot_unresponsive():
     print "reboot unresponsive"        
+    remote_ip = ""
+    mac_address = ""
+    switch_interface = ""
+    device_type = ""
+    try:
+        # Open database connection, create cursor
+        if os.name == 'nt':
+            con = lite.connect(WINDOWS_DB_FILENAME)
+        else:
+            con = lite.connect(LINUX_OSX_DB_FILENAME)     
+    except Exception, e:
+        logger.error("Can't connect to demosdb! %s" % e)
+        
+    try:
+        with con:
+            cur = con.cursor()
+            sql = "SELECT ID_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE FROM DEVICES WHERE STATUS='NONRESPONSIVE' ORDER BY DEVICE_TYPE DESC, ID_NAME ASC" 
+            cur.execute(sql)
+            data = cur.fetchall()
+            print data
+            for item in data:
+                (remote_ip, mac_address, switch_interface, device_type) = item
+                if mac_address is None:
+                    mac_address = ""
+
+                if switch_interface is None:
+                    switch_interface = ""
+                    switch_ip = ""
+                else:
+                    switch_group = switch_interface.split()
+                    switch_ip = switch_group[0]
+                    switch_interface = switch_group[1]
+
+                if remote_ip is None:
+                    remote_ip = ""
             
+                print "mac " + mac_address
+                print "switch ip " + switch_ip
+                print "switch interface " + switch_interface
+                print "remote_ip " + remote_ip
+
+                #stop each item, then delay
+                print "reboot it"
+                exit
+                    
+    except lite.Error, e:
+        print(" SQL error! %s" % e) 
+
 ###################################
 # main() - main scan loop
 ###################################
 
 if __name__ == "__main__":
 
-#set_PoE("never", "10.42.0.16", "FastEthernet1/0/8")
-#time.sleep(10)
-#set_PoE("auto", "10.42.0.16", "FastEthernet1/0/8")
-#shut_down_windows_or_pi("10.42.16.23")
-#wake_on_lan("D8:CB:8A:38:E8:E2")
-
     remote_ip = ""
     mac_address = ""
     switch_interface = ""
+    device_type = ""
     
     parser = argparse.ArgumentParser()
     group = parser.add_mutually_exclusive_group()
-    group.add_argument('--start_pi',
+    group.add_argument('--start_device',
                         action='store_true',
-                        help='starts a Raspberry Pi (given ip address in --ip)' )
+                        help='starts a single device (given ip address in --ip)' )
 
-    group.add_argument('--start_arduino',
+    group.add_argument('--stop_device',
                         action='store_true',
-                        help='starts an Arduino (given ip address in --ip)' )
+                        help='stops a single device (given ip address in --ip)' )
 
-    group.add_argument('--start_windows',
+    group.add_argument('--reboot_device',
                         action='store_true',
-                        help='starts a Windows PC (given ip address in --ip)' )
-
-    group.add_argument('--stop_pi',
-                        action='store_true',
-                        help='stops a Raspberry Pi (given ip address in --ip)' )
-
-    group.add_argument('--stop_arduino',
-                        action='store_true',
-                        help='stops an Arduino (given ip address in --ip)' )
-    
-    group.add_argument('--stop_windows',
-                        action='store_true',
-                        help='stops a Windows PC (given ip address in --ip)' )
-
-    group.add_argument('--reboot_arduino',
-                        action='store_true',
-                        help='reboots an Arduino (given ip address in --ip)' )
-
-    group.add_argument('--reboot_windows',
-                        action='store_true',
-                        help='reboots a Windows PC (given ip address in --ip)' )
-
-    group.add_argument('--reboot_pi',
-                        action='store_true',
-                        help='reboots a Raspberry Pi (given ip address in --ip)' )
+                        help='reboots a single device (given ip address in --ip)' )
 
     group.add_argument('--reboot_show',
                         action='store_true',
@@ -224,9 +389,9 @@ if __name__ == "__main__":
                         action='store_true',
                         help='starts the whole show (with great power... etc)')
 
-    group.add_argument('--reboot_unresponsive',
+    group.add_argument('--reboot_nonresponsive',
                         action='store_true',
-                        help='reboots all unresponsive devices in the whole show (with great power... etc)')
+                        help='reboots all nonresponsive devices in the whole show (with great power... etc)')
     
     parser.add_argument('--ip', 
                         type=str,
@@ -234,84 +399,83 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
 
+    ###############################################
+    # sets args for single-device start/stop/reboot
+    ###############################################            
+    
     if args.ip:
-        remote_ip = args.ip
-        (mac_address, switch_interface) = get_item(remote_ip)
-        if mac_address is None:
-            mac_address = ""
-
-        if switch_interface is None:
-            switch_interface = ""
-            switch_ip = ""
-        else:
-            switch_group = switch_interface.split()
-            switch_ip = switch_group[0]
-            switch_interface = switch_group[1]
-
-        if remote_ip is None:
-            remote_ip = ""
+        if args.start_device or args.stop_device or args.reboot_device:
+            remote_ip = args.ip
+            (mac_address, switch_interface, device_type) = get_item(remote_ip)
+            if device_type is None:
+                print "Error: no device type found for %s, exiting..." % remote_ip
+                exit
             
-        print "mac " + mac_address
-        print "switch ip " + switch_ip
-        print "switch interface " + switch_interface
-        print "remote_ip " + remote_ip
+            if mac_address is None:
+                mac_address = ""
 
-    if args.start_pi:
-        print "start pi"
-        check_switch(switch_ip, switch_interface)
-        start_pi(switch_ip, switch_interface)
-        
-    if args.start_arduino:
-        check_switch(switch_ip, switch_interface)
-        start_arduino(switch_ip, switch_interface)
-        print "start arduino"
+            if switch_interface is None:
+                switch_interface = ""
+                switch_ip = ""
+            else:
+                switch_group = switch_interface.split()
+                switch_ip = switch_group[0]
+                switch_interface = switch_group[1]
 
-    if args.start_windows:
-        print "start windows"
-        check_macaddress(mac_address)
-        start_windows(mac_address)
+            if remote_ip is None:
+                remote_ip = ""
+            
+            print "mac " + mac_address
+            print "switch ip " + switch_ip
+            print "switch interface " + switch_interface
+            print "remote_ip " + remote_ip
+
+    ###############
+    # START DEVICE
+    ###############
         
-    if args.stop_pi:
-        print "stop pi"
-        check_remoteip_switch(remote_ip, switch_ip, switch_interface)
-        stop_pi(remote_ip, switch_ip, switch_interface, 6)
+    if args.start_device:
+        start_device(switch_ip, switch_interface, device_type)
         
-    if args.stop_arduino:
-        print "stop arduino"
-        check_switch(switch_ip, switch_interface)
-        stop_arduino(switch_ip, switch_interface)
-        
-    if args.stop_windows:
-        print "stop windows"
-        check_remoteip(remote_ip)
-        stop_windows(remote_ip)
-        
-    if args.reboot_pi:
-        print "reboot pi"
-        check_remoteip(remote_ip)
-        reboot_pi(remote_ip)
-        
-    if args.reboot_arduino:
-        print "reboot arduino"
-        check_switch(switch_ip, switch_interface)
-        reboot_arduino(switch_ip, switch_interface, 2)
-        
-    if args.reboot_windows:
-        print "reboot windows"        
-        check_remoteip(remote_ip)
-        reboot_windows(remote_ip)
+    ###############
+    # STOP DEVICE
+    ###############
+                    
+    if args.stop_device:
+        stop_device(remote_ip, switch_ip, switch_interface, device_type)
+
+    ###############
+    # REBOOT DEVICE
+    ###############
+                    
+    if args.reboot_device:
+        reboot_device(remote_ip, switch_ip, switch_interface, device_type)
+
+    ###############
+    # START SHOW
+    ###############
+
+    if args.start_show:
+        start_stop_reboot_show("start")
+
+    ###############
+    # STOP SHOW
+    ###############
         
     if args.stop_show:
-        stop_show()
+        start_stop_reboot_show("stop")
         
-    if args.start_show:
-        start_show()
+    ###############
+    # REBOOT SHOW
+    ###############
 
     if args.reboot_show:
-        reboot_show()
+        start_stop_reboot_show("reboot")
 
-    if args.reboot_unresponsive:
-        reboot_unresponsive()
+    ###############
+    # REBOOT NONRESPONSIVE
+    ###############
         
-    
-    
+    if args.reboot_nonresponsive:
+        reboot_unresponsive()
+
