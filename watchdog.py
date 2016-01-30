@@ -388,7 +388,6 @@ def get_ip_address(ifname):
             else: #mac os probably
                 import socket
                 local_ip_address = socket.gethostbyname(socket.gethostname())
-                local_ip_address = ""
                 if local_ip_address == None or local_ip_address == "":
                     return this_default_ip
                 else:
