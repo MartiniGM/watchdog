@@ -92,6 +92,19 @@ signal.signal(signal.SIGINT, signal_handler)
 ####################
 
 ############################################################
+#find_item()
+############################################################
+def find_item(mylist, item_name):
+     #gets the position of "item" in the sublists & returns
+    for item in mylist:
+        i = 0
+        for subitem in item:
+            if subitem == item_name:
+                item_id = i
+                return item_id
+            i = i + 1
+
+############################################################
 #open_googlesheet()
 ############################################################
 # opens Google spreadsheet for later use. Call every hour or so to refresh the data from the Google sheet, then use get_item_googlesheet to access the data as often as you like in the interim.
@@ -105,7 +118,6 @@ def open_googlesheet():
         global googleSheetDict
         global json_file
         global googleSheetKey
-        global googleWorksheet
         global list_of_lists
         global loadGoogleSheetEvery 
         json_key = json.load(open(json_file))
@@ -125,13 +137,15 @@ def open_googlesheet():
             fname,lineno,fn,text = frame
             logger.error( "     in %s on line %d" % (fname, lineno))
             
-#['IP ADDRESS', 'Mac Address', 'Hostname', 'Device Name', 'Device Type', 'Zone', 'Space', 'Location Details', 'Description', 'Flow Chart LInk', 'Order', 'Switch Interface']
     try:
-        #create searchable dictionary with ID_NAME as the key!
+        #create searchable dictionary with ID_NAME/IP ADDRESS as the key!
         googleSheetDict = defaultdict(list)
+        #finds location of "IP ADDRESS" column to use as key
+        ip_address_column = 1 #default
+        ip_address_column = find_item(list_of_lists, "IP ADDRESS")
+        next_column = ip_address_column + 1
         for listy in list_of_lists:
-            #googleSheetDict[listy[0]] += listy[1:]
-            googleSheetDict[listy[1]] += listy[2:]
+            googleSheetDict[listy[ip_address_column]] += listy[next_column:]
         googleSheetLen = len(googleSheetDict)    
         #for keys,values in googleSheetDict.items():
         #    print(keys)
@@ -167,7 +181,6 @@ def get_item_googlesheet(id_name, item_name):
     try:
         item_id = header_item.index(item_name)
         our_item = googleSheetDict[id_name]
-#        print our_item
         return str(our_item[item_id])
     except IndexError:
         logger.warning("dict entry '%s' not found" % id_name)
@@ -189,11 +202,10 @@ def get_item_googlesheet(id_name, item_name):
 def save_googlesheet_backup():
     global googleSheetDict
     for key in googleSheetDict:
-        (location, device_type, zone, space, device_name, description, switch_interface, mac_address, hostname, flow_chart_link, order) = get_items_from_googlesheet_forsave(key)
-#        print (location, device_type, zone, space, device_name, description, switch_interface, mac_address, hostname, flow_chart_link, order)
+        (location, device_type, zone, space, device_name, description, switch_interface, mac_address, hostname, boot_order) = get_items_from_googlesheet_forsave(key)
         try:
             cur = con.cursor()
-            cur.execute("INSERT OR REPLACE INTO GOOGLESHEET_BACKUP(IP_ADDRESS, LOCATION, DEVICE_TYPE, ZONE, SPACE, DEVICE_NAME, DESCRIPTION, SWITCH_INTERFACE, MAC_ADDRESS, HOSTNAME, FLOW_CHART_LINK, GS_ORDER) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (key, location, device_type, zone, space, device_name, description, switch_interface, mac_address, hostname, flow_chart_link, order))
+            cur.execute("INSERT OR REPLACE INTO GOOGLESHEET_BACKUP(IP_ADDRESS, LOCATION, DEVICE_TYPE, ZONE, SPACE, DEVICE_NAME, DESCRIPTION, SWITCH_INTERFACE, MAC_ADDRESS, HOSTNAME, BOOT_ORDER) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (key, location, device_type, zone, space, device_name, description, switch_interface, mac_address, hostname, boot_order))
             con.commit()
         except lite.Error, e:
             for frame in traceback.extract_tb(sys.exc_info()[2]):
@@ -204,6 +216,7 @@ def save_googlesheet_backup():
                 con.rollback()
             except Exception, e:
                 logger.error(" Can't rollback! %s" % e)
+
 ############################################################
 # get_item_googlesheet_backup()
 ############################################################        
@@ -241,45 +254,42 @@ def get_items_from_googlesheet_forsave(id_name):
     switch_interface = get_item_googlesheet(id_name, "Switch Interface")
     mac_address = get_item_googlesheet(id_name, "Mac Address")
     hostname = get_item_googlesheet(id_name, "Hostname")
-    flow_chart_link = get_item_googlesheet(id_name, "Flow Chart LInk")
-    order = get_item_googlesheet(id_name, "Order")
+    boot_order = get_item_googlesheet(id_name, "Boot Order")
     
-    return (location, device_type, zone, space, device_name, description, switch_interface, mac_address, hostname, flow_chart_link, order) #return items from googlesheet dictionary
+    return (location, device_type, zone, space, device_name, description, switch_interface, mac_address, hostname, boot_order) #return items from googlesheet dictionary
 
-def is_known_pi_software(id_name):
-    sep = '/'
-    parent = id_name.split(sep, 1)[0]
-#    print "parent: " + parent
-    desc = get_item_googlesheet(parent, "Description")
-#    print "desc: " + desc[:15] 
+############################################################
+#is_known_software(id_name)
+############################################################
+#returns alias for known pi software. Or returns ""
+def is_known_software(id_name):
+    try:
+        sep = '/'
+        parent = id_name.split(sep, 1)[0]
+        desc = get_item_googlesheet(parent, "Description")
     
-    if "do-audio.py" in id_name:
-#        print "found do_audio"
-        return desc[:20] + " (audio script)"  
-    if "do-video.py" in id_name:
-#        print "found do_video"
-        return desc[:20] + " (video script)"  
-    if "looping-audio.sh" in id_name:
-#        print "found looping audio"
-        return desc[:20] + " (looping audio 1)"
-    if "looping-audio1.sh" in id_name:
-#        print "found looping audio1"
-        return desc[:20] + " (looping audio 2)"
-    if "looping-audio2.sh" in id_name:
-#        print "found looping audio1"
-        return desc[:20] + " (looping audio 3)"
-    if "looping-audio3.sh" in id_name:
-#        print "found looping audio1"
-        return desc[:20] + " (looping audio 4)"
-    if "checkServer.sh" in id_name:
-#        print "found looping audio1"
-        return desc[:20] + " (check server)"  
-    if "Max.exe" in id_name:
-#        print "found looping audio1"
-        return desc[:20] + " (Max MSP)"  
+        if "do-audio.py" in id_name:
+            return desc[:20] + " (audio script)"  
+        if "do-video.py" in id_name:
+            return desc[:20] + " (video script)"  
+        if "looping-audio.sh" in id_name:
+            return desc[:20] + " (looping audio 1)"
+        if "looping-audio1.sh" in id_name:
+            return desc[:20] + " (looping audio 2)"
+        if "looping-audio2.sh" in id_name:
+            return desc[:20] + " (looping audio 3)"
+        if "looping-audio3.sh" in id_name:
+            return desc[:20] + " (looping audio 4)"
+        if "checkServer.sh" in id_name:
+            return desc[:20] + " (check server)"  
+        if "Max.exe" in id_name:
+            return desc[:20] + " (Max MSP)"  
     
-    return ""
-
+        return ""
+    except Exception, e:
+        print "Error in is_known_software: %s" % e
+        return ""
+    
 ############################################################
 #get_items_from_googlesheet()
 ############################################################
@@ -299,19 +309,17 @@ def get_items_from_googlesheet(id_name):
         description = get_item_from_googlesheet_backup(id_name,  "DESCRIPTION")
         if description == "" or description is None:
             #new device. try to autofill
-            loc = is_known_pi_software(id_name)
-            if loc == "":
+            desc = is_known_software(id_name)
+            if desc == "":
                 description = get_item_sqlite(id_name, "DESCRIPTION")
             else:
-#                print "*******set locations to: " + str(loc)
-                description = loc
+                description = desc
                 
     device_type = get_item_googlesheet(id_name, "Device Type")
     if device_type == "" or device_type is None:
         device_type = get_item_from_googlesheet_backup(id_name, "DEVICE_TYPE")
         if device_type == "" or device_type is None:
-            if loc != "":
-#                print "*******set type to sfotware"
+            if desc != "":
                 device_type = "Software"
             else:
                 device_type = get_item_sqlite(id_name, "DEVICE_TYPE")
@@ -345,119 +353,33 @@ def get_items_from_googlesheet(id_name):
         mac_address = get_item_from_googlesheet_backup(id_name, "MAC_ADDRESS")
         if mac_address == "" or mac_address is None:
             mac_address = get_item_sqlite(id_name, "MAC_ADDRESS")
+
+    boot_order = get_item_googlesheet(id_name, "Boot Order")
+    if boot_order == "" or boot_order is None:
+        boot_order = get_item_from_googlesheet_backup(id_name, "BOOT_ORDER")
+        if boot_order == "" or boot_order is None:
+            boot_order = get_item_sqlite(id_name, "BOOT_ORDER")
             
-    return (location, device_type, zone, space, device_name, description, switch_interface, mac_address) #return items, either from GS backup or as-is from the database
+    return (location, device_type, zone, space, device_name, description, switch_interface, mac_address, boot_order) #return items, either from GS backup or as-is from the database
 
 ############################################################
 #get_all_from_googlesheet()
 ############################################################
 # queries the google spreadsheet dict for type, location, zone, space,
-# device name, and description. then returns them along with the MAX_ID_NAME
-# for use with Max (Cycling '74)
+# device name, and description. then returns them 
 # otherwise does nothing
 def get_all_from_googlesheet(id_name):
-#    if (USE_GOOGLE_SHEETS != 1):
-        # if googlesheets are off, read these back from the GS backup or from the database as they already exist
     try:
-        (location, device_type, zone, space, device_name, description, switch_interface, mac_address) = get_items_from_googlesheet(id_name)
+        (location, device_type, zone, space, device_name, description, switch_interface, mac_address, boot_order) = get_items_from_googlesheet(id_name)
     except Exception, e:
         print "get_all_from_googlesheet error: %s" % e
         for frame in traceback.extract_tb(sys.exc_info()[2]):
             fname,lineno,fn,text = frame
             print "     in %s on line %d" % (fname, lineno)
-        return ("", "", "", "", "", "", "", id_name)
+        return ("", "", "", "", "", "", "", "", "")
     
-    #got data back and all is well. now parse max_id_name and return
-    parent_child_list = id_name.split('/', 1)
-    if len(parent_child_list) > 1:
-        (parent, child) = parent_child_list
-        if (device_type is not None and len(device_type) > 0):
-            max_id_name = str(parent) + "/" + str(device_type) + "/" + str(child)
-        else:
-            max_id_name = str(parent) + "/" + "UNKNOWN" + "/" + str(child)
-    else:
-        parent = id_name
-        child = ""
-        if (device_type is not None and len(device_type) > 0):
-            max_id_name = str(parent) + "/" + str(device_type) 
-        else:
-            max_id_name = str(parent) + "/" + "UNKNOWN"
-    #print "parent " + parent + " child " + child
-    #print "max_id_name " + max_id_name
-    return (location, device_type, zone, space, device_name, description, switch_interface, max_id_name, mac_address) #return items from googlesheet dictionary
+    return (location, device_type, zone, space, device_name, description, switch_interface, mac_address, boot_order) #return items from googlesheet dictionary
     
-############################################################
-#get_all_from_googlesheet_old()
-############################################################
-# queries the google spreadsheet dict for type, location, zone, space,
-# device name, and description. then returns them along with the MAX_ID_NAME
-# for use with Max (Cycling '74)
-# otherwise does nothing
-def get_all_from_googlesheet_old(id_name):
-    if (USE_GOOGLE_SHEETS != 1):
-        # if googlesheets are off, read these back from the database as they already exist
-        try:
-            location = get_item_sqlite(id_name, "LOCATION")
-            device_type = get_item_sqlite(id_name, "DEVICE_TYPE")
-            zone = get_item_sqlite(id_name, "ZONE")
-            space = get_item_sqlite(id_name, "SPACE")
-            device_name = get_item_sqlite(id_name, "DEVICE_NAME")
-            description = get_item_sqlite(id_name, "DESCRIPTION")
-            switch_interface = get_item_sqlite(id_name, "SWITCH_INTERFACE")
-            return (location, device_type, zone, space, device_name, description, switch_interface, id_name) #return items as-is from the database
-        except Exception, e:
-            logger.debug( )
-    try:
-        #otherwise try to read them from the googlesheet dictionary
-        device_type = get_item_googlesheet(id_name, "Device Type")
-        location = get_item_googlesheet(id_name, "Location Details")
-        zone = get_item_googlesheet(id_name, "Zone")
-        space = get_item_googlesheet(id_name, "Space")
-        device_name = get_item_googlesheet(id_name, "Device Name")
-        description = get_item_googlesheet(id_name, "Description")
-        switch_interface = get_item_googlesheet(id_name, "Switch Interface")
-        
-        parent_child_list = id_name.split('/', 1)
-        if len(parent_child_list) > 1:
-            (parent, child) = parent_child_list
-            if (len(device_type) > 0):
-                max_id_name = str(parent) + "/" + str(device_type) + "/" + str(child)
-            else:
-                max_id_name = str(parent) + "/" + "UNKNOWN" + "/" + str(child)
-        else:
-            parent = id_name
-            child = ""
-            if (len(device_type) > 0):
-                max_id_name = str(parent) + "/" + str(device_type) 
-            else:
-                 max_id_name = str(parent) + "/" + "UNKNOWN"
-        #print "parent " + parent + " child " + child
-        #print "max_id_name " + max_id_name
-        return (location, device_type, zone, space, device_name, description, switch_interface, max_id_name) #return items from googlesheet dictionary
-    except Exception, e:
-        #if the googlesheet read fails, read them from the database
-        print "get_all_from_googlesheet error: %s" % e
-        for frame in traceback.extract_tb(sys.exc_info()[2]):
-            fname,lineno,fn,text = frame
-            print "     in %s on line %d" % (fname, lineno)
-        # read these back from the database as they already exist
-        try:
-            location = get_item_sqlite(id_name, "LOCATION")
-            device_type = get_item_sqlite(id_name, "DEVICE_TYPE")
-            zone = get_item_sqlite(id_name, "ZONE")
-            space = get_item_sqlite(id_name, "SPACE")
-            device_name = get_item_sqlite(id_name, "DEVICE_NAME")
-            description = get_item_sqlite(id_name, "DESCRIPTION")
-            switch_interface = get_item_sqlite(id_name, "SWITCH_INTERFACE")
-            return (location, device_type, zone, space, device_name, description, switch_interface, max_id_name) #return items as-is from the database
-        except Exception, e:
-            print "get_all_from_googlesheet error #2: %s" % e
-            for frame in traceback.extract_tb(sys.exc_info()[2]):
-                fname,lineno,fn,text = frame
-                print "     in %s on line %d" % (fname, lineno)
-#if all else fails, return empty items
-                return ("", "", "", "", "", "", "", id_name) #do nothing for now
-            
 ############################################################
 #return_last_reset()
 ############################################################
@@ -465,16 +387,16 @@ def get_all_from_googlesheet_old(id_name):
 def return_last_reset(new_uptime, last_uptime, id_name):
     last_reset_timestamp_check = get_item_sqlite(id_name, "LAST_RESET_TIMESTAMP")
     uptime_sec = get_item_sqlite(id_name, "UPTIME_SEC")
-  #  print "*******************last check is " + str(last_reset_timestamp_check) + " uptime is " + str(uptime_sec)
     if (last_reset_timestamp_check == None and uptime_sec != None):
         #get the uptime and subtract from the current time to create baseline ts
         try:
             last_reset_time = datetime.datetime.now() - datetime.timedelta(seconds=int(float(uptime_sec)))
+            last_reset_timestamp = str(last_reset_time.strftime("%b %d, %Y %H:%M:%S"))
         except Exception, e:
+            import time
             logger.debug("Problem converting last reset time, setting to 0")
             last_reset_time = 0
-        last_reset_timestamp = str(last_reset_time.strftime("%b %d, %Y %H:%M:%S"))
-#        print "*****************NOW SETTING BLANK RESET TS TO: " + str(last_reset_timestamp) 
+            last_reset_timestamp = ""
         return last_reset_timestamp
     else:
         if (last_uptime == None):
@@ -482,7 +404,6 @@ def return_last_reset(new_uptime, last_uptime, id_name):
             last_reset_timestamp = get_item_sqlite(id_name, "LAST_RESET_TIMESTAMP")
             return last_reset_timestamp
         else:
-            #print "new uptime " + str(new_uptime) + " old uptime " + str(last_uptime)
             try:
                 if (int(float(new_uptime)) < int(float(last_uptime))):
                 #detected a device reset since the last time we checked the uptime
@@ -499,29 +420,22 @@ def return_last_reset(new_uptime, last_uptime, id_name):
                 print "Problem converting timestamp, returning ''"
                 return ""
             
-            ############################################################
-            #return_status()
-            ############################################################
-            # returns new human-friendly status strings, given internal codes
+############################################################
+#return_status()
+############################################################
+# returns human-friendly status strings, given internal codes
 
 def return_status(stat):
     if stat is None:
         return "UNKNOWN" # in case something badly formatted got into the database
-    
     if ('CLEAR' in stat):
         return "OKAY"
     else:
-        if ('DISCON' in stat):
-            return "DISCONNECT"
+        if ('NOREPLY' in stat):
+            return "NONRESPONSIVE"
         else:
-            if ('PIPE' in stat):
-                return "BROKEN_PIDUINO_LINK"
-            else:
-                if ('NOREPLY' in stat):
-                    return "NONRESPONSIVE"
-                else:
-                    # if not recognized, return status as-is
-                    return stat
+            # if not recognized, return status as-is
+            return stat
     
 ############################################################
 # get_pis_sqlite()
@@ -565,20 +479,49 @@ def get_item_sqlite(id_name, item_name):
 ############################################################            
 # splits string input into a formatted list of tuples and returns it.
 # this is intended to match the way SQLite returns values, so we can use the
-# same functions to parse both.
+# same functions to parse both. Also checks msg for validity & truncates strings
 
 def listify_data(data):
+    MAX_STATUS_STRING = 50 #strings longer than 50 chars are truncated
+    MAX_ID_STRING = 150 #strings longer than 150 chars are truncated
+    MAX_UPTIME_STRING = 50 #strings longer than 50 chars are truncated
     try:
         if len(data) == 0:
             return
         data_list = data.split();
         status = data_list[0]
+        #truncate stuff, none of these strings need to be super long
+        if len(status) > MAX_STATUS_STRING:
+            status = status[:MAX_STATUS_STRING]
         new_status = return_status(status)
         id_name = data_list[1]
+        #truncate stuff, none of these strings need to be super long
+        if len(id_name) > MAX_ID_STRING:
+            id_name = id_name[:MAX_ID_STRING]
+
+        #right now all ID names should contain an IP address
+        if '.' not in id_name:
+            logger.error( "Error in listify_data: ID %s doesn't contain IP address?", id_name)
+            logger.error( "Check the last message's formatting!")
+            return
+        
+        #if there's no uptime...
+        if len(data_list) <= 2:
+            logger.error( "Error in listify_data: message %s has no uptime" % data)
+            logger.error( "Check the last message's formatting!")
+            uptime_sec = "0"
+            timestamp = str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
+            uptime = ""
+            return [(id_name, timestamp, new_status, uptime_sec, uptime)]
+
+        #if everything's cool...
         uptime_sec = data_list[2]
         timestamp = str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
         strr = " "
         uptime = strr.join(data_list[3:])
+        #truncate stuff, none of these strings need to be super long
+        if len(uptime) > MAX_UPTIME_STRING:
+            uptime = uptime[:MAX_UPTIME_STRING]
         return [(id_name, timestamp, new_status, uptime_sec, uptime)]
     except Exception, e:
         logger.error( "Error in listify_data: %s" % e)
@@ -590,7 +533,6 @@ def listify_data(data):
 ############################################################        
 # parses data (as a list of tuples, either from SQLite or listify_data) a
 # and updates SQLite
-
 
 def sql_data_sqlite(data, pi_or_arduino, ip):
     global con
@@ -613,8 +555,6 @@ def sql_data_sqlite(data, pi_or_arduino, ip):
         uptime_sec = non_decimal.sub('', uptime_sec)
         #strips out dumb characters at the end of strings sent by Max
         uptime_sec = uptime_sec.replace('\x00', '')
-        #prints with dumb characters if present
-#        print(repr(uptime_sec))
         uptime = datalist[3]
     else:
         id_name = datalist[0]
@@ -640,13 +580,13 @@ def sql_data_sqlite(data, pi_or_arduino, ip):
         except Exception, e:
             logger.debug("Problem converting uptime. Setting to 0")
             sec = 0
-        mins = sec/60
-        hours = mins/60
-        days = hours / 24
+        mins = int(sec / 60)
+        hours = int(mins / 60)
+        days = int(hours / 24)
 
-        sec=sec-(mins*60)     # subtract the coverted seconds to minutes 
-        mins=mins-(hours*60)  # subtract the coverted minutes to hours 
-        hours=hours-(days*24) # subtract the coverted hours to days 
+        sec = int(sec - (mins * 60))     # subtract the coverted seconds to minutes 
+        mins = int(mins - (hours * 60))  # subtract the coverted minutes to hours 
+        hours = int(hours - (days * 24)) # subtract the coverted hours to days 
         uptime = "%d days, %02d:%02d:%02d" % (days, hours, mins, sec)
 
     timestamp = str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
@@ -657,13 +597,11 @@ def sql_data_sqlite(data, pi_or_arduino, ip):
     last_reset_timestamp = return_last_reset(uptime_sec, last_uptime, id_name)
     #reset uptime and write back to the database
     last_uptime = uptime_sec
-    #also get location, device type, and max name from google sheet
-    #    (location, device_type, max_id_name) = get_type_location_and_max_name(id_name)
-    (location, device_type, zone, space, device_name, description, switch_interface, max_id_name, mac_address) = get_all_from_googlesheet(id_name)
+    (location, device_type, zone, space, device_name, description, switch_interface, mac_address, boot_order) = get_all_from_googlesheet(id_name)
     # insert & commit, otherwise rollback
     try:
         cur = con.cursor()
-        cur.execute("INSERT OR REPLACE INTO DEVICES(ID_NAME, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME, LAST_UPTIME_SEC, LOCATION, DEVICE_TYPE, LAST_RESET_TIMESTAMP, MAX_ID_NAME, ZONE, SPACE, DEVICE_NAME, DESCRIPTION, SWITCH_INTERFACE, MAC_ADDRESS) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",  (id_name,timestamp,status, uptime_sec,uptime,uptime_sec, location, device_type, last_reset_timestamp, max_id_name, zone, space, device_name, description, switch_interface, mac_address))
+        cur.execute("INSERT OR REPLACE INTO DEVICES(ID_NAME, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME, LAST_UPTIME_SEC, LOCATION, DEVICE_TYPE, LAST_RESET_TIMESTAMP, ZONE, SPACE, DEVICE_NAME, DESCRIPTION, SWITCH_INTERFACE, MAC_ADDRESS, BOOT_ORDER) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",  (id_name,timestamp,status, uptime_sec,uptime,uptime_sec, location, device_type, last_reset_timestamp, zone, space, device_name, description, switch_interface, mac_address, boot_order))
         con.commit()
     except lite.Error, e:
         logger.error(" sqlite error: %s" % e)
@@ -685,12 +623,10 @@ def parse_data_sqlite(data):
     num_total = 0
     for row in data:
         num_total += 1
-#        logger.info("row is " + str(row))
         id_name = row[0]
         timestamp = row[1]
         status = row[2]
         new_status = return_status(status)
-#        location = get_item_sqlite(id_name, "LOCATION")
         last_reset_timestamp = get_item_sqlite(id_name, "LAST_RESET_TIMESTAMP")
         uptime_sec = row[3]
         uptime = row[4]
@@ -700,19 +636,15 @@ def parse_data_sqlite(data):
         else:
             time_ts = datetime.datetime.time()
         total_seconds = ((time_cur-time_ts).seconds)
-#        logger.debug("total seconds between times: " + str(total_seconds))
         if (total_seconds > periodic_period):
             # more than X seconds since last message. update this entry with NOREPLY
-#            logger.debug("More than %d minutes for %s" % (periodic_period / 60, id_name))
             timestamp = str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
             status = "NONRESPONSIVE"
-            #also get location, device type, and max name from google sheet
-            #            (location, device_type, max_id_name) = get_type_location_and_max_name(id_name)
-            (location, device_type, zone, space, device_name, description, switch_interface, max_id_name, mac_address) = get_all_from_googlesheet(id_name)
+            (location, device_type, zone, space, device_name, description, switch_interface, mac_address, boot_order) = get_all_from_googlesheet(id_name)
             logger.info(id_name + " silent for " + str(total_seconds) + " seconds, setting " + status + " with uptime " + uptime)
             try:
                 cur = con.cursor()
-                cur.execute("INSERT OR REPLACE INTO DEVICES(ID_NAME, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME, LAST_UPTIME_SEC, LOCATION, DEVICE_TYPE, LAST_RESET_TIMESTAMP, MAX_ID_NAME, ZONE, SPACE, DEVICE_NAME, DESCRIPTION, SWITCH_INTERFACE, MAC_ADDRESS) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",  (id_name,timestamp,status, uptime_sec,uptime,uptime_sec, location, device_type, last_reset_timestamp, max_id_name, zone, space, device_name, description, switch_interface, mac_address))
+                cur.execute("INSERT OR REPLACE INTO DEVICES(ID_NAME, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME, LAST_UPTIME_SEC, LOCATION, DEVICE_TYPE, LAST_RESET_TIMESTAMP, ZONE, SPACE, DEVICE_NAME, DESCRIPTION, SWITCH_INTERFACE, MAC_ADDRESS, BOOT_ORDER) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",  (id_name,timestamp,status, uptime_sec,uptime,uptime_sec, location, device_type, last_reset_timestamp, zone, space, device_name, description, switch_interface, mac_address, boot_order))
                 con.commit()
             except lite.Error, e:
                 for frame in traceback.extract_tb(sys.exc_info()[2]):
@@ -751,6 +683,7 @@ def parse_data_sqlite(data):
                 con.rollback()
             except Exception, e:
                 logger.error(" Can't rollback! %s" % e)                
+
 ############################################################                
 ############################################################
 # main()
@@ -765,12 +698,12 @@ if __name__ == "__main__":
     
     # defines log levels for the log file. Default is 'info' and above.
     # Run program with "debug" on the command line for extra debugging output
-    LEVELS = { 'debug':logging.DEBUG,
-            'info':logging.INFO,
-            'warning':logging.WARNING,
-            'error':logging.ERROR,
-            'critical':logging.CRITICAL,
-            }
+    LEVELS = {
+        'debug':logging.DEBUG,
+        'info':logging.INFO,
+        'warning':logging.WARNING,
+        'error':logging.ERROR,
+        'critical':logging.CRITICAL, }
     
     # default log level is info (prints info, warning, error, etc).
     # run with "tcp_watchdog_sqlite.py debug" to print/log debug messages
@@ -839,7 +772,6 @@ if __name__ == "__main__":
         # refresh data from the google sheet. it's slow, don't do it too often!
         if (USE_GOOGLE_SHEETS == 1):
             if (time.time() - loadGoogleSheetTimer > loadGoogleSheetEvery):
-                #                update_from_googlesheet()
                 open_googlesheet()
                 loadGoogleSheetTimer = time.time()
                 
@@ -850,15 +782,14 @@ if __name__ == "__main__":
 
         if (time.time() - periodic_timer > periodic_period):
             data = get_pis_sqlite("DEVICES")
-#            print data
             parse_data_sqlite(data)
             periodic_timer = time.time()
         
         try:
             data, address = server_socket.recvfrom(1024)
-            #print data
             if (data):
                 print "-----Client (%s) connected, sent %s" % (address, data)
+
             #######################
             # DATA RECEIVED
             #######################
@@ -867,6 +798,7 @@ if __name__ == "__main__":
                 if data.count("ERRPI") + data.count("ERRDUINO") > 1:
                 # we may get more than one message at a time
                 # due to the way TCP works. If so, split 'em.
+                # probably can't happen w/ UDP but I'm leaving it here in case
                     datas = re.split('(ERR)', data)
                     for data in datas:
                         if data != "" and data != "ERR":
@@ -883,6 +815,7 @@ if __name__ == "__main__":
         except socket.timeout:
 #            print "socket timeout"
             continue
+        
     ##################
     # EXIT
     ##################                

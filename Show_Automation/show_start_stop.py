@@ -27,6 +27,7 @@ WOL_COMMAND = "/Users/Aesir/Documents/watchdog/wolcmd"
 WINDOWS_DB_FILENAME = 'c:\\watchdog\\tcp_watchdog_server\\demosdb.db'
 #and for Linux & OSX, I just used the local directory (where this file is) 
 LINUX_OSX_DB_FILENAME = '/Users/Aesir/Documents/watchdog/tcp_watchdog_server/demosdb.db'
+#LINUX_OSX_DB_FILENAME = "../demosdb.db"
 
 ###############
 # PoE, WOL, UDPSEND
@@ -156,7 +157,7 @@ def get_item(remote_ip):
         else:
             con = lite.connect(LINUX_OSX_DB_FILENAME)     
     except Exception, e:
-        logger.error("Can't connect to demosdb! %s" % e)
+        print "Can't connect to demosdb! %s" % e
         
     try:
         with con:
@@ -251,13 +252,19 @@ def start_stop_reboot_show(command):
         else:
             con = lite.connect(LINUX_OSX_DB_FILENAME)     
     except Exception, e:
-        logger.error("Can't connect to demosdb! %s" % e)
-        
+        print "Can't connect to demosdb! %s" % e
+        return
+    
     try:
         with con:
             cur = con.cursor()
-            sql = "SELECT ID_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE FROM DEVICES ORDER BY DEVICE_TYPE DESC, ID_NAME ASC" 
-            cur.execute(sql)
+            #old style
+            #            sql = "SELECT ID_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE FROM DEVICES ORDER BY DEVICE_TYPE DESC, ID_NAME ASC"
+            if command is "start":
+                sql = "SELECT ID_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE FROM DEVICES ORDER BY BOOT_ORDER DESC, ID_NAME ASC" 
+            else:
+                sql = "SELECT ID_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE FROM DEVICES ORDER BY BOOT_ORDER ASC, ID_NAME ASC" 
+                cur.execute(sql)
             data = cur.fetchall()
             print data
             for item in data:
@@ -315,7 +322,7 @@ def reboot_unresponsive():
         else:
             con = lite.connect(LINUX_OSX_DB_FILENAME)     
     except Exception, e:
-        logger.error("Can't connect to demosdb! %s" % e)
+        print "Can't connect to demosdb! %s" % e
         
     try:
         with con:
