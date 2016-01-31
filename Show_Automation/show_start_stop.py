@@ -261,14 +261,14 @@ def start_stop_reboot_show(command):
             #old style
             #            sql = "SELECT ID_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE FROM DEVICES ORDER BY DEVICE_TYPE DESC, ID_NAME ASC"
             if command is "start":
-                sql = "SELECT ID_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE FROM DEVICES ORDER BY BOOT_ORDER DESC, ID_NAME ASC" 
+                sql = "SELECT ID_NAME, DEVICE_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE, BOOT_ORDER FROM DEVICES ORDER BY BOOT_ORDER ASC, ID_NAME ASC" 
             else:
-                sql = "SELECT ID_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE FROM DEVICES ORDER BY BOOT_ORDER ASC, ID_NAME ASC" 
-                cur.execute(sql)
+                sql = "SELECT ID_NAME, DEVICE_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE, BOOT_ORDER FROM DEVICES ORDER BY BOOT_ORDER DESC, ID_NAME ASC" 
+            cur.execute(sql)
             data = cur.fetchall()
             print data
             for item in data:
-                (remote_ip, mac_address, switch_interface, device_type) = item
+                (remote_ip, device_name, mac_address, switch_interface, device_type, boot_order) = item
                 if mac_address is None:
                     mac_address = ""
 
@@ -282,6 +282,22 @@ def start_stop_reboot_show(command):
 
                 if remote_ip is None:
                     remote_ip = ""
+
+                if device_name is None:
+                    device_name = ""
+
+                if device_type is None:
+                    device_type = ""
+
+                if "software" in device_type.lower():
+                    continue
+
+                if device_name != "":
+                    print
+                    print device_name
+
+                if boot_order is not None:
+                    print boot_order
 
                 if mac_address != "":
                     print "mac " + mac_address
