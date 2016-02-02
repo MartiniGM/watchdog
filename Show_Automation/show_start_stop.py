@@ -343,12 +343,13 @@ def reboot_unresponsive():
     try:
         with con:
             cur = con.cursor()
-            sql = "SELECT ID_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE FROM DEVICES WHERE STATUS='NONRESPONSIVE' ORDER BY DEVICE_TYPE DESC, ID_NAME ASC" 
+            sql = "SELECT ID_NAME, DEVICE_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE, BOOT_ORDER FROM DEVICES ORDER BY BOOT_ORDER ASC, ID_NAME ASC"
+#            sql = "SELECT ID_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE FROM DEVICES WHERE STATUS='NONRESPONSIVE' ORDER BY DEVICE_TYPE DESC, ID_NAME ASC" 
             cur.execute(sql)
             data = cur.fetchall()
             print data
             for item in data:
-                (remote_ip, mac_address, switch_interface, device_type) = item
+                (remote_ip, device_name, mac_address, switch_interface, device_type, boot_order) = item
                 if mac_address is None:
                     mac_address = ""
 
@@ -362,7 +363,29 @@ def reboot_unresponsive():
 
                 if remote_ip is None:
                     remote_ip = ""
-            
+
+                if device_type is None:
+                    device_type = ""
+
+                if "software" in device_type.lower():
+                    continue
+
+                if device_name != "":
+                    print
+                    print device_name
+
+                if boot_order is not None:
+                    print boot_order
+
+                if mac_address != "":
+                    print "mac " + mac_address
+                if switch_ip != "":
+                    print "switch ip " + switch_ip
+                if switch_interface != "":
+                    print "switch interface " + switch_interface
+                if remote_ip != "":
+                    print "remote_ip " + remote_ip
+
                 if mac_address != "":
                     print "mac " + mac_address
                 if switch_ip != "":
@@ -416,6 +439,10 @@ if __name__ == "__main__":
                         help='starts the whole show (with great power... etc)')
 
     group.add_argument('--reboot_nonresponsive',
+                        action='store_true',
+                        help='reboots all nonresponsive devices in the whole show (with great power... etc)')
+
+    group.add_argument('--reboot_unresponsive',
                         action='store_true',
                         help='reboots all nonresponsive devices in the whole show (with great power... etc)')
     
@@ -508,5 +535,5 @@ if __name__ == "__main__":
     # REBOOT NONRESPONSIVE
     ###############
         
-    if args.reboot_nonresponsive:
+    if args.reboot_nonresponsive or args.reboot_unresponsive:
         reboot_unresponsive()
