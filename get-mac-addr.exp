@@ -1,0 +1,60 @@
+#!/usr/bin/env expect -f
+
+set user      [lindex $argv 0]
+set host      [lindex $argv 1]
+#set password  [lindex $argv 2]
+#set enable    [lindex $argv 3]
+
+set password [read [open "/Users/Guest/watchdog/power_passphrase1.secret" r]]
+set enable [read [open "/Users/Guest/watchdog/power_passphrase2.secret" r]]
+
+set timeout 9
+
+if {[llength $argv] == 0} {
+  send_user "Usage: scriptname <switch-username> <switch-ip>\n"
+  exit 1
+}
+
+#set timeout 1
+#user="myuser"
+
+spawn telnet "$host"
+expect "Connected"
+
+send "$user\r"
+
+expect {
+  timeout { send_user "\rFailed to get password prompt\r"; exit 1 }
+  eof { send_user "\rTelnet failure for $host\r"; exit 1 }
+  "*#" {}
+  "*assword:" {
+    send "$password"
+  }
+}
+
+expect {
+  default { send_user "\nCould not get into enabled mode. Password problem?\n"; exit 1 }
+  "*#" {}
+  "*>" {
+    send "enable\r"
+    expect "*assword"
+    send "$enable"
+    expect "*#"
+  }
+}
+
+send "show mac address-table\r"
+expect {
+
+  "#" {
+    send "exit"
+  }
+  -ex "--More--" {
+    send "\r"    ;
+    exp_continue ;
+  }
+}
+
+send_user "\nsuccess\n"
+close
+
