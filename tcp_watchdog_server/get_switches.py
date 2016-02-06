@@ -11,6 +11,7 @@ import sys
 import signal
 import traceback
 import shutil
+import argparse
 from collections import defaultdict
 # to install the three below:
 # "pip install gspread; pip install oauth2client; pip install PyOpenSSL"
@@ -20,6 +21,7 @@ import json
 import gspread
 from oauth2client.client import SignedJwtAssertionCredentials
 
+# switch list. add more switches here if you got 'em
 switches = ["10.42.0.3","10.42.0.4","10.42.0.5","10.42.0.6","10.42.0.7",
             "10.42.0.8","10.42.0.9","10.42.0.10","10.42.0.11","10.42.0.12",
             "10.42.0.13", "10.42.0.14"]
@@ -50,11 +52,6 @@ googleSheetDictSwitches = {}
 list_of_lists = []
 list_of_lists_switches = []
 
-# load google sheet every hour. it's a bit slow to get the data back so it doesn't reload often, but if you want to trigger it immediately just restart the program
-LOADSHEET_SLOW = 3600 #seconds, once the initial load gets at least 1 row
-LOADSHEET_FAST = 200 #seconds, as long as all loads have failed
-loadGoogleSheetEvery = LOADSHEET_FAST #starts with fast loads until it succeeds
-loadGoogleSheetTimer = time.time()
 USE_GOOGLE_SHEETS = 1
 
 ############################################################
@@ -67,7 +64,6 @@ def find_item(mylist, item_name):
         for subitem in item:
             if subitem == item_name:
                 item_id = i
-#                print "found  " + item_name + " at " + str(item_id)
                 return item_id
             i = i + 1
 
@@ -81,7 +77,6 @@ def subfinder(mylist, pattern):
     try:
         #and then gets every item where the device type matches the pattern 
         for item in mylist:
-#            print "%s in %s?" % (pattern, item[item_id])
             if pattern in item[device_type_item_id]:
                 matches.append(item)
         return matches
@@ -101,7 +96,6 @@ def subfinder_switch(mylist, pattern):
     try:
         #and then gets every item where the device type matches the pattern 
         for item in mylist:
-#            print "%s in %s?" % (pattern, item[item_id])
             if pattern in item[0]:
                 matches.append(item)
         return matches
@@ -138,12 +132,14 @@ def open_googlesheet():
         gc = gspread.authorize(credentials)
         sh = gc.open_by_key(googleSheetKey)
         googleWorksheet = sh.worksheet(googleWorksheetName)
-        
+
+        # reads every item from the Networked Devices tab
         list_of_lists = googleWorksheet.get_all_values()
 
         device_name_item_id = find_item(list_of_lists, "Device Name")
         mac_address_item_id = find_item(list_of_lists, "Mac Address")
-        
+
+        # makes a list of every mac address and device name for which both exist
         for item in list_of_lists:
             mac_address = item[mac_address_item_id].replace(':','').lower()
             device_name = item[device_name_item_id]
@@ -152,23 +148,18 @@ def open_googlesheet():
                     item2 = (mac_address, device_name)
                     device_name_list.append(item2)
 
-#        print "made a list"
-#        print device_name_list
+        print "made a list"
+        print device_name_list
 
         device_type_item_id = find_item(list_of_lists, "Device Type")
         hostname_item_id = find_item(list_of_lists, "Device Name")
         ip_address_item_id = find_item(list_of_lists, "IP ADDRESS")
         alias_item_id = find_item(list_of_lists, "Device Name")
         description_item_id = find_item(list_of_lists, "Description")
-#        print "ids: device %d hostname %d ip_address %d alias %d" % (device_type_item_id, hostname_item_id, ip_address_item_id, alias_item_id)
-        #sorts by device type
+        # sorts by device type
         list_of_lists.sort(key=lambda x: x[5])
-        #creates list of pis
-#        print "PIS"
+        # creates list of pis
         pi_list = subfinder(list_of_lists, "berry")
-#        print pi_list
-#        print
-#        print
     except Exception, e:
         print  "error in open_googlesheet: %s" % e
 
@@ -177,12 +168,11 @@ def open_googlesheet():
 ############################################################         
 def return_name(c):
     matches = []
+    global device_name_list
     for item in device_name_list:
         try:
             if item[0].lower() == c:
-                if item[1] not in matches:
-#                print "match %s" % item[1]
-                    matches.append(item[1])
+                matches.append(item[1])
         except Exception, e:
             print "oops %s" % e
     return matches
@@ -191,6 +181,7 @@ def return_name(c):
 #do_pis: runs do_a_host on each pi and adds them to both lists
 ############################################################ 
 def do_pis(mylist):
+    global device_name_list
     for item in mylist:
         returnval = do_a_host(item, "pi")
         if returnval == []:
@@ -220,9 +211,7 @@ def do_a_host(mylist, compare):
         if device_name is None or device_name == '':
             device_name = ip_address
             
-            #do the thing
         command = "/Users/Guest/watchdog/tcp_watchdog_server/get_pi_macaddr.exp " + str(ip_address) + " | grep 'eth0' | grep -v 'echo'"
-#        print "command " + command
         output = subprocess.check_output(command, shell=True, stderr=subprocess.STDOUT)
         for row in output.split('\n'):
             listy = row.split()
@@ -235,7 +224,6 @@ def do_a_host(mylist, compare):
                 return returnitem
 
     except subprocess.CalledProcessError, e:
-#        print "%s: no response" % str(ip_address)
         return []
     except Exception, e:
         print "error in do_linux %s" % e
@@ -251,16 +239,12 @@ def do_a_host(mylist, compare):
 def print_switch(switch):
     entries = ["\t"]*49
     this_switch = subfinder_switch(interface_list, switch)
-#    if this_switch != []:
-#        print ""
-#        print str(this_switch)
     for item in this_switch:
         interface = item[3]
         number = interface.rsplit('/', 1)[-1]
         stringy = item[1] + "\t"
         entries[int(number)-1] = stringy
         print "%s: %s at %s" % (switch, item[1], interface) 
-#    print "entries " + str(entries)
     return entries
     
 ############################################################
@@ -274,30 +258,38 @@ def do_a_switch(ip_address):
             print "No 'IP ADDRESS' in the Master Doc for this device, skipping:" + str(mylist)
             return -1
 
-            #do the thing
         command = "/Users/Guest/watchdog/get-mac-addr.exp meow %s | grep ' 16 ' | grep Fa" % str(ip_address)
         print "command " + command
         output = subprocess.check_output(command, shell=True, stderr=subprocess.STDOUT)
         for row in output.split('\n'):
             print row
             listy = row.split()
-            if (len(listy) >= 6):
-                mac_addr = listy[4].replace('.', '').lower()
-#                print "searching for %s" % mac_addr
+            # necessary because sometimes the output contains junk before the "16"
+            try:
+                first_row = listy.index("16")
+#                print "first row is %d" % first_row
+            except:
+                # skips junk rows that don't have "16"
+                continue
+            if (len(listy) >= first_row + 4):
+                mac_addr = listy[first_row+1].replace('.', '').lower()
+ #               print "searching for %s" % mac_addr
                 matches = return_name(mac_addr)
                 if matches == []:
 #                    print "blank match"
                     continue
                 else:
                     if len(matches) != 1:
-                        print "Error: multiple identical MAC addresses %s" % matches
+                        if (matches[0] != matches[1]):
+                            print "Error: multiple identical MAC addresses %s" % matches
                     else:
 #                        print "%s matched %s" % (mac_addr, matches)
                         match = matches[0]
-                        inter = listy[6].replace("Fa", "FastEthernet")
+                        inter = listy[first_row+3].replace("Fa", "FastEthernet")
                         this_interface = (ip_address, match, mac_addr, inter)
                         interface_list.append(this_interface)
-
+            else:
+                print "line too short? %d" % len(listy)
     except subprocess.CalledProcessError, e:
         print "%s: no response" % str(ip_address)
         return []
@@ -306,71 +298,87 @@ def do_a_switch(ip_address):
         for frame in traceback.extract_tb(sys.exc_info()[2]):
             fname,lineno,fn,text = frame
             print( "     in %s on line %d" % (fname, lineno))
-        #otherwise return an error
+        # otherwise return an error
         return -1
 
 ########################################################################
 # MAIN MAIN MAIN MAIN etc yeah I said it, it's MAIN
 ########################################################################    
 
-#open the sheet & create lists, one of Pis and one of all items
+# you can use --skip-pis to make the script skip the (time consuming)
+# pi mac address query.
+# if it skips the query it'll just get them as-is from the Master Doc
+parser = argparse.ArgumentParser()
+parser.add_argument('--skip-pis',
+                        action='store_true',
+                        help='skips over querying Pis, which is time-consuming and may not be necessary if there are no new Pis on the network...' )
+args = parser.parse_args()
+
+# open the sheet & create lists, one of Pis and one of all items
 open_googlesheet()
 
-try:
-    shutil.copy ("pi_map.txt", "pi_map.old")
-    if not (os.path.isfile ("pi_map.old")): print "error backing up old file"
-except Exception, e:
-    print "error backing up old pi_map file: %s" % e
+if args.skip_pis:
+    print "---------SKIPPING PI QUERY, WILL GET PIS FROM MASTER DOC"
+else:
+    #back up the old copy of the pi map so we can sanity check before pasting it
+    try:
+        shutil.copy ("pi_map.txt", "pi_map.old")
+        if not (os.path.isfile ("pi_map.old")): print "error backing up old file"
+    except Exception, e:
+        print "error backing up old pi_map file: %s" % e
 
-try:
-    #go through the Pi list, run the expect script for each to get mac addresses
-    print "----------NOW QUERYING PIS (hit ctrl-C a lot if you need to cancel each pi):"
-    do_pis(pi_list)
-    pi_target = open("pi_map.txt", 'w')
-    for pi in pi_output_list:
-        #puts the ":" back in so we can cut-n-paste these into the master doc
-        s = pi[0]
-        macaddr = ':'.join(s[i:i+2] for i in range(0, len(s), 2))
-        item = "%s %s\n" % (pi[1], macaddr)
-        #and writes each item out to pi_map.txt
-        pi_target.write(item)
+    try:
+        # go through the Pi list, run the expect script for each to get mac addresses
+        print "----------NOW QUERYING PIS (hit ctrl-C a lot if you need to cancel each pi):"
+        do_pis(pi_list)
+        pi_target = open("pi_map.txt", 'w')
+        for pi in pi_output_list:
+        # puts the ":" back in so we can cut-n-paste these into the master doc
+            s = pi[0]
+            macaddr = ':'.join(s[i:i+2] for i in range(0, len(s), 2))
+            item = "%s %s\n" % (pi[1], macaddr)
+            # and writes each item out to pi_map.txt
+            pi_target.write(item)
 
-except Exception, e:
-    print("Hit error in pis within main: %s" % e)
-    for frame in traceback.extract_tb(sys.exc_info()[2]):
+    except Exception, e:
+        print("Hit error in pis within main: %s" % e)
+        for frame in traceback.extract_tb(sys.exc_info()[2]):
             fname,lineno,fn,text = frame
             print( "     in %s on line %d" % (fname, lineno))
 
+# back up the old copy of the switch map so we can sanity check before pasting it
 try:
     shutil.copy ("switch_map.txt", "switch_map.old")
     if not (os.path.isfile ("switch_map.old")): print "error backing up old file"
 except Exception, e:
     print "error backing up old switch_map file: %s" % e
             
-    #go through the switch list, run the expect script for each to get mac addresses for connected devices
+    # go through the switch list, run the expect script for each to get mac addresses for connected devices
 try:
     print "----------NOW QUERYING SWITCHES:"
     for switch in switches:
         do_a_switch(switch)
 
-        #go through the switch list, run the expect script for each to get mac addresses for connected devices
-    print "---------DETECTED ITEMS:"
+        # go through the switch list, run the expect script for each to get mac addresses for connected devices
     print interface_list
+    print ""
+    print "---------DETECTED ITEMS:"
 
     target = open("switch_map.txt", 'w')
 
     for switch in switches:
         switch_map = print_switch(switch)
-        #writes out each switch with tabs so you can cut-n-paste the whole
-        #map into the Master Doc. 
+        # writes out each switch with tabs so you can cut-n-paste the whole
+        # map into the Master Doc. 
         for item in switch_map:
             target.write(item)
         target.write("\n")
-        #10.42.0.3 has two switches, second one isn't in use. print an extra newline
+        # 10.42.0.3 has two switches, second one isn't in use. print an extra newline
         if switch == "10.42.0.3":
             target.write("\n")
-
-    print "***Done. Check pi_map.txt and switch_map.txt for output"
+    print ""
+    print "***Done. Check pi_map.txt and switch_map.txt for formatted output"
+    print ""
 except Exception, e:
     print("Hit error in switches within main: %s" % e)
     for frame in traceback.extract_tb(sys.exc_info()[2]):
