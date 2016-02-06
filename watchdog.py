@@ -57,7 +57,7 @@ upslist = []
 host = '10.42.16.17'
 port = 6666
 # set this machine's IP in case the network goes down & it forgets :l  
-this_default_ip = "10.42.32.2"
+this_default_ip = "x.x.x.x"
 send_ok_period = 30 #sends OKAY every N seconds
 
 # give a filename for the watchdog's log file here
