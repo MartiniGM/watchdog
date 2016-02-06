@@ -1,0 +1,19 @@
+#!/usr/bin/expect -f
+# usage: ./get_pi_macaddr 10.42.24.42
+
+set ip [lindex $argv 0]
+#DO NOT upload these files to github, they have our passwords in them!
+set pass1 [read [open "pi_passphrase1.secret" r]]
+
+set timeout -1
+eval spawn ssh -oConnectTimeout=20 -oStrictHostKeyChecking=no -oCheckHostIP=no pi@$ip
+match_max 100000
+set prompt ":|#|\\\$"
+interact -o -nobuffer "password:" return
+send -- "$pass1\r"
+interact -o -nobuffer -re $prompt return
+send -- {echo -n `ip route get 8.8.8.8 | awk ' NR==1 {print $NF}'` ; echo -n " " ; ifconfig -a | awk '/^[a-z]/ { iface=$1; mac=$NF; next } /inet addr:/ { print iface, mac }' | grep eth0 }
+send -- "\r"
+interact -o -nobuffer -re $prompt return
+send -- "exit\r"
+expect eof
