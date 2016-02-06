@@ -27,6 +27,7 @@ ip_address_item_id = 1
 
 interface_list = []
 device_name_list = []
+pi_list = []
 
 # json file to hold Google credentials.
 # ----> DO NOT EVER UPLOAD the .json file to public access (github)! <----
@@ -64,6 +65,45 @@ def find_item(mylist, item_name):
                 return item_id
             i = i + 1
 
+############################################################
+#subfinder() takes a list of lists and a pattern. finds pattern in the
+# "Device Type" column of the list of lists. Returns a list of all lists
+# that matched.
+############################################################
+def subfinder(mylist, pattern):
+    matches = []
+    try:
+        #and then gets every item where the device type matches the pattern 
+        for item in mylist:
+#            print "%s in %s?" % (pattern, item[item_id])
+            if pattern in item[device_type_item_id]:
+                matches.append(item)
+        return matches
+    except Exception, e:
+        print "error in subfinder: %s" % e
+        for frame in traceback.extract_tb(sys.exc_info()[2]):
+            fname,lineno,fn,text = frame
+            print( "     in %s on line %d" % (fname, lineno))
+        #otherwise return blank list
+        return []
+
+def subfinder_switch(mylist, pattern):
+    matches = []
+    try:
+        #and then gets every item where the device type matches the pattern 
+        for item in mylist:
+#            print "%s in %s?" % (pattern, item[item_id])
+            if pattern in item[0]:
+                matches.append(item)
+        return matches
+    except Exception, e:
+        print "error in subfinder: %s" % e
+        for frame in traceback.extract_tb(sys.exc_info()[2]):
+            fname,lineno,fn,text = frame
+            print( "     in %s on line %d" % (fname, lineno))
+        #otherwise return blank list
+        return []
+            
 def open_googlesheet():
 # if we're not loading the Google sheet, just return
     if (USE_GOOGLE_SHEETS != 1):
@@ -77,6 +117,7 @@ def open_googlesheet():
         global list_of_lists
         global loadGoogleSheetEvery 
         global device_name_list
+        global pi_list
         json_key = json.load(open(json_file))
         scope = ['https://spreadsheets.google.com/feeds']
         
@@ -101,7 +142,21 @@ def open_googlesheet():
 
 #        print "made a list"
         print device_name_list
-            
+
+        device_type_item_id = find_item(list_of_lists, "Device Type")
+        hostname_item_id = find_item(list_of_lists, "Device Name")
+        ip_address_item_id = find_item(list_of_lists, "IP ADDRESS")
+        alias_item_id = find_item(list_of_lists, "Device Name")
+        description_item_id = find_item(list_of_lists, "Description")
+        print "ids: device %d hostname %d ip_address %d alias %d" % (device_type_item_id, hostname_item_id, ip_address_item_id, alias_item_id)
+        #sorts by device type
+        list_of_lists.sort(key=lambda x: x[5])
+        #creates list of pis
+        print "PIS"
+        pi_list = subfinder(list_of_lists, "berry")
+        print pi_list
+        print
+        print
     except Exception, e:
         print  "error in open_googlesheet: %s" % e
             
@@ -116,6 +171,72 @@ def return_name(c):
             print "oops %s" % e
     return matches
 
+def do_pis(mylist):
+    for item in mylist:
+        returnval = do_a_host(item, "pi")
+        if returnval == []:
+            continue
+        else:
+            device_name_list.append(returnval)
+        
+############################################################
+#do_a_linux: takes a list, creates one .cfg file for the teensy in the list
+############################################################ 
+def do_a_host(mylist, compare):
+    import subprocess
+    try:
+        ip_address = mylist[ip_address_item_id]
+        device_type = mylist[device_type_item_id]
+        device_name = mylist[hostname_item_id]
+        
+        if compare not in device_type.lower():
+            print "Error? Can't tell if this is a %s, skipping: %s" % (compare, str(mylist))
+            return []
+
+        if ip_address is None or ip_address == '':
+            print "No 'IP ADDRESS' in the Master Doc for this device, skipping:" + str(mylist)
+            return []
+
+        if device_name is None or device_name == '':
+            device_name = ip_address
+            
+            #do the thing
+        command = "/Users/Guest/watchdog/tcp_watchdog_server/get_pi_macaddr.exp " + str(ip_address) + " | grep 'eth0' | grep -v 'echo'"
+        print "command " + command
+        output = subprocess.check_output(command, shell=True)
+        for row in output.split('\n'):
+            listy = row.split()
+            if listy[0] == "send:":
+                print "send detected, continue"
+                return []
+            else:
+                returnitem = (listy[2].replace(':', '').lower(), device_name)
+                print returnitem
+                return returnitem
+            
+    except Exception, e:
+        print "error in do_linux %s" % e
+        for frame in traceback.extract_tb(sys.exc_info()[2]):
+            fname,lineno,fn,text = frame
+            print( "     in %s on line %d" % (fname, lineno))
+        #otherwise return an error
+        return []
+
+def print_switch(switch):
+    entries = ["\t"]*49
+    this_switch = subfinder_switch(interface_list, switch)
+    if this_switch != []:
+        print ""
+        print str(this_switch)
+    for item in this_switch:
+        interface = item[3]
+        number = interface.rsplit('/', 1)[-1]
+        stringy = item[1] + "\t"
+        entries[int(number)-1] = stringy
+        print "%s: %s at %s / %d" % (switch, item[1], interface, int(number)) 
+#    print "entries " + str(entries)
+    return entries
+    
 ############################################################
 #do_a_switch: takes an ip, grabs interfaces for items in the switch,
 #returns as a (mac_address, interface) tuple 
@@ -159,17 +280,32 @@ def do_a_switch(ip_address):
         return -1
 
 open_googlesheet()
-#do_a_switch("10.42.0.13")
+
+try:
+    do_pis(pi_list)
+except Exception, e:
+    print("Hit error in do_pis: %s" % e)
+
 switches = ["10.42.0.3","10.42.0.4","10.42.0.5","10.42.0.6","10.42.0.7",
             "10.42.0.8","10.42.0.9","10.42.0.10","10.42.0.11","10.42.0.12",
             "10.42.0.13", "10.42.0.14"]
 for switch in switches:
     do_a_switch(switch)
 
+#format example:
+#interface_list = [('10.42.0.3', 'RPi-A0104', 'b827eb64b950', 'FastEthernet1/0/14'), ('10.42.0.3', 'RPi-A0105', 'b827eb7a26b5', 'FastEthernet1/0/15'), ('10.42.0.4', 'RPi-C0303', 'b827eb9deb8e', 'FastEthernet1/0/1'), ('10.42.0.4', 'RPi-C0309', 'b827ebeb5cf4', 'FastEthernet1/0/16'), ('10.42.0.4', 'RPi-C0307', 'b827ebf08b55', 'FastEthernet1/0/3'), ('10.42.0.5', 'RPi-D0401', 'b827ebc7d4bf', 'FastEthernet1/0/1'), ('10.42.0.5', 'RPi-D0408', 'b827ebf997c3', 'FastEthernet1/0/8'), ('10.42.0.6', 'RPi-E0506', 'b827eb224704', 'FastEthernet1/0/8'), ('10.42.0.7', 'RPi-F0605', 'b827eb662331', 'FastEthernet1/0/5'), ('10.42.0.7', 'RPi-F0606', 'b827ebc398d0', 'FastEthernet1/0/6'), ('10.42.0.7', 'RPi-F0607', 'b827ebd106f5', 'FastEthernet1/0/7'), ('10.42.0.8', 'RPi-G0706', 'b827eb8e7f58', 'FastEthernet1/0/6'), ('10.42.0.8', 'RPi-G0702', 'b827ebb83f41', 'FastEthernet1/0/2'), ('10.42.0.8', 'RPi-G0701', 'b827ebc882d4', 'FastEthernet1/0/1'), ('10.42.0.8', 'RPi-G0707', 'b827ebe44d0e', 'FastEthernet1/0/7'), ('10.42.0.9', 'RPi-H0805', 'b827ebacd25f', 'FastEthernet1/0/5'), ('10.42.0.13', 'RPi-L1206', 'b827eb619357', 'FastEthernet1/0/4'), ('10.42.0.13', 'RPi-G0714', 'b827eb8b0ed3', 'FastEthernet1/0/32'), ('10.42.0.13', 'MS-L1202', 'd8cb8a38e8e2', 'FastEthernet1/0/16')]
+
 print interface_list
 
-#bash command to get ip and mac addr on linux:
-#echo -n `ip route get 8.8.8.8 | awk 'NR==1 {print $NF}'` ; echo -n " " ; ifconfig -a | awk '/^[a-z]/ { iface=$1; mac=$NF; next } /inet addr:/ { print iface, mac }' | grep eth0
+target = open("switch_map.txt", 'w')
 
-
-
+for switch in switches:
+    switch_map = print_switch(switch)
+    #writes out each switch with tabs so you can cut-n-paste the whole
+    #map into the Master Doc. 
+    for item in switch_map:
+        target.write(item)
+    target.write("\n")
+    #10.42.0.3 has two switches, second one isn't in use. print an extra newline
+    if switch == "10.42.0.3":
+        target.write("\n")
