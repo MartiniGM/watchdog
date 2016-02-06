@@ -646,7 +646,7 @@ def sql_data_sqlite(data, pi_or_arduino, ip):
     datalist = data[0]
     non_decimal = re.compile(r'[^\d.]+')
 
-    if len(datalist) != 5:
+    if len(datalist) != 5 or datalist[0] == "x.x.x.x":
 #        print "got the IP address error"        
         id_name = ip
         timestamp = datalist[0]
