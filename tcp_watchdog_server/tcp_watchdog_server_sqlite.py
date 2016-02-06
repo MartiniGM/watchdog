@@ -48,10 +48,16 @@ json_file = 'mwsheets-91347531e5f4.json.secret'
 # URL for the google sheet. this can be public
 googleSheetKey = "1kHAcbAo8saNSTBc7ffidzrwu_FGK3FaBpmh7rO7hT-U"
 googleWorksheetName = "Networked Devices" #name of the tab on the google sheet
+googleWorksheetName_Switches = "Switch Interface Map" #name of the tab on the google sheet
 
 # dictionary to load Google spreadsheet into (for device types and descriptions)
 googleSheetDict = {}
 list_of_lists = []
+# dictionary to load Google spreadsheet into (for Switch Interface Map)
+googleSheetDictSwitches = {}
+list_of_lists_switches = []
+switch_prefix_index = 0
+switch_ip_index = 0
 
 # load google sheet every hour. it's a bit slow to get the data back so it doesn't reload often, but if you want to trigger it immediately just restart the program
 LOADSHEET_SLOW = 3600 #seconds, once the initial load gets at least 1 row
@@ -116,9 +122,13 @@ def open_googlesheet():
 # else use our JSON credentials to open the Google Drive sheet        
     try:
         global googleSheetDict
+        global googleSheetDictSwitches
         global json_file
         global googleSheetKey
         global list_of_lists
+        global list_of_lists_switches
+        global switch_ip_index
+        global switch_prefix_index
         global loadGoogleSheetEvery 
         json_key = json.load(open(json_file))
         scope = ['https://spreadsheets.google.com/feeds']
@@ -127,9 +137,13 @@ def open_googlesheet():
         
         gc = gspread.authorize(credentials)
         sh = gc.open_by_key(googleSheetKey)
-        googleWorksheet = sh.worksheet(googleWorksheetName)
         
+        googleWorksheet = sh.worksheet(googleWorksheetName)
         list_of_lists = googleWorksheet.get_all_values()
+
+        googleWorksheet_switches = sh.worksheet(googleWorksheetName_Switches)
+        list_of_lists_switches = googleWorksheet_switches.get_all_values()
+        googleSheetLenSwitches = len(list_of_lists_switches)
 
     except Exception, e:
         logger.error("error in open_googlesheet: %s" % e)
@@ -137,6 +151,22 @@ def open_googlesheet():
             fname,lineno,fn,text = frame
             logger.error( "     in %s on line %d" % (fname, lineno))
             
+    try:
+        #create searchable dictionary with ID_NAME/IP ADDRESS as the key!
+        if googleSheetLenSwitches != 0:
+            matches2 = [match for match in find_switch("Switch Prefix")]
+            switch_prefix_index = int(matches2[0][1])
+        
+            matches3 = [match for match in find_switch("Switch IP")]
+            switch_ip_index = int(matches3[0][1])
+            pivot_switches()
+
+    except Exception, e:
+        logger.error("error in open_googlesheet for switches: %s" % e)
+        for frame in traceback.extract_tb(sys.exc_info()[2]):
+            fname,lineno,fn,text = frame
+            logger.error( "     in %s on line %d" % (fname, lineno))
+
     try:
         #create searchable dictionary with ID_NAME/IP ADDRESS as the key!
         googleSheetDict = defaultdict(list)
@@ -150,15 +180,15 @@ def open_googlesheet():
         #for keys,values in googleSheetDict.items():
         #    print(keys)
         #    print(values)
-        if googleSheetLen == 0:
+        if googleSheetLen == 0 or googleSheetLenSwitches == 0:
             # set slower loads after load gets at least one row
             # if not, try to reload much more often.
             loadGoogleSheetEvery = LOADSHEET_FAST #seconds
-            logger.info("     Google Sheets load failed? %s rows loaded" % googleSheetLen)      
+            logger.info("     Google Sheets load failed? %s rows loaded plus %s switch interfaces" % (googleSheetLen, googleSheetLenSwitches))      
         else:
             #the load got at least one row. Save everything in the DB 
             loadGoogleSheetEvery = LOADSHEET_SLOW #seconds
-            logger.info("     Google Sheets load OK, %s rows loaded" % googleSheetLen)
+            logger.info("     Google Sheets load OK, %s rows loaded plus %s switch interfaces" % (googleSheetLen, googleSheetLenSwitches))
             save_googlesheet_backup()
             
     except Exception, e:
@@ -179,11 +209,24 @@ def get_item_googlesheet(id_name, item_name):
         return ""
     header_item = googleSheetDict["IP ADDRESS"]
     try:
-        item_id = header_item.index(item_name)
-        our_item = googleSheetDict[id_name]
-        return str(our_item[item_id])
+        item_id = header_item.index(item_name) 
+        if item_name == "Switch Interface":
+#            print "getting a switch from new page"
+            our_item = googleSheetDict[id_name]
+            item_id = header_item.index("Device Name")
+            dev_name = our_item[item_id]
+            our_item2 = googleSheetDictSwitches[dev_name]
+
+            print "%s %s" % (id_name, our_item2[0])
+            return str(our_item2[0])
+        else:
+            our_item = googleSheetDict[id_name]
+            return str(our_item[item_id])
+    except KeyError:
+#        logger.warning("dict entry '%s' not found" % id_name)
+        return ""
     except IndexError:
-        logger.warning("dict entry '%s' not found" % id_name)
+#        logger.warning("dict entry '%s' not found" % id_name)
         return ""
     except ValueError:
         logger.warning("column '%s' not found" % item_name)
@@ -379,7 +422,66 @@ def get_all_from_googlesheet(id_name):
         return ("", "", "", "", "", "", "", "", "")
     
     return (location, device_type, zone, space, device_name, description, switch_interface, mac_address, boot_order) #return items from googlesheet dictionary
-    
+
+############################################################
+#find_item()
+############################################################
+#gets the position of "item" in the sublists & returns
+def find_item(mylist, item_name):
+     #gets the position of "item" in the sublists & returns
+    for item in mylist:
+        i = 0
+        for subitem in item:
+            if subitem == item_name:
+                item_id = i
+                return item_id
+            i = i + 1
+
+############################################################
+#find_switch()
+############################################################
+# returns switch in list of switches
+def find_switch(c):
+    for i, switch in enumerate(list_of_lists_switches):
+        try:
+            j = switch.index(c)
+        except ValueError:
+            continue
+        yield i, j
+
+############################################################
+#pivot_switches()
+############################################################
+# creates searchable per-switch dict of device names & switch interfaces
+def pivot_switches():
+    top = 13; #max number of switches, ignore everything below these in sheet
+    global googleSheetDictSwitches
+    googleSheetDictSwitches = defaultdict(list)
+    for i, switch in enumerate(list_of_lists_switches):
+        try:
+            if i == 0: # the first row is always just the column titles/key
+                continue
+            if i <= top:
+                print ""
+                #                print "i %d switch %s" % (i, switch)
+                this_prefix = switch[switch_prefix_index]
+#                print "this_prefix %s" % this_prefix
+                this_switch = switch[switch_ip_index]
+#                print "this_switch_ip %s" % this_switch
+                j = 0
+                for item in switch[switch_prefix_index+1:]:
+                    j = j + 1
+                    if item != "":
+                        return_item = "%s: %s %s%d" % (item, this_switch, this_prefix, j)
+                        interface = "%s %s%d" % (this_switch, this_prefix, j)
+                    #add these to a dict so you can look them up by item later
+                        googleSheetDictSwitches[item] += [interface]
+                        print return_item
+            else:
+                return
+        except ValueError:
+            continue
+
 ############################################################
 #return_last_reset()
 ############################################################
