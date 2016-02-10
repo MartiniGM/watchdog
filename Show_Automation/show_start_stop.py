@@ -165,7 +165,7 @@ def get_item(remote_ip):
             sql = "SELECT MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE FROM DEVICES WHERE ID_NAME LIKE '%s'" % remote_ip
             cur.execute(sql)
             data = cur.fetchall()
-#            print data
+            print data 
             return data[0]
     except lite.Error, e:
         print(" SQL error! %s" % e)   
@@ -174,21 +174,30 @@ def get_item(remote_ip):
 # START DEVICE
 ###############
 
-def start_device(switch_ip, switch_interface, device_type):        
+def start_device(switch_ip, switch_interface, device_type, mac_address):        
     if "berry" in device_type.lower(): 
-#        print "start pi"
+        print "start pi"
+        print "%s %s" % (switch_ip, switch_interface)
         check_switch(switch_ip, switch_interface)
-        start_pi(switch_ip, switch_interface)
+        if not args.disable:
+            print "gonna do the thing"
+            start_pi(switch_ip, switch_interface)
     else:
         if "indow" in device_type.lower():
-#            print "start windows"
+            print "start windows"
+            print "%s" % (mac_address)
             check_macaddress(mac_address)
-            start_windows(mac_address)
+            if not args.disable:
+                print "gonna do the thing"
+                start_windows(mac_address)
         else:
             if "duino" in device_type.lower() or "eensy" in device_type.lower():
-#                print "start arduino"                    
+                print "start arduino"                    
+                print "%s %s" % (switch_ip, switch_interface)
                 check_switch(switch_ip, switch_interface)
-                start_arduino(switch_ip, switch_interface)
+                if not args.disable:
+                    print "gonna do the thing"
+                    start_arduino(switch_ip, switch_interface)
             else:
                 print "WARNING: type %s not matched, exiting..." % device_type
 
@@ -197,19 +206,28 @@ def start_device(switch_ip, switch_interface, device_type):
 ###############
 def stop_device(remote_ip, switch_ip, switch_interface, device_type):
     if "berry" in device_type.lower(): 
-#        print "stop pi"
+        print "stop pi"
+        print "%s %s %s" % (remote_ip, switch_ip, switch_interface)
         check_remoteip_switch(remote_ip, switch_ip, switch_interface)
-        stop_pi(remote_ip, switch_ip, switch_interface, 6)        
+        if not args.disable:
+            print "gonna do the thing"
+            stop_pi(remote_ip, switch_ip, switch_interface, 6)        
     else:
         if "indow" in device_type.lower():
-#            print "stop windows"
+            print "stop windows"
+            print "%s" % (remote_ip)
             check_remoteip(remote_ip)
-            stop_windows(remote_ip)
+            if not args.disable:
+                print "gonna do the thing"
+                stop_windows(remote_ip)
         else:
             if "duino" in device_type.lower() or "eensy" in device_type.lower():            
-#                print "stop arduino"
+                print "stop arduino"
+                print "%s %s" % (switch_ip, switch_interface)
                 check_switch(switch_ip, switch_interface)
-                stop_arduino(switch_ip, switch_interface)
+                if not args.disable:
+                    print "gonna do the thing"
+                    stop_arduino(switch_ip, switch_interface)
             else:
                 print "WARNING: type %s not matched, exiting..." % device_type
 
@@ -219,19 +237,25 @@ def stop_device(remote_ip, switch_ip, switch_interface, device_type):
 
 def reboot_device(remote_ip, switch_ip, switch_interface, device_type):
     if "berry" in device_type.lower(): 
-#        print "reboot pi"
+        print "reboot pi"
         check_remoteip(remote_ip)
-        reboot_pi(remote_ip)        
+        if not args.disable:
+            print "gonna do the thing"
+            reboot_pi(remote_ip)        
     else:
         if "indow" in device_type.lower():
-#            print "reboot windows"        
+            print "reboot windows"        
             check_remoteip(remote_ip)
-            reboot_windows(remote_ip)
+            if not args.disable:
+                print "gonna do the thing"
+                reboot_windows(remote_ip)
         else:
             if "duino" in device_type.lower() or "eensy" in device_type.lower():            
-#                print "reboot arduino"
+                print "reboot arduino"
                 check_switch(switch_ip, switch_interface)
-                reboot_arduino(switch_ip, switch_interface, 2)
+                if not args.disable:
+                    print "gonna do the thing"
+                    reboot_arduino(switch_ip, switch_interface, 2)
             else:
                 print "WARNING: type %s not matched, exiting..." % device_type
 
@@ -239,8 +263,7 @@ def reboot_device(remote_ip, switch_ip, switch_interface, device_type):
 # START/STOP/REBOOT SHOW
 ###############            
                 
-def start_stop_reboot_show(command):
-    print "start show"
+def start_stop_reboot_show(command, limit_to_switch_ip):
     remote_ip = ""
     mac_address = ""
     switch_interface = ""
@@ -258,12 +281,31 @@ def start_stop_reboot_show(command):
     try:
         with con:
             cur = con.cursor()
+            where_cmd = ""
+
+            if limit_to_switch_ip is None:
+                limit_to_switch_ip = ""
+
+#            if limit_to_switch_ip is not None and limit_to_switch_ip != "":
+#                print "Limit to switch: %s" % limit_to_switch_ip
+#                where_cmd = where_cmd + "WHERE 'SWITCH_INTERFACE' IS LIKE '%s'" % limit_to_switch_ip
+            if "noglobal" in command:
+                where_cmd = where_cmd + "AND DESCRIPTION NOT LIKE 'GLOBAL'"
+
             #old style
             #            sql = "SELECT ID_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE FROM DEVICES ORDER BY DEVICE_TYPE DESC, ID_NAME ASC"
-            if command is "start":
-                sql = "SELECT ID_NAME, DEVICE_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE, BOOT_ORDER FROM DEVICES ORDER BY BOOT_ORDER ASC, ID_NAME ASC" 
+            if "start" in command:
+                sql = "SELECT ID_NAME, DEVICE_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE, BOOT_ORDER FROM DEVICES ORDER BY BOOT_ORDER ASC, ID_NAME ASC"
             else:
-                sql = "SELECT ID_NAME, DEVICE_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE, BOOT_ORDER FROM DEVICES ORDER BY BOOT_ORDER DESC, ID_NAME ASC" 
+                if "stop" in command:
+                    sql = "SELECT ID_NAME, DEVICE_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE, BOOT_ORDER FROM DEVICES ORDER BY BOOT_ORDER DESC, ID_NAME ASC" 
+                else:
+                    if "reboot" in command:
+                        sql = "SELECT ID_NAME, DEVICE_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE, BOOT_ORDER FROM DEVICES ORDER BY BOOT_ORDER DESC, ID_NAME ASC" 
+                    else:
+                        print "command not recognized"
+                        return
+            print "sql is: %s" % sql
             cur.execute(sql)
             data = cur.fetchall()
             print data
@@ -292,32 +334,51 @@ def start_stop_reboot_show(command):
                 if "software" in device_type.lower():
                     continue
 
-                if device_name != "":
-                    print
-                    print device_name
+ #               if device_name != "":
+ #                   print
+ #                   print device_name
 
-                if boot_order is not None:
-                    print boot_order
+ #               if boot_order is not None:
+ #                   print boot_order
 
-                if mac_address != "":
-                    print "mac " + mac_address
-                if switch_ip != "":
-                    print "switch ip " + switch_ip
-                if switch_interface != "":
-                    print "switch interface " + switch_interface
-                if remote_ip != "":
-                    print "remote_ip " + remote_ip
+ #               if mac_address != "":
+ #                   print "mac " + mac_address
+ #               if switch_ip != "":
+ #                   print "switch ip " + switch_ip
+ #               if switch_interface != "":
+ #                   print "switch interface " + switch_interface
+ #               if remote_ip != "":
+ #                   print "remote_ip " + remote_ip
 
                 if command is "start":
                     #start each item, then delay
-                    print "start it"
+                    if limit_to_switch_ip is not None and limit_to_switch_ip != "":
+                        if limit_to_switch_ip in switch_group:
+                            start_device(switch_ip, switch_interface, device_type, mac_address)
+                            print "start it"
+                    else:
+                        print "start it"
+                        start_device(switch_ip, switch_interface, device_type, mac_address)
+                            
                 if command is "stop":
                     #stop each item, then delay
-                    print "stop it"
+                    if limit_to_switch_ip is not None and limit_to_switch_ip != "":
+                        if limit_to_switch_ip in switch_group:
+                            print "stop it"
+                            stop_device(remote_ip, switch_ip, switch_interface, device_type)
+                    else:
+                            print "stop it"
+                            stop_device(remote_ip, switch_ip, switch_interface, device_type)
+
                 if command is "reboot":
                     #stop each item, then delay
-                    print "reboot it"
-                    
+                    if limit_to_switch_ip is not None and limit_to_switch_ip != "":
+                        if limit_to_switch_ip in switch_group:
+                            print "reboot it"
+                            reboot_device(remote_ip, switch_ip, switch_interface, device_type)
+                    else:
+                            print "reboot it"
+                            reboot_device(remote_ip, switch_ip, switch_interface, device_type)
     except lite.Error, e:
         print(" SQL error! %s" % e)   
 
@@ -434,9 +495,17 @@ if __name__ == "__main__":
                         action='store_true',
                         help='shuts down the whole show (with great power... etc)')
 
+    group.add_argument('--stop_show_noglobal',
+                        action='store_true',
+                        help='shuts down the whole show, sans global audio (with great power... etc)')
+
     group.add_argument('--start_show',
                         action='store_true',
                         help='starts the whole show (with great power... etc)')
+
+    group.add_argument('--start_show_noglobal',
+                        action='store_true',
+                        help='starts the whole show, sans global audio (with great power... etc)')
 
     group.add_argument('--reboot_nonresponsive',
                         action='store_true',
@@ -445,7 +514,15 @@ if __name__ == "__main__":
     group.add_argument('--reboot_unresponsive',
                         action='store_true',
                         help='reboots all nonresponsive devices in the whole show (with great power... etc)')
+
+    parser.add_argument("--switch",
+                       type=str,
+                       help='Limits start_show and stop_shot to this switch IP address (i.e. 10.42.16.166)' ) 
     
+    parser.add_argument('--disable',
+                        action='store_true',
+                        help='Disables start/stop/reboot commands (test mode)')
+
     parser.add_argument('--ip', 
                         type=str,
                         help='IP address to use (i.e. 10.42.16.166)' )
@@ -458,6 +535,7 @@ if __name__ == "__main__":
     ###############################################            
     
     if args.ip:
+
         if args.start_device or args.stop_device or args.reboot_device:
             remote_ip = args.ip
 #            print remote_ip
@@ -494,7 +572,7 @@ if __name__ == "__main__":
     ###############
         
     if args.start_device:
-        start_device(switch_ip, switch_interface, device_type)
+        start_device(switch_ip, switch_interface, device_type, mac_address)
         
     ###############
     # STOP DEVICE
@@ -515,21 +593,41 @@ if __name__ == "__main__":
     ###############
 
     if args.start_show:
-        start_stop_reboot_show("start")
+        if args.switch:
+            switch_interface = args.switch
+            
+        start_stop_reboot_show("start", switch_interface)
+
+    if args.start_show_noglobal:
+        if args.switch:
+            switch_interface = args.switch
+        start_stop_reboot_show("start_noglobal", switch_interface)
 
     ###############
     # STOP SHOW
     ###############
         
     if args.stop_show:
-        start_stop_reboot_show("stop")
+        if args.switch:
+            switch_interface = args.switch
+
+        start_stop_reboot_show("stop", switch_interface)
+
+    if args.stop_show_noglobal:
+        if args.switch:
+            switch_interface = args.switch
+
+        start_stop_reboot_show("stop_noglobal", switch_interface)
         
     ###############
     # REBOOT SHOW
     ###############
 
     if args.reboot_show:
-        start_stop_reboot_show("reboot")
+        if args.switch:
+            switch_interface = args.switch
+
+        start_stop_reboot_show("reboot", switch_interface)
 
     ###############
     # REBOOT NONRESPONSIVE
