@@ -71,7 +71,7 @@ LOG_FILENAME = 'tcp_watchdog_server.out'
 PORT = 6666 # port number to watch
 
 # give the size for each rolling log segment, in bytes
-LOG_SIZE = 2000000 #2 MB, in bytes
+LOG_SIZE = 20000000 #20 MB, in bytes
 # give the number of rolling log segments to record before the log rolls over
 LOG_NUM_BACKUPS = 5 # five .out files before they roll over
 
@@ -211,7 +211,7 @@ def get_item_googlesheet(id_name, item_name):
     try:
         item_id = header_item.index(item_name) 
         if item_name == "Switch Interface":
-#            print "getting a switch from new page"
+            print "getting a switch from new page"
             our_item = googleSheetDict[id_name]
             item_id = header_item.index("Device Name")
             dev_name = our_item[item_id]
@@ -827,7 +827,7 @@ if __name__ == "__main__":
                                                    backupCount=LOG_NUM_BACKUPS)
     
     # sets the message & timestamp format for the log
-    frmt = logging.Formatter('%(asctime)s - %(message)s',"%d/%m/%Y %H:%M:%S")
+    frmt = logging.Formatter('%(asctime)s - %(message)s',"%m/%d/%Y %H:%M:%S")
     handler.setFormatter(frmt)
     logger.addHandler(handler)
 
