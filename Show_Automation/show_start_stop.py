@@ -346,7 +346,7 @@ def start_stop_reboot_show(command, limit_to_switch_ip):
             cur = con.cursor()
             where_cmd = ""
 
-            if "noglobal" in command:
+            if args.no_global:
                 where_cmd = where_cmd + "AND DESCRIPTION NOT LIKE 'GLOBAL'"
 
             if "start" in command:
@@ -553,17 +553,9 @@ if __name__ == "__main__":
                         action='store_true',
                         help='shuts down the whole show (with great power... etc)')
 
-    group.add_argument('--stop_show_noglobal',
-                        action='store_true',
-                        help='shuts down the whole show, sans global audio (with great power... etc)')
-
     group.add_argument('--start_show',
                         action='store_true',
                         help='starts the whole show (with great power... etc)')
-
-    group.add_argument('--start_show_noglobal',
-                        action='store_true',
-                        help='starts the whole show, sans global audio (with great power... etc)')
 
     group.add_argument('--reboot_nonresponsive',
                         action='store_true',
@@ -586,6 +578,10 @@ if __name__ == "__main__":
                         action='store_true',
                         help='Skip start/stop/reboot commands for servers (Windows/Mac); start/stop/reboot Pis and Arduinos only')
 
+    parser.add_argument('--no_global',
+                        action='store_true',
+                        help='Skip global audio devices')
+
     parser.add_argument('--ip', 
                         type=str,
                         help='IP address to use with start/stop/reboot_device (i.e. 10.42.16.166)' )
@@ -601,6 +597,8 @@ if __name__ == "__main__":
         cmd = cmd + (" with IP %s" % args.ip)
     if args.no_servers:
         cmd = cmd + (", with --no_servers")      
+    if args.no_global:
+        cmd = cmd + (", with --no_global")      
     if args.switch:
         cmd = cmd + (", limited to switch %s" % args.switch)
     logger.info(cmd)
@@ -661,11 +659,6 @@ if __name__ == "__main__":
             switch_interface = args.switch            
         start_stop_reboot_show("start", switch_interface)
 
-    if args.start_show_noglobal:
-        if args.switch:
-            switch_interface = args.switch
-        start_stop_reboot_show("start_noglobal", switch_interface)
-
     ###############
     # STOP SHOW
     ###############
@@ -675,18 +668,13 @@ if __name__ == "__main__":
             switch_interface = args.switch
         start_stop_reboot_show("stop", switch_interface)
 
-    if args.stop_show_noglobal:
-        if args.switch:
-            switch_interface = args.switch
-        start_stop_reboot_show("stop_noglobal", switch_interface)
-        
     ###############
     # REBOOT SHOW
     ###############
 
     if args.reboot_show:
         if args.switch:
-            switch_interface = args.switch
+            switch_interface = args.switch            
         start_stop_reboot_show("reboot", switch_interface)
 
     ###############
