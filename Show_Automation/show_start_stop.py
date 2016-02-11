@@ -22,12 +22,37 @@ from oauth2client.client import SignedJwtAssertionCredentials
 
 POE_COMMAND = "/Users/Aesir/Documents/watchdog/set_power.exp"
 WOL_COMMAND = "/Users/Aesir/Documents/watchdog/wolcmd"
+DELAY_BETWEEN_DEVICES = 0.5 #delays a half second between displaying device & stop/starting
 
 # give a filename for the watchdog's SQLite database here, on Windows
 WINDOWS_DB_FILENAME = 'c:\\watchdog\\tcp_watchdog_server\\demosdb.db'
 #and for Linux & OSX, I just used the local directory (where this file is) 
 LINUX_OSX_DB_FILENAME = '/Users/Aesir/Documents/watchdog/tcp_watchdog_server/demosdb.db'
 #LINUX_OSX_DB_FILENAME = "../demosdb.db"
+
+# give a filename for the watchdog's log file here                              
+LOG_FILENAME = 'show_start_stop.out'
+# give the size for each rolling log segment, in bytes                          
+LOG_SIZE = 2000000 #2 MB, in bytes                                              
+# give the number of rolling log segments to record before the log rolls over   
+LOG_NUM_BACKUPS = 5 # five .out files before they roll over                     
+
+####################                                                            
+# EXIT HANDLER                                                                  
+####################
+
+# upon exit, log exit msg, disconnect from sqlite and close sockets             
+def exit_func():
+    logger.warning ("     Show start/stop script CLOSED ")
+    logger.warning ("     ")
+    sys.exit(0)
+
+# exits the program cleanly, logging exit time                                  
+def signal_handler(signal, frame):
+    print ""
+    exit_func()
+
+signal.signal(signal.SIGINT, signal_handler)
 
 ###############
 # PoE, WOL, UDPSEND
@@ -39,23 +64,23 @@ def set_PoE(auto_or_never, remote_ip, switch):
         command = [POE_COMMAND, auto_or_never, remote_ip, switch]
         p = subprocess.Popen(command, stdout=subprocess.PIPE)
         for line in p.stdout:
-            print line
+            logger.info( line )
 
     except Exception, e:
-        print( "set_PoE error: %s" % e)
+        logger.error( " ERROR: set_PoE error: %s" % e)
 
 def udpsend(message, remote_ip, port):
     try:
         watchsock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     except socket.error as e:
-        print( 'Failed to create outgoing socket: %s' % e )
+        logger.error( ' ERROR: Failed to create outgoing socket: %s' % e )
 
     try:
-        print "send " + message + " to " + remote_ip
+        logger.info( " send " + message + " to " + remote_ip )
         watchsock.sendto(message, (remote_ip, port))
         watchsock.close()
     except Exception, e:
-        print( 'Failed to send on outgoing socket: %s' % e )
+        logger.error( ' ERROR: Failed to send on outgoing socket: %s' % e )
 
 def wake_on_lan(mac_address):
     import subprocess
@@ -64,10 +89,10 @@ def wake_on_lan(mac_address):
                    "255.255.255.255", "4343"]
         p = subprocess.Popen(command, stdout=subprocess.PIPE)
         for line in p.stdout:
-            print line
+            logger.info(line)
 
     except Exception, e:
-        print( "set_PoE error: %s" % e)
+        logger.error( " ERROR: set_PoE error: %s" % e)
 
 ###############
 # START TYPES
@@ -118,31 +143,31 @@ def stop_pi(remote_ip, switch_ip, switch_interface, delay):
     
 def check_remoteip(remote_ip):
     if remote_ip is None or remote_ip == "":
-        print "IP not set! Exiting..."
+        logger.error( " ERROR: IP not set! Exiting...")
         exit
 
 def check_macaddress(mac_address):
     if mac_address is None or mac_address == "":
-        print "MAC address not set! Exiting..."
+        logger.error( " ERROR: MAC address not set! Exiting...")
         exit
         
 def check_switch(remote_ip, switch):
     if remote_ip is None or remote_ip == "":
-        print "switch IP not set! Exiting..."
+        logger.error( " ERROR: switch IP not set! Exiting...")
         exit
     if switch is None or switch == "":
-        print "switch interface not set! Exiting..."
+        logger.error( " ERROR: switch interface not set! Exiting...")
         exit
 
 def check_remoteip_switch(remote_ip, switch, switch_interface):
     if remote_ip is None or remote_ip == "":
-        print "remote IP not set! Exiting..."
+        logger.error( " ERROR: remote IP not set! Exiting...")
         exit
     if switch is None or switch == "":
-        print "switch IP not set! Exiting..."
+        logger.error( " ERROR: switch IP not set! Exiting...")
         exit
     if switch_interface is None or switch_interface == "":
-        print "switch interface not set! Exiting..."
+        logger.error( " ERROR: switch interface not set! Exiting...")
         exit
 
 ###############
@@ -157,7 +182,7 @@ def get_item(remote_ip):
         else:
             con = lite.connect(LINUX_OSX_DB_FILENAME)     
     except Exception, e:
-        print "Can't connect to demosdb! %s" % e
+        logger.error( " ERROR: Can't connect to demosdb! %s" % e)
         
     try:
         with con:
@@ -165,10 +190,10 @@ def get_item(remote_ip):
             sql = "SELECT MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE FROM DEVICES WHERE ID_NAME LIKE '%s'" % remote_ip
             cur.execute(sql)
             data = cur.fetchall()
-            print data 
+            logger.info( data ) 
             return data[0]
     except lite.Error, e:
-        print(" SQL error! %s" % e)   
+        logger.error(" ERROR: SQL error! %s" % e)   
 
 ###############
 # START DEVICE
@@ -176,60 +201,74 @@ def get_item(remote_ip):
 
 def start_device(switch_ip, switch_interface, device_type, mac_address):        
     if "berry" in device_type.lower(): 
-        print "start pi"
-        print "%s %s" % (switch_ip, switch_interface)
+#        print "start pi"
+        logger.info( " start pi: %s %s" % (switch_ip, switch_interface))
         check_switch(switch_ip, switch_interface)
+        time.sleep(DELAY_BETWEEN_DEVICES)
         if not args.disable:
-            print "gonna do the thing"
+            logger.info(" now starting... %s %s" %  (switch_ip, switch_interface))
             start_pi(switch_ip, switch_interface)
     else:
         if "indow" in device_type.lower():
-            print "start windows"
-            print "%s" % (mac_address)
+#            print "start windows"
+            logger.info(" start windows: %s" % (mac_address))
             check_macaddress(mac_address)
-            if not args.disable:
-                print "gonna do the thing"
+            time.sleep(DELAY_BETWEEN_DEVICES)
+            if (not args.disable) and not (args.no_servers):
+                logger.info("now starting... %s" % (mac_address))                
                 start_windows(mac_address)
+            else:
+                if args.no_servers:
+                    logger.info( " skipping device due to --no_servers")
         else:
             if "duino" in device_type.lower() or "eensy" in device_type.lower():
-                print "start arduino"                    
-                print "%s %s" % (switch_ip, switch_interface)
+#                print "start arduino"                    
+                logger.info(" start arduino: %s %s" % (switch_ip, switch_interface))
                 check_switch(switch_ip, switch_interface)
+                time.sleep(DELAY_BETWEEN_DEVICES)
                 if not args.disable:
-                    print "gonna do the thing"
+                    logger.info(" now starting... %s %s" % (switch_ip, switch_interface))
                     start_arduino(switch_ip, switch_interface)
             else:
-                print "WARNING: type %s not matched, exiting..." % device_type
+                logger.error( " ERROR: type %s not matched, exiting..." % device_type)
 
 ###############
 # STOP DEVICE
 ###############
 def stop_device(remote_ip, switch_ip, switch_interface, device_type):
     if "berry" in device_type.lower(): 
-        print "stop pi"
-        print "%s %s %s" % (remote_ip, switch_ip, switch_interface)
+#        print "stop pi"
+        logger.info( " stop pi: %s %s %s" % (remote_ip, switch_ip, switch_interface))
         check_remoteip_switch(remote_ip, switch_ip, switch_interface)
+        time.sleep(DELAY_BETWEEN_DEVICES)
         if not args.disable:
-            print "gonna do the thing"
+            logger.info( " now stopping... %s %s %s" % (remote_ip, switch_ip, switch_interface))
             stop_pi(remote_ip, switch_ip, switch_interface, 6)        
     else:
         if "indow" in device_type.lower():
-            print "stop windows"
-            print "%s" % (remote_ip)
+#            print "stop windows"
+            logger.info( " stop windows: %s" % (remote_ip))
             check_remoteip(remote_ip)
-            if not args.disable:
-                print "gonna do the thing"
+            time.sleep(DELAY_BETWEEN_DEVICES)
+
+            if not args.disable and not args.no_servers:
+                logger.info( "now stopping... %s" % (remote_ip))
                 stop_windows(remote_ip)
+            else:
+                if args.no_servers:
+                    logger.info(" skip device due to --no_servers")
         else:
             if "duino" in device_type.lower() or "eensy" in device_type.lower():            
-                print "stop arduino"
-                print "%s %s" % (switch_ip, switch_interface)
+#                print "stop arduino"
+                logger.info( " stop arduino: %s %s" % (switch_ip, switch_interface))
                 check_switch(switch_ip, switch_interface)
+                time.sleep(DELAY_BETWEEN_DEVICES)
+
                 if not args.disable:
-                    print "gonna do the thing"
+                    logger.info( " now stopping... %s %s" % (switch_ip, switch_interface))
                     stop_arduino(switch_ip, switch_interface)
             else:
-                print "WARNING: type %s not matched, exiting..." % device_type
+                logger.error( " ERROR: type %s not matched, exiting..." % device_type)
 
 ###############
 # REBOOT DEVICE
@@ -237,27 +276,39 @@ def stop_device(remote_ip, switch_ip, switch_interface, device_type):
 
 def reboot_device(remote_ip, switch_ip, switch_interface, device_type):
     if "berry" in device_type.lower(): 
-        print "reboot pi"
+#        print "reboot pi"
+        logger.info( " reboot pi: %s" % (remote_ip))
         check_remoteip(remote_ip)
+        time.sleep(DELAY_BETWEEN_DEVICES)
+
         if not args.disable:
-            print "gonna do the thing"
+            logger.info( " now rebooting... %s" % (remote_ip))
             reboot_pi(remote_ip)        
     else:
         if "indow" in device_type.lower():
-            print "reboot windows"        
+#            print "reboot windows"       
+            logger.info( " reboot windows: %s" % (remote_ip))
             check_remoteip(remote_ip)
-            if not args.disable:
-                print "gonna do the thing"
+            time.sleep(DELAY_BETWEEN_DEVICES)
+        
+            if not args.disable and not args.no_servers:
+                logger.info( " now rebooting... %s" % (remote_ip))
                 reboot_windows(remote_ip)
+            else:
+                if args.no_servers:
+                    logger.info( " skip device due to --no_servers")
         else:
             if "duino" in device_type.lower() or "eensy" in device_type.lower():            
-                print "reboot arduino"
+#                print "reboot arduino"
+                logger.info(" reboot arduino: %s %s" % (switch_ip, switch_interface))
                 check_switch(switch_ip, switch_interface)
+                time.sleep(DELAY_BETWEEN_DEVICES)
+
                 if not args.disable:
-                    print "gonna do the thing"
+                    logger.info(" now rebooting... %s %s" % (switch_ip, switch_interface))
                     reboot_arduino(switch_ip, switch_interface, 2)
             else:
-                print "WARNING: type %s not matched, exiting..." % device_type
+                logger.error( " ERROR: type %s not matched, exiting..." % device_type)
 
 ###############
 # START/STOP/REBOOT SHOW
@@ -268,6 +319,18 @@ def start_stop_reboot_show(command, limit_to_switch_ip):
     mac_address = ""
     switch_interface = ""
     device_type = ""
+
+    if limit_to_switch_ip is None:
+        limit_to_switch_ip = ""
+
+    cmd = " -----%s show" % command
+    if limit_to_switch_ip is not "":
+        cmd = cmd + ", limited to switch %s" % limit_to_switch_ip
+    if args.disable:
+        cmd = cmd + ", ***START/STOP DISABLED"
+
+    logger.info(cmd)       
+
     try:
         # Open database connection, create cursor
         if os.name == 'nt':
@@ -275,7 +338,7 @@ def start_stop_reboot_show(command, limit_to_switch_ip):
         else:
             con = lite.connect(LINUX_OSX_DB_FILENAME)     
     except Exception, e:
-        print "Can't connect to demosdb! %s" % e
+        logger.error( " ERROR: Can't connect to demosdb! %s" % e)
         return
     
     try:
@@ -283,17 +346,9 @@ def start_stop_reboot_show(command, limit_to_switch_ip):
             cur = con.cursor()
             where_cmd = ""
 
-            if limit_to_switch_ip is None:
-                limit_to_switch_ip = ""
-
-#            if limit_to_switch_ip is not None and limit_to_switch_ip != "":
-#                print "Limit to switch: %s" % limit_to_switch_ip
-#                where_cmd = where_cmd + "WHERE 'SWITCH_INTERFACE' IS LIKE '%s'" % limit_to_switch_ip
             if "noglobal" in command:
                 where_cmd = where_cmd + "AND DESCRIPTION NOT LIKE 'GLOBAL'"
 
-            #old style
-            #            sql = "SELECT ID_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE FROM DEVICES ORDER BY DEVICE_TYPE DESC, ID_NAME ASC"
             if "start" in command:
                 sql = "SELECT ID_NAME, DEVICE_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE, BOOT_ORDER FROM DEVICES ORDER BY BOOT_ORDER ASC, ID_NAME ASC"
             else:
@@ -303,12 +358,12 @@ def start_stop_reboot_show(command, limit_to_switch_ip):
                     if "reboot" in command:
                         sql = "SELECT ID_NAME, DEVICE_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE, BOOT_ORDER FROM DEVICES ORDER BY BOOT_ORDER DESC, ID_NAME ASC" 
                     else:
-                        print "command not recognized"
+                        logger.error( " ERROR: command %s not recognized", command)
                         return
-            print "sql is: %s" % sql
+#            print "sql is: %s" % sql
             cur.execute(sql)
             data = cur.fetchall()
-            print data
+#            print data
             for item in data:
                 (remote_ip, device_name, mac_address, switch_interface, device_type, boot_order) = item
                 if mac_address is None:
@@ -334,60 +389,45 @@ def start_stop_reboot_show(command, limit_to_switch_ip):
                 if "software" in device_type.lower():
                     continue
 
- #               if device_name != "":
- #                   print
- #                   print device_name
-
- #               if boot_order is not None:
- #                   print boot_order
-
- #               if mac_address != "":
- #                   print "mac " + mac_address
- #               if switch_ip != "":
- #                   print "switch ip " + switch_ip
- #               if switch_interface != "":
- #                   print "switch interface " + switch_interface
- #               if remote_ip != "":
- #                   print "remote_ip " + remote_ip
-
                 if command is "start":
-                    #start each item, then delay
+                    #start each item
                     if limit_to_switch_ip is not None and limit_to_switch_ip != "":
                         if limit_to_switch_ip in switch_group:
                             start_device(switch_ip, switch_interface, device_type, mac_address)
-                            print "start it"
+#                            print "start it"
                     else:
-                        print "start it"
+#                        print "start it"
                         start_device(switch_ip, switch_interface, device_type, mac_address)
                             
                 if command is "stop":
-                    #stop each item, then delay
+                    #stop each item
                     if limit_to_switch_ip is not None and limit_to_switch_ip != "":
                         if limit_to_switch_ip in switch_group:
-                            print "stop it"
+#                            print "stop it"
                             stop_device(remote_ip, switch_ip, switch_interface, device_type)
                     else:
-                            print "stop it"
+#                            print "stop it"
                             stop_device(remote_ip, switch_ip, switch_interface, device_type)
 
                 if command is "reboot":
-                    #stop each item, then delay
+                    #reboot each item
                     if limit_to_switch_ip is not None and limit_to_switch_ip != "":
                         if limit_to_switch_ip in switch_group:
-                            print "reboot it"
+#                            print "reboot it"
                             reboot_device(remote_ip, switch_ip, switch_interface, device_type)
                     else:
-                            print "reboot it"
+#                            print "reboot it"
                             reboot_device(remote_ip, switch_ip, switch_interface, device_type)
+                            
     except lite.Error, e:
-        print(" SQL error! %s" % e)   
+        logger.error(" ERROR: SQL error! %s" % e)   
 
 ###############
 # REBOOT NONRESPONSIVE DEVICES
 ###############            
         
-def reboot_unresponsive():
-    print "reboot unresponsive"        
+def reboot_unresponsive(limit_to_switch_ip):
+    logger.info( " -----reboot unresponsive" )       
     remote_ip = ""
     mac_address = ""
     switch_interface = ""
@@ -399,16 +439,18 @@ def reboot_unresponsive():
         else:
             con = lite.connect(LINUX_OSX_DB_FILENAME)     
     except Exception, e:
-        print "Can't connect to demosdb! %s" % e
+        logger.error( " ERROR: Can't connect to demosdb! %s" % e)
         
+    if limit_to_switch_ip is None:
+        limit_to_switch_ip = ""
+
     try:
         with con:
             cur = con.cursor()
             sql = "SELECT ID_NAME, DEVICE_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE, BOOT_ORDER FROM DEVICES ORDER BY BOOT_ORDER ASC, ID_NAME ASC"
-#            sql = "SELECT ID_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE FROM DEVICES WHERE STATUS='NONRESPONSIVE' ORDER BY DEVICE_TYPE DESC, ID_NAME ASC" 
             cur.execute(sql)
             data = cur.fetchall()
-            print data
+            logger.info( data)
             for item in data:
                 (remote_ip, device_name, mac_address, switch_interface, device_type, boot_order) = item
                 if mac_address is None:
@@ -429,38 +471,20 @@ def reboot_unresponsive():
                     device_type = ""
 
                 if "software" in device_type.lower():
+                    #don't do anything for software
                     continue
 
-                if device_name != "":
-                    print
-                    print device_name
-
-                if boot_order is not None:
-                    print boot_order
-
-                if mac_address != "":
-                    print "mac " + mac_address
-                if switch_ip != "":
-                    print "switch ip " + switch_ip
-                if switch_interface != "":
-                    print "switch interface " + switch_interface
-                if remote_ip != "":
-                    print "remote_ip " + remote_ip
-
-                if mac_address != "":
-                    print "mac " + mac_address
-                if switch_ip != "":
-                    print "switch ip " + switch_ip
-                if switch_interface != "":
-                    print "switch interface " + switch_interface
-                if remote_ip != "" and "oftware" not in device_type:
-                    print "remote_ip " + remote_ip
-
                 #stop each item, then delay
-                    print "reboot it"
-                    
+                    if limit_to_switch_ip is not None and limit_to_switch_ip != "":
+                        if limit_to_switch_ip in switch_group:
+#                            print "reboot it"
+                            reboot_device(remote_ip, switch_ip, switch_interface, device_type)
+                    else:
+#                            print "reboot it"
+                            reboot_device(remote_ip, switch_ip, switch_interface, device_type)
+                
     except lite.Error, e:
-        print(" SQL error! %s" % e) 
+        logger.error(" ERROR: SQL error! %s" % e) 
 
 ###################################
 # main() - main scan loop
@@ -468,12 +492,46 @@ def reboot_unresponsive():
 
 if __name__ == "__main__":
 
+    ##################                                                          
+    # LOGGING SETUP                                                             
+    ##################                                                          
+
+    # defines log levels for the log file. Default is 'info' and above.         
+    # Run program with "debug" on the command line for extra debugging output   
+    LEVELS = {
+        'debug':logging.DEBUG,
+        'info':logging.INFO,
+        'warning':logging.WARNING,
+        'error':logging.ERROR,
+        'critical':logging.CRITICAL, }
+
+    # default log level is info (prints info, warning, error, etc).             
+    # run with "tcp_watchdog_sqlite.py debug" to print/log debug messages       
+    level = LEVELS.get('info', logging.NOTSET)
+    logging.basicConfig(level=level)
+
+    # creates our logger with the settings above/below                          
+    logger = logging.getLogger('StartStopLog')
+
+    # Add the log message handler to the logger. Creates a rolling/circular log
+    # with LOG_NUM_BACKUPS backups, each of size LOG_SIZE bytes                 
+    handler = logging.handlers.RotatingFileHandler(LOG_FILENAME,
+                                                   maxBytes=LOG_SIZE,
+                                                   backupCount=LOG_NUM_BACKUPS)
+
+    # sets the message & timestamp format for the log                           
+    frmt = logging.Formatter('%(asctime)s - %(message)s',"%m/%d/%Y %H:%M:%S")
+    handler.setFormatter(frmt)
+    logger.addHandler(handler)
+
     remote_ip = ""
     mac_address = ""
     switch_interface = ""
     device_type = ""
 
     parser = argparse.ArgumentParser()
+
+    ##### stand-alone arguments (choose only one)
     group = parser.add_mutually_exclusive_group()
     group.add_argument('--start_device',
                         action='store_true',
@@ -515,33 +573,48 @@ if __name__ == "__main__":
                         action='store_true',
                         help='reboots all nonresponsive devices in the whole show (with great power... etc)')
 
+    ##### add-on arguments (can be applied to the above)
     parser.add_argument("--switch",
                        type=str,
-                       help='Limits start_show and stop_shot to this switch IP address (i.e. 10.42.16.166)' ) 
+                       help='Limits start_show and stop_show to this switch IP address (i.e. 10.42.16.166)' ) 
     
     parser.add_argument('--disable',
                         action='store_true',
                         help='Disables start/stop/reboot commands (test mode)')
 
+    parser.add_argument('--no_servers',
+                        action='store_true',
+                        help='Skip start/stop/reboot commands for servers (Windows/Mac); start/stop/reboot Pis and Arduinos only')
+
     parser.add_argument('--ip', 
                         type=str,
-                        help='IP address to use (i.e. 10.42.16.166)' )
+                        help='IP address to use with start/stop/reboot_device (i.e. 10.42.16.166)' )
     
     args = parser.parse_args()
-#    print  sys.argv[1:]
 
     ###############################################
     # sets args for single-device start/stop/reboot
     ###############################################            
+
+    cmd = " Show start/stop script OPENED"
+    if args.ip:
+        cmd = cmd + (" with IP %s" % args.ip)
+    if args.no_servers:
+        cmd = cmd + (", with --no_servers")      
+    if args.switch:
+        cmd = cmd + (", limited to switch %s" % args.switch)
+    logger.info(cmd)
+
+    if args.disable:
+        logger.warning(" WARNING: disable (test/dry run) option has been selected.")
     
     if args.ip:
 
         if args.start_device or args.stop_device or args.reboot_device:
             remote_ip = args.ip
-#            print remote_ip
             (mac_address, switch_interface, device_type) = get_item(remote_ip)
             if device_type is None:
-                print "Error: no device type found for %s, exiting..." % remote_ip
+                logger.error( " ERROR: no device type found for %s, exiting..." % remote_ip)
                 exit
             
             if mac_address is None:
@@ -557,15 +630,6 @@ if __name__ == "__main__":
 
             if remote_ip is None:
                 remote_ip = ""
-
-            if mac_address != "":
-                print "mac " + mac_address
-            if switch_ip != "":
-                print "switch ip " + switch_ip
-            if switch_interface != "":
-                print "switch interface " + switch_interface
-            if remote_ip != "":
-                print "remote_ip " + remote_ip
 
     ###############
     # START DEVICE
@@ -594,8 +658,7 @@ if __name__ == "__main__":
 
     if args.start_show:
         if args.switch:
-            switch_interface = args.switch
-            
+            switch_interface = args.switch            
         start_stop_reboot_show("start", switch_interface)
 
     if args.start_show_noglobal:
@@ -610,13 +673,11 @@ if __name__ == "__main__":
     if args.stop_show:
         if args.switch:
             switch_interface = args.switch
-
         start_stop_reboot_show("stop", switch_interface)
 
     if args.stop_show_noglobal:
         if args.switch:
             switch_interface = args.switch
-
         start_stop_reboot_show("stop_noglobal", switch_interface)
         
     ###############
@@ -626,7 +687,6 @@ if __name__ == "__main__":
     if args.reboot_show:
         if args.switch:
             switch_interface = args.switch
-
         start_stop_reboot_show("reboot", switch_interface)
 
     ###############
@@ -635,3 +695,5 @@ if __name__ == "__main__":
         
     if args.reboot_nonresponsive or args.reboot_unresponsive:
         reboot_unresponsive()
+
+    exit_func()
