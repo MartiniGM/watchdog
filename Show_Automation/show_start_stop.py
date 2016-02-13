@@ -31,7 +31,7 @@ LINUX_OSX_DB_FILENAME = '/Users/Aesir/Documents/watchdog/tcp_watchdog_server/dem
 #LINUX_OSX_DB_FILENAME = "../demosdb.db"
 
 # give a filename for the watchdog's log file here                              
-LOG_FILENAME = 'show_start_stop.out'
+LOG_FILENAME = '/Users/Aesir/Documents/watchdog/Show_Automation/show_start_stop.out'
 # give the size for each rolling log segment, in bytes                          
 LOG_SIZE = 2000000 #2 MB, in bytes                                              
 # give the number of rolling log segments to record before the log rolls over   
@@ -447,10 +447,10 @@ def reboot_unresponsive(limit_to_switch_ip):
     try:
         with con:
             cur = con.cursor()
-            sql = "SELECT ID_NAME, DEVICE_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE, BOOT_ORDER FROM DEVICES ORDER BY BOOT_ORDER ASC, ID_NAME ASC"
+            sql = "SELECT ID_NAME, DEVICE_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE, BOOT_ORDER FROM DEVICES WHERE STATUS='NONRESPONSIVE' ORDER BY BOOT_ORDER ASC, ID_NAME ASC"
             cur.execute(sql)
             data = cur.fetchall()
-            logger.info( data)
+#            logger.info( data)
             for item in data:
                 (remote_ip, device_name, mac_address, switch_interface, device_type, boot_order) = item
                 if mac_address is None:
@@ -475,13 +475,13 @@ def reboot_unresponsive(limit_to_switch_ip):
                     continue
 
                 #stop each item, then delay
-                    if limit_to_switch_ip is not None and limit_to_switch_ip != "":
-                        if limit_to_switch_ip in switch_group:
+                if limit_to_switch_ip is not None and limit_to_switch_ip != "":
+                    if limit_to_switch_ip in switch_group:
 #                            print "reboot it"
-                            reboot_device(remote_ip, switch_ip, switch_interface, device_type)
-                    else:
+                        reboot_device(remote_ip, switch_ip, switch_interface, device_type)
+                else:
 #                            print "reboot it"
-                            reboot_device(remote_ip, switch_ip, switch_interface, device_type)
+                    reboot_device(remote_ip, switch_ip, switch_interface, device_type)
                 
     except lite.Error, e:
         logger.error(" ERROR: SQL error! %s" % e) 
@@ -523,6 +523,11 @@ if __name__ == "__main__":
     frmt = logging.Formatter('%(asctime)s - %(message)s',"%m/%d/%Y %H:%M:%S")
     handler.setFormatter(frmt)
     logger.addHandler(handler)
+    ch = logging.StreamHandler(sys.stdout)
+    ch.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(message)s')
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
 
     remote_ip = ""
     mac_address = ""
@@ -682,6 +687,8 @@ if __name__ == "__main__":
     ###############
         
     if args.reboot_nonresponsive or args.reboot_unresponsive:
-        reboot_unresponsive()
+        if args.switch:
+            switch_interface = args.switch
+        reboot_unresponsive(switch_interface)
 
     exit_func()
