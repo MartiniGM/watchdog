@@ -23,6 +23,7 @@ from oauth2client.client import SignedJwtAssertionCredentials
 POE_COMMAND = "/Users/Aesir/Documents/watchdog/set_power.exp"
 WOL_COMMAND = "/Users/Aesir/Documents/watchdog/wolcmd"
 DELAY_BETWEEN_DEVICES = 0.5 #delays a half second between displaying device & stop/starting
+INIT_DELAY = 30 #delays 30 seconds before starting script so people can cancel
 
 # give a filename for the watchdog's SQLite database here, on Windows
 WINDOWS_DB_FILENAME = 'c:\\watchdog\\tcp_watchdog_server\\demosdb.db'
@@ -587,6 +588,10 @@ if __name__ == "__main__":
                         action='store_true',
                         help='Skip global audio devices')
 
+    parser.add_argument('--no_delay',
+                        action='store_true',
+                        help='Skip initial delay')
+
     parser.add_argument('--ip', 
                         type=str,
                         help='IP address to use with start/stop/reboot_device (i.e. 10.42.16.166)' )
@@ -611,6 +616,19 @@ if __name__ == "__main__":
     if args.disable:
         logger.warning(" WARNING: disable (test/dry run) option has been selected.")
     
+    if not (args.no_delay):
+        cur_delay = 0.0
+        delay_string = ""
+        logger.info("Delaying %d seconds..." % (INIT_DELAY))
+        while (cur_delay <= INIT_DELAY - 1.0):
+            if (int(INIT_DELAY - cur_delay) == 5):
+                delay_string = str(int(INIT_DELAY - cur_delay)) + " seconds left, last chance!"
+            else:
+                delay_string = str(int(INIT_DELAY - cur_delay)) + "..."
+            logger.info(delay_string)
+            time.sleep(5.0)
+            cur_delay = cur_delay + 5.0
+
     if args.ip:
 
         if args.start_device or args.stop_device or args.reboot_device:
