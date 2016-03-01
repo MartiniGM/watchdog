@@ -1,4 +1,5 @@
 #!/usr/bin/python 
+import OSC
 import socket
 import sqlite3 as lite
 import datetime
@@ -37,6 +38,10 @@ LOG_FILENAME = '/Users/Aesir/Documents/watchdog/Show_Automation/show_start_stop.
 LOG_SIZE = 2000000 #2 MB, in bytes                                              
 # give the number of rolling log segments to record before the log rolls over   
 LOG_NUM_BACKUPS = 5 # five .out files before they roll over                     
+
+OSC_PORT = 9998 #port to send pause/unpause messages to do-audio on the Pis
+PAUSE_COMMAND = "/pause" #pause command sent to do-audio on the Pis
+UNPAUSE_COMMAND = "/unpause" #unpause command sent to do-audio on the Pis
 
 ####################                                                            
 # EXIT HANDLER                                                                  
@@ -487,6 +492,88 @@ def reboot_unresponsive(limit_to_switch_ip):
     except lite.Error, e:
         logger.error(" ERROR: SQL error! %s" % e) 
 
+###############
+# CONCERT MODE
+###############            
+
+def pause(remote_ip, cmd):
+    if not args.disable:
+        logger.info( " -----sending %s to %s" % (cmd, remote_ip))
+        c = OSC.OSCClient()
+        c.connect((remote_ip, OSC_PORT)) 
+        oscmsg = OSC.OSCMessage()
+        oscmsg.setAddress(cmd)
+        c.send(oscmsg)
+
+#sends "concert mode on" commands to one Pi
+def concert_on(remote_ip):
+    print "concert on %s" % remote_ip
+    pause(remote_ip, PAUSE_COMMAND)
+    #more goes here, send to watchdog to kill process
+
+#sends "concert mode off" commands to one Pi
+def concert_off(remote_ip):
+    print "concert off %s" % remote_ip
+    pause(remote_ip, UNPAUSE_COMMAND)
+    #more goes here, send to watchdog to kill process
+
+def concert_mode(on_or_off):
+    logger.info( " -----concert mode %s" % on_or_off)
+    remote_ip = ""
+    mac_address = ""
+    switch_interface = ""
+    device_type = ""
+    try:
+        # Open database connection, create cursor
+        if os.name == 'nt':
+            con = lite.connect(WINDOWS_DB_FILENAME)
+        else:
+            con = lite.connect(LINUX_OSX_DB_FILENAME)     
+    except Exception, e:
+        logger.error( " ERROR: Can't connect to demosdb! %s" % e)
+        
+    try:
+        with con:
+            cur = con.cursor()
+            sql = "SELECT ID_NAME, DEVICE_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE, BOOT_ORDER, ZONE FROM DEVICES WHERE ZONE LIKE '%SHANTY%'"
+            cur.execute(sql)
+            data = cur.fetchall()
+#            logger.info( data)
+            for item in data:
+                (remote_ip, device_name, mac_address, switch_interface, device_type, boot_order, zone) = item
+                if mac_address is None:
+                    mac_address = ""
+
+                if switch_interface is None:
+                    switch_interface = ""
+                    switch_ip = ""
+                else:
+                    switch_group = switch_interface.split()
+                    switch_ip = switch_group[0]
+                    switch_interface = switch_group[1]
+
+                if remote_ip is None:
+                    remote_ip = ""
+
+                if device_type is None:
+                    device_type = ""
+
+                if "berry" not in device_type.lower(): 
+                    #don't do anything for non-pis
+                    continue
+
+                #stop each item, then delay
+                print "%s send concert %s" % (device_name, on_or_off)
+                if (on_or_off is "on"):
+                    concert_on(remote_ip)
+                else:
+                    concert_off(remote_ip)
+
+            #light desk control stuff goes here
+
+    except lite.Error, e:
+        logger.error(" ERROR: SQL error! %s" % e) 
+
 ###################################
 # main() - main scan loop
 ###################################
@@ -551,6 +638,14 @@ if __name__ == "__main__":
                         action='store_true',
                         help='reboots a single device (given ip address in --ip)' )
 
+    group.add_argument('--pause_audio_device',
+                        action='store_true',
+                        help='pauses audio on a single device (given ip address in --ip)' )
+
+    group.add_argument('--unpause_audio_device',
+                        action='store_true',
+                        help='unpauses (plays) audio on a single device (given ip address in --ip)' )
+
     group.add_argument('--reboot_show',
                         action='store_true',
                         help='reboots the whole show (with great power... etc)')
@@ -570,6 +665,15 @@ if __name__ == "__main__":
     group.add_argument('--reboot_unresponsive',
                         action='store_true',
                         help='reboots all nonresponsive devices in the whole show (with great power... etc)')
+
+    group.add_argument('--concert_mode_on',
+                        action='store_true',
+                        help='enters concert mode (stops shantytown audio & sends light control to console')
+
+    group.add_argument('--concert_mode_off',
+                        action='store_true',
+                        help='leaves concert mode (starts shantytown audio & sends light control to devices')
+
 
     ##### add-on arguments (can be applied to the above)
     parser.add_argument("--switch",
@@ -603,6 +707,23 @@ if __name__ == "__main__":
     ###############################################            
 
     cmd = " Show start/stop script OPENED"
+
+    if args.start_show:
+        cmd = cmd + (", starting show")
+    if args.stop_show:
+        cmd = cmd + (", stopping show")
+    if args.stop_device:
+        cmd = cmd + (", stopping single device")
+    if args.start_device:
+        cmd = cmd + (", starting single device")
+    if args.pause_audio_device:
+        cmd = cmd + (", pausing audio for a single device")
+    if args.unpause_audio_device:
+        cmd = cmd + (", unpausing (playing) audio for a single device")
+    if args.concert_mode_on:
+        cmd = cmd + (", enter concert mode")
+    if args.concert_mode_off:
+        cmd = cmd + (", leave concert mode")
     if args.ip:
         cmd = cmd + (" with IP %s" % args.ip)
     if args.no_servers:
@@ -616,22 +737,23 @@ if __name__ == "__main__":
     if args.disable:
         logger.warning(" WARNING: disable (test/dry run) option has been selected.")
     
-    if not (args.no_delay):
-        cur_delay = 0.0
-        delay_string = ""
-        logger.info("Delaying %d seconds..." % (INIT_DELAY))
-        while (cur_delay <= INIT_DELAY - 1.0):
-            if (int(INIT_DELAY - cur_delay) == 5):
-                delay_string = str(int(INIT_DELAY - cur_delay)) + " seconds left, last chance!"
-            else:
-                delay_string = str(int(INIT_DELAY - cur_delay)) + "..."
-            logger.info(delay_string)
-            time.sleep(5.0)
-            cur_delay = cur_delay + 5.0
-
+    if not (args.start_device or args.stop_device or args.reboot_device or args.pause_audio_device or args.unpause_audio_device):
+            if not (args.no_delay):
+                cur_delay = 0.0
+                delay_string = ""
+                logger.info("Delaying %d seconds..." % (INIT_DELAY))
+                while (cur_delay <= INIT_DELAY - 1.0):
+                    if (int(INIT_DELAY - cur_delay) == 5):
+                        delay_string = str(int(INIT_DELAY - cur_delay)) + " seconds left, last chance!"
+                    else:
+                        delay_string = str(int(INIT_DELAY - cur_delay)) + "..."
+                    logger.info(delay_string)
+                    time.sleep(5.0)
+                    cur_delay = cur_delay + 5.0
+        
     if args.ip:
 
-        if args.start_device or args.stop_device or args.reboot_device:
+        if args.start_device or args.stop_device or args.reboot_device or args.pause_audio_device or args.unpause_audio_device:
             remote_ip = args.ip
             (mac_address, switch_interface, device_type) = get_item(remote_ip)
             if device_type is None:
@@ -674,6 +796,20 @@ if __name__ == "__main__":
         reboot_device(remote_ip, switch_ip, switch_interface, device_type)
 
     ###############
+    # PAUSE AUDIO ON DEVICE
+    ###############
+                    
+    if args.pause_audio_device:
+        pause(remote_ip, PAUSE_COMMAND)
+
+    ###############
+    # UNPAUSE AUDIO ON DEVICE
+    ###############
+                    
+    if args.unpause_audio_device:
+        pause(remote_ip, UNPAUSE_COMMAND)
+
+    ###############
     # START SHOW
     ###############
 
@@ -708,5 +844,19 @@ if __name__ == "__main__":
         if args.switch:
             switch_interface = args.switch
         reboot_unresponsive(switch_interface)
+
+    #################
+    # CONCERT MODE ON
+    #################
+
+    if args.concert_mode_on:
+        concert_mode("on")
+
+    #################
+    # CONCERT MODE OFF
+    #################
+
+    if args.concert_mode_off:
+        concert_mode("off")
 
     exit_func()
