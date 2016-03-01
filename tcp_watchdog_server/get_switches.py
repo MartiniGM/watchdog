@@ -148,7 +148,7 @@ def open_googlesheet():
                     item2 = (mac_address, device_name)
                     device_name_list.append(item2)
 
-        print "made a list"
+        print "made a list from master doc"
         print device_name_list
 
         device_type_item_id = find_item(list_of_lists, "Device Type")
@@ -171,7 +171,9 @@ def return_name(c):
     global device_name_list
     for item in device_name_list:
         try:
+            print ("compare %s to %s" % (item[0].lower(), c))
             if item[0].lower() == c:
+                print "matched!!!"
                 matches.append(item[1])
         except Exception, e:
             print "oops %s" % e
@@ -273,7 +275,7 @@ def do_a_switch(ip_address):
                 continue
             if (len(listy) >= first_row + 4):
                 mac_addr = listy[first_row+1].replace('.', '').lower()
- #               print "searching for %s" % mac_addr
+                print "searching for %s" % mac_addr
                 matches = return_name(mac_addr)
                 if matches == []:
 #                    print "blank match"
@@ -282,8 +284,14 @@ def do_a_switch(ip_address):
                     if len(matches) != 1:
                         if (matches[0] != matches[1]):
                             print "Error: multiple identical MAC addresses %s" % matches
+                        else:
+                            print "%s matched %s" % (mac_addr, matches)
+                            match = matches[0]
+                            inter = listy[first_row+3].replace("Fa", "FastEthernet")
+                            this_interface = (ip_address, match, mac_addr, inter)
+                            interface_list.append(this_interface)
                     else:
-#                        print "%s matched %s" % (mac_addr, matches)
+                        print "%s matched %s" % (mac_addr, matches)
                         match = matches[0]
                         inter = listy[first_row+3].replace("Fa", "FastEthernet")
                         this_interface = (ip_address, match, mac_addr, inter)
@@ -346,6 +354,9 @@ else:
             fname,lineno,fn,text = frame
             print( "     in %s on line %d" % (fname, lineno))
 
+    print "----------DONE QUERYING PIS. Current device list is:"
+    print device_name_list
+    
 # back up the old copy of the switch map so we can sanity check before pasting it
 try:
     shutil.copy ("switch_map.txt", "switch_map.old")
@@ -357,8 +368,11 @@ except Exception, e:
 try:
     print "----------NOW QUERYING SWITCHES:"
     for switch in switches:
-        do_a_switch(switch)
-
+        returnval = do_a_switch(switch)
+        if returnval == []:
+            #retry, sometimes they don't call back
+            do_a_switch(switch)
+    
         # go through the switch list, run the expect script for each to get mac addresses for connected devices
     print interface_list
     print ""
