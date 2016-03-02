@@ -114,6 +114,7 @@ if (USE_SOCKETS):
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         server_socket.setblocking(0)
         server_socket.bind(("0.0.0.0", PORT))
+
     except socket.error as e:
         print( 'Failed to create incoming socket: %s' % e )
             
@@ -241,6 +242,30 @@ def autodetect_softwarelist():
 
         except Exception, e:
             logger.error( "autodetect_softwarelist error: %s" % e, exc_info=True)
+
+############################################################
+# kill_proc and start_proc
+############################################################
+# starts or kills the specified program remotely.
+# kill_proc takes a string to be passed to
+# pkill -f, so it'll do pattern matching (warning: use with caution,
+# pkill will kill ALL processes containing this string!)
+# start_proc takes an exact program to be started, including full path
+
+def kill_proc(process_name):
+    try:
+        os.system('pkill -f ' + process_name)
+    except Exception, e:
+        print "error in kill-proc: can't kill %s: %s" % (process_name, e)
+
+def start_proc(process_name):
+    try:
+        # preexec_fn=os.setsid, close_fds=True is the key to not killing the
+        # process when the watchdog dies or is ctrl-c'd, and not letting
+        # child processes hold onto the watchdog's own ports
+        tmp_process = subprocess.Popen(process_name, preexec_fn=os.setsid, close_fds=True)
+    except Exception, e:
+        print "error in start-proc: can't start %s: %s" % (process_name, e)
             
 ############################################################
 # rebootscript()
@@ -291,14 +316,19 @@ def rebootscript():
         logger.error( "Couldn't reset system: %s" % e, exc_info=True )
 
 ############################################################
-# parse_reboot_command()
+# parse_command()
 ############################################################
 # takes a string, parses it for commands like:
-# "reboot now"
+# "reboot now" / "halt now"
 # or
-# "reboot in N [second|seconds|minute|minutes]"
-# calls rebootscript() to reboot the machine if the command is valid
-def parse_reboot_command(data):
+# "reboot/halt in N [second|seconds|minute|minutes]"
+# or
+# "kill_proc <process name string, to be passed to pkill -f>"
+# or
+# "start_proc <process name, including full path, to be started>"
+#
+# calls rebootscript() to reboot/halt the machine if a reboot command is valid
+def parse_command(data):
     global reboot_in
     global reboot_timer
     global reboot_cmd
@@ -309,6 +339,41 @@ def parse_reboot_command(data):
             reboot_cmd = datas[0]
             rebootscript()
         else:
+            #processes the start_proc and kill_proc commands
+            if ("start_proc" in data):
+                datas = data.split()
+                process_name = ""
+                if len(datas) < 1:
+                    print "Bad msg format, should be 'start_proc /path/to/looping-audio/sh'"
+                    print "too short!"
+                    return
+                #adding this silences output & disconnects children from parent
+                data2 = ['nohup']
+                for item in datas[1:]:
+                    #rip out extra stuff from Max, if present
+                    item = item.replace('\x00', '')
+                    item = item.replace(',', '')
+                    data2.append(item)
+                process_name = data2
+                logger.info( "starting: " + str(process_name))
+                start_proc(process_name)
+                return
+            
+            if ("kill_proc" in data):
+                datas = data.split()
+                process_name = ""
+                if len(datas) < 1:
+                    print "Bad msg format, should be 'kill_proc looping-audio'"
+                    print "too short!"
+                    return
+                for item in datas[1:]:
+                    process_name = process_name + item
+                #rip out extra stuff from Max
+                process_name = process_name.replace('\x00', '')
+                process_name = process_name.replace(',', '')
+                logger.info( "killing " + process_name)
+                kill_proc(process_name)
+                return
             if ("reboot" in data or "halt" in data):
                 #reboot in X seconds
                 datas = data.split()
@@ -354,7 +419,7 @@ def parse_reboot_command(data):
                 print "Unknown command"
                 logger.info("Unknown command")
     except Exception, e:
-        logger.error( "error in parse_reboot_command", exc_info=True)
+        logger.error( "error in parse_command", exc_info=True)
         
 ############################################################
 # get_ip_address()
@@ -577,7 +642,7 @@ def pi_scan():
             #######################
             # DATA RECEIVED
             #######################
-                parse_reboot_command(data)
+                parse_command(data)
     except socket.timeout:
         return
     except Exception, e:
