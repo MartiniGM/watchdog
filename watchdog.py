@@ -348,7 +348,7 @@ def parse_command(data):
                     print "too short!"
                     return
                 #adding this silences output & disconnects children from parent
-                data2 = ['nohup']
+                data2 = []
                 for item in datas[1:]:
                     #rip out extra stuff from Max, if present
                     item = item.replace('\x00', '')
