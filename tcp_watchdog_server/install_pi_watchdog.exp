@@ -20,6 +20,8 @@ send -- "chmod 755 /home/pi/watchdog/add_watchdog_to_crontab.sh\r"
 interact -o -nobuffer -re $prompt return
 send -- "/home/pi/watchdog/add_watchdog_to_crontab.sh\r"
 interact -o -nobuffer -re $prompt return
+send -- "pkill -f watchdog.py\r"
+interact -o -nobuffer -re $prompt return
 send -- "if pidof -x watchdog.py >/dev/null; then echo 'Running'; else /home/pi/RUNNING/scripts/watchdog.py > /dev/null & fi\r"
 interact -o -nobuffer -re $prompt return
 send -- "exit\r"
