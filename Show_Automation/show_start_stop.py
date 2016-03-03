@@ -40,6 +40,7 @@ LOG_SIZE = 2000000 #2 MB, in bytes
 LOG_NUM_BACKUPS = 5 # five .out files before they roll over                     
 
 OSC_PORT = 9998 #port to send pause/unpause messages to do-audio on the Pis
+WATCHDOG_PORT = 6666 #port to send commands to the watchdog on the Pis
 PAUSE_COMMAND = "/pause" #pause command sent to do-audio on the Pis
 UNPAUSE_COMMAND = "/unpause" #unpause command sent to do-audio on the Pis
 
@@ -496,25 +497,50 @@ def reboot_unresponsive(limit_to_switch_ip):
 # CONCERT MODE
 ###############            
 
-def pause(remote_ip, cmd):
+def send_to_osc(remote_ip, port, cmd):
     if not args.disable:
         logger.info( " -----sending %s to %s" % (cmd, remote_ip))
         c = OSC.OSCClient()
-        c.connect((remote_ip, OSC_PORT)) 
+        c.connect((remote_ip, port)) 
         oscmsg = OSC.OSCMessage()
         oscmsg.setAddress(cmd)
         c.send(oscmsg)
+
+def kill_proc_device(remote_ip, procname):
+    if not args.disable:
+        cmd = "kill_proc " + procname
+        logger.info( " -----sending %s to %s" % (cmd, remote_ip))
+        send_to_osc(remote_ip, WATCHDOG_PORT, cmd)
+
+def start_proc_device(remote_ip, procname):
+    if not args.disable:
+        cmd = "start_proc " + procname
+        logger.info( " -----sending %s to %s" % (cmd, remote_ip))
+        send_to_osc(remote_ip, WATCHDOG_PORT, cmd)
+
+def kill_looping_audio(remote_ip):
+    send_to_osc(remote_ip, WATCHDOG_PORT, "kill_proc looping-audio")
+
+def start_looping_audio(remote_ip):
+    send_to_osc(remote_ip, WATCHDOG_PORT, "start_proc /home/pi/RUNNING/scripts/looping-audio.sh")
+    send_to_osc(remote_ip, WATCHDOG_PORT, "start_proc /home/pi/RUNNING/scripts/looping-audio1.sh")
+    send_to_osc(remote_ip, WATCHDOG_PORT, "start_proc /home/pi/RUNNING/scripts/looping-audio2.sh")
+
+def pause(remote_ip, cmd):
+    send_to_osc(remote_ip, OSC_PORT, cmd)
 
 #sends "concert mode on" commands to one Pi
 def concert_on(remote_ip):
     print "concert on %s" % remote_ip
     pause(remote_ip, PAUSE_COMMAND)
-    #more goes here, send to watchdog to kill process
+    kill_looping_audio(remote_ip)
+    #more goes here, set up the lights
 
 #sends "concert mode off" commands to one Pi
 def concert_off(remote_ip):
     print "concert off %s" % remote_ip
     pause(remote_ip, UNPAUSE_COMMAND)
+    start_looping_audio(remote_ip)
     #more goes here, send to watchdog to kill process
 
 def concert_mode(on_or_off):
@@ -638,6 +664,14 @@ if __name__ == "__main__":
                         action='store_true',
                         help='reboots a single device (given ip address in --ip)' )
 
+    group.add_argument('--start_proc_device',
+                        action='store_true',
+                        help='tells the watchdog to spawn a process on device (given ip address in --ip). Expects a program name to start, including full path')
+
+    group.add_argument('--kill_proc_device',
+                        action='store_true',
+                       help='tells the watchdog to kill a process on device (given ip address in --ip). This uses pkill -f to kill all similar process names, use carefully!')
+
     group.add_argument('--pause_audio_device',
                         action='store_true',
                         help='pauses audio on a single device (given ip address in --ip)' )
@@ -674,6 +708,14 @@ if __name__ == "__main__":
                         action='store_true',
                         help='leaves concert mode (starts shantytown audio & sends light control to devices')
 
+    group.add_argument('--concert_mode_on_device',
+                        action='store_true',
+                        help='enters concert mode (stops shantytown audio & sends light control to console')
+
+    group.add_argument('--concert_mode_off_device',
+                        action='store_true',
+                        help='leaves concert mode (starts shantytown audio & sends light control to devices')
+
 
     ##### add-on arguments (can be applied to the above)
     parser.add_argument("--switch",
@@ -699,6 +741,10 @@ if __name__ == "__main__":
     parser.add_argument('--ip', 
                         type=str,
                         help='IP address to use with start/stop/reboot_device (i.e. 10.42.16.166)' )
+
+    parser.add_argument('--proc', 
+                        type=str,
+                        help='Process to use with proc_ commands')
     
     args = parser.parse_args()
 
@@ -726,6 +772,8 @@ if __name__ == "__main__":
         cmd = cmd + (", leave concert mode")
     if args.ip:
         cmd = cmd + (" with IP %s" % args.ip)
+    if args.proc:
+        cmd = cmd + (" with process %s" % args.proc)
     if args.no_servers:
         cmd = cmd + (", with --no_servers")      
     if args.no_global:
@@ -737,7 +785,11 @@ if __name__ == "__main__":
     if args.disable:
         logger.warning(" WARNING: disable (test/dry run) option has been selected.")
     
-    if not (args.start_device or args.stop_device or args.reboot_device or args.pause_audio_device or args.unpause_audio_device):
+    single_item = False
+    if not (args.start_device or args.stop_device or args.reboot_device or args.pause_audio_device or args.unpause_audio_device or args.kill_proc_device or args.start_proc_device):
+        single_item = True
+        
+        if not (single_item):
             if not (args.no_delay):
                 cur_delay = 0.0
                 delay_string = ""
@@ -753,7 +805,7 @@ if __name__ == "__main__":
         
     if args.ip:
 
-        if args.start_device or args.stop_device or args.reboot_device or args.pause_audio_device or args.unpause_audio_device:
+        if args.start_device or args.stop_device or args.reboot_device or args.pause_audio_device or args.unpause_audio_device or args.kill_proc_device or args.start_proc_device:
             remote_ip = args.ip
             (mac_address, switch_interface, device_type) = get_item(remote_ip)
             if device_type is None:
@@ -773,6 +825,10 @@ if __name__ == "__main__":
 
             if remote_ip is None:
                 remote_ip = ""
+
+        if args.start_proc_device or args.kill_proc_device:
+            if args.proc is None or args.proc == "":
+                logger.error( " ERROR: --start_proc_device or --kill_proc_device selected but no process name was given with --proc, exiting...")        
 
     ###############
     # START DEVICE
@@ -808,6 +864,20 @@ if __name__ == "__main__":
                     
     if args.unpause_audio_device:
         pause(remote_ip, UNPAUSE_COMMAND)
+
+    ###############
+    # START PROCESS ON DEVICE
+    ###############
+                    
+    if args.start_proc_device:
+        start_proc_device(remote_ip, args.proc)
+
+    ###############
+    # KILL PROCESS ON DEVICE
+    ###############
+                    
+    if args.kill_proc_device:
+        kill_proc_device(remote_ip, args.proc)
 
     ###############
     # START SHOW
@@ -858,5 +928,19 @@ if __name__ == "__main__":
 
     if args.concert_mode_off:
         concert_mode("off")
+
+    #################
+    # CONCERT MODE ON
+    #################
+
+    if args.concert_mode_on_device:
+        concert_on(args.ip)
+
+    #################
+    # CONCERT MODE OFF
+    #################
+
+    if args.concert_mode_off_device:
+        concert_off(args.ip)
 
     exit_func()
