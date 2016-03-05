@@ -516,7 +516,7 @@ def start_stop_reboot_show(command, limit_to_switch_ip):
             where_cmd = ""
 
             if args.no_global:
-                where_cmd = where_cmd + "AND DESCRIPTION NOT LIKE 'GLOBAL'"
+                where_cmd = where_cmd + "AND DESCRIPTION NOT LIKE '%GLOBAL%'"
 
             if "start" in command:
                 sql = "SELECT ID_NAME, DEVICE_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE, BOOT_ORDER FROM DEVICES ORDER BY BOOT_ORDER ASC, ID_NAME ASC"
@@ -689,18 +689,21 @@ def on_by_zone(on_or_off, zone):
         with con:
             #select everything for this zone, in the proper boot/shutdown order
             cur = con.cursor()
-            sql = "SELECT ID_NAME, DEVICE_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE, BOOT_ORDER, SPACE, ZONE FROM DEVICES WHERE ZONE LIKE '" + ('%' + zone + "%'")   
+            sql = "SELECT ID_NAME, DEVICE_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE, BOOT_ORDER, SPACE, ZONE, DESCRIPTION FROM DEVICES WHERE ZONE LIKE '" + ('%' + zone + "%'")   
+            if args.no_global:
+                sql = sql + " AND DESCRIPTION NOT LIKE '%GLOBAL%'"
             if (on_or_off == "on"):
                 sql = sql + " ORDER BY BOOT_ORDER ASC, ID_NAME ASC"
             else:
                 sql = sql + " ORDER BY BOOT_ORDER DESC, ID_NAME ASC"
             cur.execute(sql)
+            print "sql " + str(sql)
             data = cur.fetchall()
 #            logger.info( data)
 
             #and step through devices, turning them on/off
             for item in data:
-                (remote_ip, device_name, mac_address, switch_interface, device_type, boot_order, space, zone) = item
+                (remote_ip, device_name, mac_address, switch_interface, device_type, boot_order, space, zone, description) = item
                 if mac_address is None:
                     mac_address = ""
 
@@ -1016,7 +1019,7 @@ if __name__ == "__main__":
 
     parser.add_argument('--no_global',
                         action='store_true',
-                        help='Skip global audio devices')
+                        help='Skip global audio devices (devices with "global" in the description)')
 
     parser.add_argument('--no_delay',
                         action='store_true',
