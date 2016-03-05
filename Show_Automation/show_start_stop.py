@@ -24,6 +24,8 @@ from oauth2client.client import SignedJwtAssertionCredentials
 POE_COMMAND = "/Users/Aesir/Documents/watchdog/set_power.exp"
 WOL_COMMAND = "/Users/Aesir/Documents/watchdog/wolcmd"
 DELAY_BETWEEN_DEVICES = 0.5 #delays a half second between displaying device & stop/starting
+DELAY_BETWEEN_RELAYS = 2.0 #delays 2 seconds between commands to the relays
+DELAY_FOR_PROJECTORS = 360.0 #delays 6 minutes for projector cooldown and/or startup
 INIT_DELAY = 30 #delays 30 seconds before starting script so people can cancel
 
 # give a filename for the watchdog's SQLite database here, on Windows
@@ -44,6 +46,160 @@ RELAY_PORT = 9999 #port to send on/off messages to power relays
 WATCHDOG_PORT = 6666 #port to send commands to the watchdog on the Pis
 PAUSE_COMMAND = "/pause" #pause command sent to do-audio on the Pis
 UNPAUSE_COMMAND = "/unpause" #unpause command sent to do-audio on the Pis
+
+#list of valid zones. if the zone is not in this list, don't continue
+zones_ok_list = ["arcade", "art city", "beamcade", "caves", "forest", "house", "portals", "shanty", "theater"]
+#list of relay prefixes and their IP addresses, for lookup
+relay_ip_list = [["2LB", "10.42.0.111"], ["2LC","10.42.0.112"], ["2LD","10.42.0.113"]]
+
+#list of Max relay mapping files. We read these to get the pin for each relay name
+relay_files = ["/Users/Aesir/Documents/Max 7/Library/Show Automation/Panel-2LBmapping.txt",
+               "/Users/Aesir/Documents/Max 7/Library/Show Automation/Panel-2LCmapping.txt", 
+               "/Users/Aesir/Documents/Max 7/Library/Show Automation/Panel-2LDmapping.txt"] 
+
+#empty list for later
+relay_list = []
+
+# json file to hold Google credentials.                                         
+# ----> DO NOT EVER UPLOAD the .json file to public access (github)! <----      
+json_file = '/Users/Aesir/Documents/watchdog/tcp_watchdog_server/mwsheets-91347531e5f4.json.secret'
+# ----> srsly DO NOT DO NOT DO NOT UPLOAD THE .JSON FILE <----                  
+
+# URL for the google sheet. this can be public                                  
+googleSheetKey = "1kHAcbAo8saNSTBc7ffidzrwu_FGK3FaBpmh7rO7hT-U"
+googleWorksheetNameRelays = "Circuits and Relays" #name of the tab on the google sheet
+# dictionary to load Google spreadsheet into (for Circuits and Relays tab)
+googleSheetDictRelays = {}
+list_of_lists_relays = []
+circuit_name_item_id = 0
+circuit_on_relay_item_id = 0
+circuit_zone_item_id = 0
+circuit_space_item_id = 0 
+USE_GOOGLE_SHEETS = 1
+
+##################
+# open_googlesheet
+##################
+def open_googlesheet():
+# if we're not loading the Google sheet, just return                            
+    if (USE_GOOGLE_SHEETS != 1):
+        return
+# else use our JSON credentials to open the Google Drive sheet                  
+    try:
+        global list_of_lists_relays
+        global circuit_name_item_id
+        global circuit_on_relay_item_id
+        global circuit_zone_item_id
+        global circuit_space_item_id
+        json_key = json.load(open(json_file))
+        scope = ['https://spreadsheets.google.com/feeds']
+
+        credentials = SignedJwtAssertionCredentials(json_key['client_email'], json_key['private_key'], scope)
+
+        gc = gspread.authorize(credentials)
+        sh = gc.open_by_key(googleSheetKey)
+
+        #creates list of list of every entry on the Circuits and Relays tab
+        googleWorksheetRelays = sh.worksheet(googleWorksheetNameRelays)
+        list_of_lists_relays = googleWorksheetRelays.get_all_values()
+
+        circuit_name_item_id = find_item(list_of_lists_relays, "Circuit Name")
+        circuit_on_relay_item_id = find_item(list_of_lists_relays, "On Relay")
+        circuit_zone_item_id = find_item(list_of_lists_relays, "Zone")
+        circuit_space_item_id = find_item(list_of_lists_relays, "Space")
+  
+    except Exception, e:
+        print  "error in open_googlesheet: %s" % e
+
+################################
+# find_item()
+################################
+def find_item(mylist, item_name):
+    # gets the position of "item" in the sublists & returns                     
+    for item in mylist:
+        i = 0
+        for subitem in item:
+            if subitem == item_name:
+                item_id = i
+                return item_id
+            i = i + 1
+
+############################################################                    
+#subfinder() takes a list of lists and a pattern. finds pattern in the          
+# id_num column of the list of lists. Returns a list of all lists        
+# that matched.                                                                 
+############################################################                    
+def subfinder(mylist, pattern, id_num):
+    matches = []
+    try:
+        #and then gets every item where the device type matches the pattern     
+        for item in mylist:
+            if pattern in item[id_num]:
+                matches.append(item)
+        return matches
+    except Exception, e:
+        print "error in subfinder: %s" % e
+        for frame in traceback.extract_tb(sys.exc_info()[2]):
+            fname,lineno,fn,text = frame
+            print( "     in %s on line %d" % (fname, lineno))
+        #otherwise return blank list                                            
+        return []
+
+##################
+# GET RELAY ZONES
+##################
+# gets the list of relay names and pins from the Max files listed in relay_files
+def get_relay_zones(zone, zone_items):
+    #reads everything from the Circuits and Relays tab                      
+    relay_list = []
+    if len(list_of_lists_relays) == 0:
+        open_googlesheet()
+    
+#    print "%d google items loaded" % len(list_of_lists_relays)
+
+    for item in list_of_lists_relays:
+        zone_item = item[circuit_zone_item_id].replace(':','').lower()
+        circuit_on_relay = item[circuit_on_relay_item_id].replace(':','').lower()
+        circuit_space = item[circuit_space_item_id]
+        circuit_name = item[circuit_name_item_id]        
+
+        #if the zone matches and this circuit is on a relay, get relay info and add it to the list
+        if zone.lower() in zone_item.lower() and circuit_on_relay == "yes":
+            pin = -1
+            #grab the pin from the relay map file
+            item = subfinder(zone_items, circuit_name, 0)
+            if item != []:
+                pin = item[0][1]
+            #grab the IP address for this relay
+                remote_ip_item = subfinder(relay_ip_list, circuit_name[:3], 0) 
+                if (remote_ip_item != []):
+                    remote_ip = remote_ip_item[0][1]
+                else:
+                    remote_ip = ""
+                #and return the zone, relay name, pin, and IP plus extras
+                item2 = (zone_item, circuit_name, circuit_on_relay, pin, remote_ip, "Relay")
+                relay_list.append(item2)
+
+    #and return the list
+    return relay_list
+
+##################
+# GET RELAY PINS
+##################
+# gets the list of relay names and pins from the Max files listed in relay_files
+#reads file(s) of format "6 /2LB-7, /2LB-7;", grabs pin (6) and name ("2LB-7") and returns each
+
+def get_relay_pins(relay_items):
+    for relay_file in relay_files:
+        with open(relay_file, 'r') as infile:
+            for line in infile:
+                line_split = line.split()
+                pin = line_split[0]
+                name = line_split[1][:-1]
+                relay_items.append([name, pin])
+
+    relay_items.sort(key=lambda x: x[0])
+    return relay_items
 
 ####################                                                            
 # EXIT HANDLER                                                                  
@@ -66,6 +222,7 @@ signal.signal(signal.SIGINT, signal_handler)
 # PoE, WOL, UDPSEND
 ###############
 
+#turns PoE on or off
 def set_PoE(auto_or_never, remote_ip, switch):
     import subprocess
     try:
@@ -77,6 +234,7 @@ def set_PoE(auto_or_never, remote_ip, switch):
     except Exception, e:
         logger.error( " ERROR: set_PoE error: %s" % e)
 
+#sends messages to Pi or Windows watchdog via UDP
 def udpsend(message, remote_ip, port):
     try:
         watchsock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -90,6 +248,7 @@ def udpsend(message, remote_ip, port):
     except Exception, e:
         logger.error( ' ERROR: Failed to send on outgoing socket: %s' % e )
 
+#tells a Windows or Mac server to wake on lan (boot from the off state)
 def wake_on_lan(mac_address):
     import subprocess
     try:
@@ -105,6 +264,7 @@ def wake_on_lan(mac_address):
 ###############
 # START TYPES
 ###############
+#run these to start a device of the given type. start_device calls these for the proper type
         
 def start_windows(mac_address):
     wake_on_lan(mac_address)
@@ -118,7 +278,7 @@ def start_arduino(remote_ip, switch):
 ###############
 # REBOOT TYPES
 ###############
-    
+#run these to reboot a device of the given type. reboot_device calls these for the proper type
 def reboot_windows(remote_ip):
     udpsend("reboot now", remote_ip, 6666)
 
@@ -133,7 +293,7 @@ def reboot_arduino(switch_ip, switch_interface, delay):
 ###############
 # STOP TYPES
 ###############
-    
+#run these to stop a device of the given type. stop_device calls these for the proper type
 def stop_arduino(remote_ip, switch):
     set_PoE("never", remote_ip, switch)
 
@@ -148,7 +308,7 @@ def stop_pi(remote_ip, switch_ip, switch_interface, delay):
 ###############
 # CHECK FUNCTIONS
 ###############
-    
+#run these to check inputs before using them    
 def check_remoteip(remote_ip):
     if remote_ip is None or remote_ip == "":
         logger.error( " ERROR: IP not set! Exiting...")
@@ -181,7 +341,7 @@ def check_remoteip_switch(remote_ip, switch, switch_interface):
 ###############
 # GET_ITEM 
 ###############
-        
+#grabs an item from the DEVICES table in SQLITE, given the ID_NAME        
 def get_item(remote_ip):
     try:
         # Open database connection, create cursor
@@ -198,7 +358,7 @@ def get_item(remote_ip):
             sql = "SELECT MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE FROM DEVICES WHERE ID_NAME LIKE '%s'" % remote_ip
             cur.execute(sql)
             data = cur.fetchall()
-            logger.info( data ) 
+#            logger.info( data ) 
             return data[0]
     except lite.Error, e:
         logger.error(" ERROR: SQL error! %s" % e)   
@@ -206,7 +366,7 @@ def get_item(remote_ip):
 ###############
 # START DEVICE
 ###############
-
+#starts a generic device; checks the type and inputs, then calls the correct start function
 def start_device(switch_ip, switch_interface, device_type, mac_address):        
     if "berry" in device_type.lower(): 
 #        print "start pi"
@@ -243,6 +403,7 @@ def start_device(switch_ip, switch_interface, device_type, mac_address):
 ###############
 # STOP DEVICE
 ###############
+#stops a generic device; checks the type and inputs, then calls the correct stop function
 def stop_device(remote_ip, switch_ip, switch_interface, device_type):
     if "berry" in device_type.lower(): 
 #        print "stop pi"
@@ -281,7 +442,7 @@ def stop_device(remote_ip, switch_ip, switch_interface, device_type):
 ###############
 # REBOOT DEVICE
 ###############
-
+#reboots a generic device; checks the type and inputs, then calls the correct reboot function
 def reboot_device(remote_ip, switch_ip, switch_interface, device_type):
     if "berry" in device_type.lower(): 
 #        print "reboot pi"
@@ -321,7 +482,7 @@ def reboot_device(remote_ip, switch_ip, switch_interface, device_type):
 ###############
 # START/STOP/REBOOT SHOW
 ###############            
-                
+#start, stops, or reboots the whole show. a little out of date right now...
 def start_stop_reboot_show(command, limit_to_switch_ip):
     remote_ip = ""
     mac_address = ""
@@ -432,8 +593,8 @@ def start_stop_reboot_show(command, limit_to_switch_ip):
 
 ###############
 # REBOOT NONRESPONSIVE DEVICES
-###############            
-        
+###############             
+#reboots the whole show. a little out of date right now...
 def reboot_unresponsive(limit_to_switch_ip):
     logger.info( " -----reboot unresponsive" )       
     remote_ip = ""
@@ -495,15 +656,26 @@ def reboot_unresponsive(limit_to_switch_ip):
         logger.error(" ERROR: SQL error! %s" % e) 
 
 ###############
-# CONCERT MODE
+# BY ZONE FUNCTIONS
 ###############            
-
-def lycratunnel(on_or_off):
-    logger.info( " -----turn %s lycratunnel" % on_or_off)
+#turns on/off a given zone. See the valid zones at the top of the file.
+def on_by_zone(on_or_off, zone):
+    logger.info( " -----turn %s %s" % (on_or_off, zone))
     remote_ip = ""
     mac_address = ""
     switch_interface = ""
     device_type = ""
+    
+    #zone must be given AND must be in the list of valid zones at the top of the file. otherwise exit
+    if zone == "" or zone is None:
+        logger.error( " ERROR: no zone given with _by_zone, exiting")
+        return
+
+    if zone not in zones_ok_list:
+        logger.error( " ERROR: %s is not a valid zone, exiting" % (zone))
+        logger.error("Valid zones are: " + str(zones_ok_list))
+        return
+
     try:
         # Open database connection, create cursor
         if os.name == 'nt':
@@ -515,8 +687,9 @@ def lycratunnel(on_or_off):
         
     try:
         with con:
+            #select everything for this zone, in the proper boot/shutdown order
             cur = con.cursor()
-            sql = "SELECT ID_NAME, DEVICE_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE, BOOT_ORDER, SPACE FROM DEVICES WHERE SPACE LIKE '%lycra%'" 
+            sql = "SELECT ID_NAME, DEVICE_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE, BOOT_ORDER, SPACE, ZONE FROM DEVICES WHERE ZONE LIKE '" + ('%' + zone + "%'")   
             if (on_or_off == "on"):
                 sql = sql + " ORDER BY BOOT_ORDER ASC, ID_NAME ASC"
             else:
@@ -524,8 +697,10 @@ def lycratunnel(on_or_off):
             cur.execute(sql)
             data = cur.fetchall()
 #            logger.info( data)
+
+            #and step through devices, turning them on/off
             for item in data:
-                (remote_ip, device_name, mac_address, switch_interface, device_type, boot_order, space) = item
+                (remote_ip, device_name, mac_address, switch_interface, device_type, boot_order, space, zone) = item
                 if mac_address is None:
                     mac_address = ""
 
@@ -547,39 +722,48 @@ def lycratunnel(on_or_off):
                     #don't do anything for software
                     continue
 
-                print item
-
+                #kill or start each device
                 if on_or_off == "on":
+                    print device_name
                     start_device(switch_ip, switch_interface, device_type, mac_address)               
-                
-            if on_or_off == "on":
-                send_to_osc("10.42.0.113", RELAY_PORT, "/relays/3 1")
+                else:
+                    print device_name
+                    stop_device(remote_ip, switch_ip, switch_interface, device_type)
 
-            if on_or_off == "off":
-                send_to_osc("10.42.0.113", RELAY_PORT, "/relays/3 0")
+            #then pause
+            #                    time.sleep(DELAY_FOR_PROJECTORS)
 
-    #lycratunnel on
+            #then kill or start the relays for this zone
+            get_relay_pins(relay_list)
+            zone_list = get_relay_zones(zone, relay_list)
+
+            if zone_list is not None:
+                for item in zone_list:
+#                    time.sleep(DELAY_BETWEEN_RELAYS)
+                    if (on_or_off == "on"):
+                        logger.info("send to " + str(item[1]))
+                        msg = "/relays/%s 1" % item[3]
+                        send_to_osc(item[4], RELAY_PORT, msg)
+                    else:
+                        logger.info("send to " + str(item[1]))
+                        msg = "/relays/%s 0" % item[3]
+                        send_to_osc(item[4], RELAY_PORT, msg)
+
+#on boot order
     #start media server
-
     #start Pis
-
     #wait 6 minutes
-
     #start projectors etc
 
-            else:
-                print "off"
-    #lycratunnel off
+#off boot order
     #kill the Pis
-
     #kill the media server
-
     #wait 6 minutes 
-
     #kill the projectors etc
     except lite.Error, e:
         logger.error(" ERROR: SQL error! %s" % e)
 
+#sends OSC messages to the relays/Pis/etc
 def send_to_osc(remote_ip, port, cmd):
     if not args.disable:
         logger.info( " -----sending %s to %s" % (cmd, remote_ip))
@@ -591,26 +775,31 @@ def send_to_osc(remote_ip, port, cmd):
         oscmsg.setAddress(cmd)
         c.send(oscmsg)
 
+#tells the watchdog to kill a process (example: "looping-audio" kills all such functions) on the given Pi
 def kill_proc_device(remote_ip, procname):
     if not args.disable:
         cmd = "kill_proc " + procname
         logger.info( " -----sending %s to %s" % (cmd, remote_ip))
         send_to_osc(remote_ip, WATCHDOG_PORT, cmd)
 
+#tells the watchdog to spawn a background process (example: "/home/pi/RUNNING/scripts/looping-audio.sh", needs full path) on the given Pi
 def start_proc_device(remote_ip, procname):
     if not args.disable:
         cmd = "start_proc " + procname
         logger.info( " -----sending %s to %s" % (cmd, remote_ip))
         send_to_osc(remote_ip, WATCHDOG_PORT, cmd)
 
+#kills looping audio for a given Pi
 def kill_looping_audio(remote_ip):
     send_to_osc(remote_ip, WATCHDOG_PORT, "kill_proc looping-audio")
 
+#starts looping audio on a given Pi
 def start_looping_audio(remote_ip):
     send_to_osc(remote_ip, WATCHDOG_PORT, "start_proc /home/pi/RUNNING/scripts/looping-audio.sh")
     send_to_osc(remote_ip, WATCHDOG_PORT, "start_proc /home/pi/RUNNING/scripts/looping-audio1.sh")
     send_to_osc(remote_ip, WATCHDOG_PORT, "start_proc /home/pi/RUNNING/scripts/looping-audio2.sh")
 
+#sends audio pause or unpause command to the given Pi
 def pause(remote_ip, cmd):
     send_to_osc(remote_ip, OSC_PORT, cmd)
 
@@ -628,6 +817,8 @@ def concert_off(remote_ip):
     start_looping_audio(remote_ip)
     #more goes here, send to watchdog to kill process
 
+# turns concert mode (for live shows) on or off. Kills/starts audio on all Pis in Shanty Town, plus sends 
+# DMX light control to/from the light console
 def concert_mode(on_or_off):
     logger.info( " -----concert mode %s" % on_or_off)
     remote_ip = ""
@@ -673,7 +864,7 @@ def concert_mode(on_or_off):
                     #don't do anything for non-pis
                     continue
 
-                #stop each item, then delay
+                #turn on or off concert mode for each device
                 print "%s send concert %s" % (device_name, on_or_off)
                 if (on_or_off is "on"):
                     concert_on(remote_ip)
@@ -801,14 +992,14 @@ if __name__ == "__main__":
                         action='store_true',
                         help='leaves concert mode (starts shantytown audio & sends light control to devices')
 
-    group.add_argument('--lycratunnel_on',
+    group.add_argument('--on_by_zone',
                         action='store_true',
-                        help='turns everything in the lycratunnel area on, in order')
+                        help='turns everything in the given zone on, in boot order')
 
 
-    group.add_argument('--lycratunnel_off',
+    group.add_argument('--off_by_zone',
                         action='store_true',
-                        help='turns everything in the lycratunnel area off, in order')
+                        help='turns everything in the given zone off, in reverse boot order')
 
     ##### add-on arguments (can be applied to the above)
     parser.add_argument("--switch",
@@ -838,6 +1029,10 @@ if __name__ == "__main__":
     parser.add_argument('--proc', 
                         type=str,
                         help='Process to use with proc_ commands')
+
+    parser.add_argument('--zone', 
+                        type=str,
+                        help='Zone to use with _zone commands')
     
     args = parser.parse_args()
 
@@ -863,6 +1058,10 @@ if __name__ == "__main__":
         cmd = cmd + (", enter concert mode")
     if args.concert_mode_off:
         cmd = cmd + (", leave concert mode")
+    if args.on_by_zone:
+        cmd = cmd + (", on by zone:")
+    if args.off_by_zone:
+        cmd = cmd + (", off by zone:")
     if args.ip:
         cmd = cmd + (" with IP %s" % args.ip)
     if args.proc:
@@ -873,13 +1072,16 @@ if __name__ == "__main__":
         cmd = cmd + (", with --no_global")      
     if args.switch:
         cmd = cmd + (", limited to switch %s" % args.switch)
+    if args.zone:
+        cmd = cmd + (", for zone %s" % args.zone)
     logger.info(cmd)
 
     if args.disable:
         logger.warning(" WARNING: disable (test/dry run) option has been selected.")
     
+        #checks whether this is a standalone call or requires arguments
     single_item = False
-    if not (args.start_device or args.stop_device or args.reboot_device or args.pause_audio_device or args.unpause_audio_device or args.kill_proc_device or args.start_proc_device or args.lycratunnel_on or args.lycratunnel_off):
+    if not (args.start_device or args.stop_device or args.reboot_device or args.pause_audio_device or args.unpause_audio_device or args.kill_proc_device or args.start_proc_device):
         single_item = True
         
         if not (single_item):
@@ -895,9 +1097,9 @@ if __name__ == "__main__":
                     logger.info(delay_string)
                     time.sleep(5.0)
                     cur_delay = cur_delay + 5.0
-        
-    if args.ip:
 
+    #if we included the IP, check it to make sure it's in the Master Doc
+    if args.ip:
         if args.start_device or args.stop_device or args.reboot_device or args.pause_audio_device or args.unpause_audio_device or args.kill_proc_device or args.start_proc_device:
             remote_ip = args.ip
             (mac_address, switch_interface, device_type) = get_item(remote_ip)
@@ -922,6 +1124,11 @@ if __name__ == "__main__":
         if args.start_proc_device or args.kill_proc_device:
             if args.proc is None or args.proc == "":
                 logger.error( " ERROR: --start_proc_device or --kill_proc_device selected but no process name was given with --proc, exiting...")        
+
+    if args.off_by_zone or args.on_by_zone:
+        if args.zone is None or args.zone == "":
+            logger.error( " ERROR: --off_by_zone or --on_by_zone selected but no zone name was given with --zone. Exiting...")
+            logger.error("Valid zones are: " + str(zones_ok_list))
 
     ###############
     # START DEVICE
@@ -1023,18 +1230,20 @@ if __name__ == "__main__":
         concert_mode("off")
 
     #################
-    # LYCRATUNNEL ON
+    # ON BY ZONE
     #################
 
-    if args.lycratunnel_on:
-        lycratunnel("on")
+    if args.on_by_zone:
+        if (args.zone):
+            on_by_zone("on", args.zone.lower())
 
     #################
-    # LYCRATUNNEL OFF
+    # OFF BY ZONE
     #################
 
-    if args.lycratunnel_off:
-        lycratunnel("off")
+    if args.off_by_zone:
+        if (args.zone):
+            on_by_zone("off", args.zone.lower())
 
     #################
     # CONCERT MODE ON DEVICE
@@ -1049,7 +1258,5 @@ if __name__ == "__main__":
 
     if args.concert_mode_off_device:
         concert_off(args.ip)
-
-
 
     exit_func()
