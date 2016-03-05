@@ -40,6 +40,7 @@ LOG_SIZE = 2000000 #2 MB, in bytes
 LOG_NUM_BACKUPS = 5 # five .out files before they roll over                     
 
 OSC_PORT = 9998 #port to send pause/unpause messages to do-audio on the Pis
+RELAY_PORT = 9999 #port to send on/off messages to power relays
 WATCHDOG_PORT = 6666 #port to send commands to the watchdog on the Pis
 PAUSE_COMMAND = "/pause" #pause command sent to do-audio on the Pis
 UNPAUSE_COMMAND = "/unpause" #unpause command sent to do-audio on the Pis
@@ -497,9 +498,93 @@ def reboot_unresponsive(limit_to_switch_ip):
 # CONCERT MODE
 ###############            
 
+def lycratunnel(on_or_off):
+    logger.info( " -----turn %s lycratunnel" % on_or_off)
+    remote_ip = ""
+    mac_address = ""
+    switch_interface = ""
+    device_type = ""
+    try:
+        # Open database connection, create cursor
+        if os.name == 'nt':
+            con = lite.connect(WINDOWS_DB_FILENAME)
+        else:
+            con = lite.connect(LINUX_OSX_DB_FILENAME)     
+    except Exception, e:
+        logger.error( " ERROR: Can't connect to demosdb! %s" % e)
+        
+    try:
+        with con:
+            cur = con.cursor()
+            sql = "SELECT ID_NAME, DEVICE_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE, BOOT_ORDER, SPACE FROM DEVICES WHERE SPACE LIKE '%lycra%'" 
+            if (on_or_off == "on"):
+                sql = sql + " ORDER BY BOOT_ORDER ASC, ID_NAME ASC"
+            else:
+                sql = sql + " ORDER BY BOOT_ORDER DESC, ID_NAME ASC"
+            cur.execute(sql)
+            data = cur.fetchall()
+#            logger.info( data)
+            for item in data:
+                (remote_ip, device_name, mac_address, switch_interface, device_type, boot_order, space) = item
+                if mac_address is None:
+                    mac_address = ""
+
+                if switch_interface is None:
+                    switch_interface = ""
+                    switch_ip = ""
+                else:
+                    switch_group = switch_interface.split()
+                    switch_ip = switch_group[0]
+                    switch_interface = switch_group[1]
+
+                if remote_ip is None:
+                    remote_ip = ""
+
+                if device_type is None:
+                    device_type = ""
+
+                if "software" in device_type.lower():
+                    #don't do anything for software
+                    continue
+
+                print item
+
+                if on_or_off == "on":
+                    start_device(switch_ip, switch_interface, device_type, mac_address)               
+                
+            if on_or_off == "on":
+                send_to_osc("10.42.0.113", RELAY_PORT, "/relays/3 1")
+
+            if on_or_off == "off":
+                send_to_osc("10.42.0.113", RELAY_PORT, "/relays/3 0")
+
+    #lycratunnel on
+    #start media server
+
+    #start Pis
+
+    #wait 6 minutes
+
+    #start projectors etc
+
+            else:
+                print "off"
+    #lycratunnel off
+    #kill the Pis
+
+    #kill the media server
+
+    #wait 6 minutes 
+
+    #kill the projectors etc
+    except lite.Error, e:
+        logger.error(" ERROR: SQL error! %s" % e)
+
 def send_to_osc(remote_ip, port, cmd):
     if not args.disable:
         logger.info( " -----sending %s to %s" % (cmd, remote_ip))
+    else:
+        logger.info( " -----would send %s to %s" % (cmd, remote_ip))
         c = OSC.OSCClient()
         c.connect((remote_ip, port)) 
         oscmsg = OSC.OSCMessage()
@@ -716,6 +801,14 @@ if __name__ == "__main__":
                         action='store_true',
                         help='leaves concert mode (starts shantytown audio & sends light control to devices')
 
+    group.add_argument('--lycratunnel_on',
+                        action='store_true',
+                        help='turns everything in the lycratunnel area on, in order')
+
+
+    group.add_argument('--lycratunnel_off',
+                        action='store_true',
+                        help='turns everything in the lycratunnel area off, in order')
 
     ##### add-on arguments (can be applied to the above)
     parser.add_argument("--switch",
@@ -786,7 +879,7 @@ if __name__ == "__main__":
         logger.warning(" WARNING: disable (test/dry run) option has been selected.")
     
     single_item = False
-    if not (args.start_device or args.stop_device or args.reboot_device or args.pause_audio_device or args.unpause_audio_device or args.kill_proc_device or args.start_proc_device):
+    if not (args.start_device or args.stop_device or args.reboot_device or args.pause_audio_device or args.unpause_audio_device or args.kill_proc_device or args.start_proc_device or args.lycratunnel_on or args.lycratunnel_off):
         single_item = True
         
         if not (single_item):
@@ -930,17 +1023,33 @@ if __name__ == "__main__":
         concert_mode("off")
 
     #################
-    # CONCERT MODE ON
+    # LYCRATUNNEL ON
+    #################
+
+    if args.lycratunnel_on:
+        lycratunnel("on")
+
+    #################
+    # LYCRATUNNEL OFF
+    #################
+
+    if args.lycratunnel_off:
+        lycratunnel("off")
+
+    #################
+    # CONCERT MODE ON DEVICE
     #################
 
     if args.concert_mode_on_device:
         concert_on(args.ip)
 
     #################
-    # CONCERT MODE OFF
+    # CONCERT MODE OFF DEVICE
     #################
 
     if args.concert_mode_off_device:
         concert_off(args.ip)
+
+
 
     exit_func()
