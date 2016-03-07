@@ -9,7 +9,7 @@
 			"modernui" : 1
 		}
 ,
-		"rect" : [ 33.0, 45.0, 1596.0, 967.0 ],
+		"rect" : [ 30.0, 45.0, 1323.0, 967.0 ],
 		"bglocked" : 1,
 		"openinpresentation" : 0,
 		"default_fontsize" : 12.0,
@@ -38,11 +38,189 @@
 		"subpatcher_template" : "",
 		"boxes" : [ 			{
 				"box" : 				{
+					"id" : "obj-429",
+					"linecount" : 13,
+					"maxclass" : "message",
+					"numinlets" : 2,
+					"numoutlets" : 1,
+					"outlettype" : [ "" ],
+					"patching_rect" : [ 1459.0, 851.5, 56.0, 183.0 ],
+					"style" : "",
+					"text" : "[;\rmax launch_browser http://localhost/nagios/cgi-bin/status.cgi?hostgroup=all&style=overview"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"id" : "obj-427",
+					"maxclass" : "textbutton",
+					"numinlets" : 1,
+					"numoutlets" : 3,
+					"outlettype" : [ "", "", "int" ],
+					"parameter_enable" : 0,
+					"patching_rect" : [ 1459.0, 816.0, 153.0, 23.0 ],
+					"presentation" : 1,
+					"presentation_rect" : [ 1397.75, 720.0, 172.0, 20.0 ],
+					"style" : "",
+					"text" : "Launch Web Monitoring",
+					"varname" : "rebootdevs[6]"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"id" : "obj-426",
+					"maxclass" : "toggle",
+					"numinlets" : 1,
+					"numoutlets" : 1,
+					"outlettype" : [ "int" ],
+					"parameter_enable" : 0,
+					"patching_rect" : [ 1587.0, -15.0, 24.0, 24.0 ],
+					"style" : ""
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"id" : "obj-424",
+					"maxclass" : "newobj",
+					"numinlets" : 2,
+					"numoutlets" : 1,
+					"outlettype" : [ "bang" ],
+					"patching_rect" : [ 1548.0, 21.0, 100.0, 22.0 ],
+					"style" : "",
+					"text" : "metro 60000"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"id" : "obj-417",
+					"linecount" : 2,
+					"maxclass" : "comment",
+					"numinlets" : 1,
+					"numoutlets" : 0,
+					"patching_rect" : [ 1477.0, 76.0, 150.0, 33.0 ],
+					"presentation" : 1,
+					"presentation_linecount" : 2,
+					"presentation_rect" : [ 1488.0, -17.0, 150.0, 33.0 ],
+					"style" : "",
+					"text" : "server\nstatus:"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"bgmode" : 0,
+					"border" : 0,
+					"clickthrough" : 0,
+					"enablehscroll" : 0,
+					"enablevscroll" : 0,
+					"id" : "obj-414",
+					"ignoreclick" : 1,
+					"lockeddragscroll" : 0,
+					"maxclass" : "bpatcher",
+					"name" : "serverStatus.maxpat",
+					"numinlets" : 1,
+					"numoutlets" : 0,
+					"offset" : [ 0.0, 0.0 ],
+					"patching_rect" : [ 1474.0, -18.0, 36.0, 42.0 ],
+					"presentation" : 1,
+					"presentation_rect" : [ 1527.0, -21.5, 36.0, 42.0 ],
+					"viewvisibility" : 1
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"id" : "obj-407",
+					"linecount" : 2,
+					"maxclass" : "comment",
+					"numinlets" : 1,
+					"numoutlets" : 0,
+					"patching_rect" : [ 846.0, 1072.0, 204.0, 33.0 ],
+					"style" : "",
+					"text" : "new bpatcher version, can be \ndisplayed in other pages!"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"id" : "obj-406",
+					"maxclass" : "comment",
+					"numinlets" : 1,
+					"numoutlets" : 0,
+					"patching_rect" : [ 846.0, 1105.0, 189.0, 20.0 ],
+					"style" : "",
+					"text" : "old version, should get deleted"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"id" : "obj-404",
+					"maxclass" : "newobj",
+					"numinlets" : 0,
+					"numoutlets" : 0,
+					"patching_rect" : [ 1030.0, 1072.0, 100.0, 22.0 ],
+					"style" : "",
+					"text" : "RelayControl"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"bgmode" : 0,
+					"border" : 0,
+					"clickthrough" : 0,
+					"enablehscroll" : 0,
+					"enablevscroll" : 0,
+					"id" : "obj-398",
+					"ignoreclick" : 1,
+					"lockeddragscroll" : 0,
+					"maxclass" : "bpatcher",
+					"name" : "RelayControl.maxpat",
+					"numinlets" : 0,
+					"numoutlets" : 0,
+					"offset" : [ 0.0, 0.0 ],
+					"patching_rect" : [ 1294.0, 578.0, 341.0, 330.0 ],
+					"presentation" : 1,
+					"presentation_rect" : [ 1230.0, 369.0, 339.75, 349.0 ],
+					"viewvisibility" : 1
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"id" : "obj-375",
+					"maxclass" : "comment",
+					"numinlets" : 1,
+					"numoutlets" : 0,
+					"patching_rect" : [ 335.0, 495.0, 67.0, 20.0 ],
+					"style" : "",
+					"text" : "cut?"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"id" : "obj-372",
+					"maxclass" : "comment",
+					"numinlets" : 1,
+					"numoutlets" : 0,
+					"patching_rect" : [ 403.0, 442.0, 53.0, 20.0 ],
+					"style" : "",
+					"text" : "cut?"
+				}
+
+			}
+, 			{
+				"box" : 				{
 					"id" : "obj-369",
 					"maxclass" : "newobj",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 1264.0, 543.0, 100.0, 22.0 ],
+					"patching_rect" : [ 1270.0, 441.5, 100.0, 22.0 ],
 					"style" : "",
 					"text" : "onOffByZone"
 				}
@@ -55,7 +233,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 1383.0, 361.5, 154.0, 74.0 ],
+					"patching_rect" : [ 1386.0, 268.0, 154.0, 74.0 ],
 					"style" : "",
 					"text" : "warning: the On/Off By Zone/Switch screens are live!\nconfirm via radio before turning on/off devices!"
 				}
@@ -68,7 +246,7 @@
 					"numinlets" : 2,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
-					"patching_rect" : [ 1264.0, 489.5, 50.0, 22.0 ],
+					"patching_rect" : [ 1270.0, 388.0, 50.0, 22.0 ],
 					"style" : "",
 					"text" : "open"
 				}
@@ -81,7 +259,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
-					"patching_rect" : [ 1264.0, 514.5, 100.0, 22.0 ],
+					"patching_rect" : [ 1270.0, 413.0, 100.0, 22.0 ],
 					"style" : "",
 					"text" : "pcontrol"
 				}
@@ -95,9 +273,9 @@
 					"numoutlets" : 3,
 					"outlettype" : [ "", "", "int" ],
 					"parameter_enable" : 0,
-					"patching_rect" : [ 1264.0, 460.5, 196.0, 22.0 ],
+					"patching_rect" : [ 1270.0, 359.0, 196.0, 22.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 1349.0, 244.5, 184.0, 20.0 ],
+					"presentation_rect" : [ 1349.0, 244.0, 184.0, 20.0 ],
 					"style" : "",
 					"text" : "Open ON/OFF By Zone Screen",
 					"varname" : "poeoff[4]"
@@ -111,10 +289,10 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 1428.0, 602.0, 150.0, 33.0 ],
+					"patching_rect" : [ 1432.5, 509.0, 150.0, 33.0 ],
 					"presentation" : 1,
 					"presentation_linecount" : 2,
-					"presentation_rect" : [ 1233.5, 318.0, 150.0, 33.0 ],
+					"presentation_rect" : [ 1229.0, 308.0, 150.0, 33.0 ],
 					"style" : "",
 					"text" : "press to cancel current on/off command..."
 				}
@@ -128,9 +306,9 @@
 					"numoutlets" : 3,
 					"outlettype" : [ "", "", "int" ],
 					"parameter_enable" : 0,
-					"patching_rect" : [ 1283.0, 643.0, 114.0, 21.0 ],
+					"patching_rect" : [ 1287.5, 550.0, 114.0, 21.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 1428.0, 318.0, 172.0, 20.0 ],
+					"presentation_rect" : [ 1423.5, 308.0, 172.0, 20.0 ],
 					"style" : "",
 					"text" : "Concert Mode OFF",
 					"varname" : "rebootdevs[5]"
@@ -482,7 +660,7 @@
  ]
 					}
 ,
-					"patching_rect" : [ 1417.5, 643.0, 91.0, 22.0 ],
+					"patching_rect" : [ 1422.0, 550.0, 91.0, 22.0 ],
 					"saved_object_attributes" : 					{
 						"description" : "",
 						"digest" : "",
@@ -504,9 +682,9 @@
 					"numoutlets" : 3,
 					"outlettype" : [ "", "", "int" ],
 					"parameter_enable" : 0,
-					"patching_rect" : [ 1283.0, 615.0, 114.0, 20.0 ],
+					"patching_rect" : [ 1287.5, 522.0, 114.0, 20.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 1428.0, 295.0, 172.0, 20.0 ],
+					"presentation_rect" : [ 1423.5, 285.0, 172.0, 20.0 ],
 					"style" : "",
 					"text" : "Concert Mode ON",
 					"varname" : "rebootdevs[4]"
@@ -737,7 +915,7 @@
  ]
 					}
 ,
-					"patching_rect" : [ 1455.0, 575.0, 96.0, 22.0 ],
+					"patching_rect" : [ 1459.5, 482.0, 96.0, 22.0 ],
 					"saved_object_attributes" : 					{
 						"description" : "",
 						"digest" : "",
@@ -759,9 +937,9 @@
 					"numoutlets" : 3,
 					"outlettype" : [ "", "", "int" ],
 					"parameter_enable" : 0,
-					"patching_rect" : [ 1264.0, 576.5, 176.0, 22.0 ],
+					"patching_rect" : [ 1268.5, 483.5, 176.0, 22.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 1233.5, 295.0, 172.0, 20.0 ],
+					"presentation_rect" : [ 1229.0, 285.0, 172.0, 20.0 ],
 					"style" : "",
 					"text" : "CANCEL on/off",
 					"varname" : "rebootdevs[3]"
@@ -775,7 +953,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 1468.0, 185.5, 150.0, 60.0 ],
+					"patching_rect" : [ 1474.0, 114.5, 150.0, 60.0 ],
 					"presentation" : 1,
 					"presentation_linecount" : 2,
 					"presentation_rect" : [ 1231.0, 152.0, 344.0, 33.0 ],
@@ -790,7 +968,7 @@
 					"maxclass" : "newobj",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 1263.0, 415.0, 100.0, 22.0 ],
+					"patching_rect" : [ 1266.0, 321.5, 100.0, 22.0 ],
 					"style" : "",
 					"text" : "onOffBySwitch"
 				}
@@ -803,7 +981,7 @@
 					"numinlets" : 2,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
-					"patching_rect" : [ 1263.0, 359.0, 50.0, 22.0 ],
+					"patching_rect" : [ 1266.0, 265.5, 50.0, 22.0 ],
 					"style" : "",
 					"text" : "open"
 				}
@@ -816,7 +994,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
-					"patching_rect" : [ 1263.0, 384.0, 100.0, 22.0 ],
+					"patching_rect" : [ 1266.0, 290.5, 100.0, 22.0 ],
 					"style" : "",
 					"text" : "pcontrol"
 				}
@@ -830,9 +1008,9 @@
 					"numoutlets" : 3,
 					"outlettype" : [ "", "", "int" ],
 					"parameter_enable" : 0,
-					"patching_rect" : [ 1263.0, 330.0, 196.0, 22.0 ],
+					"patching_rect" : [ 1266.0, 236.5, 196.0, 22.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 1349.0, 223.0, 184.0, 20.0 ],
+					"presentation_rect" : [ 1349.0, 222.5, 184.0, 20.0 ],
 					"style" : "",
 					"text" : "Open ON/OFF By Switch Screen",
 					"varname" : "poeoff[3]"
@@ -1207,9 +1385,9 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 1252.0, 843.0, 208.0, 20.0 ],
+					"patching_rect" : [ 1250.0, 941.0, 208.0, 20.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 1252.0, 732.0, 208.0, 20.0 ],
+					"presentation_rect" : [ 1233.5, 884.0, 208.0, 20.0 ],
 					"style" : "",
 					"text" : "Black = Unknown/No Database Entry"
 				}
@@ -1223,9 +1401,9 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 1252.0, 827.0, 208.0, 20.0 ],
+					"patching_rect" : [ 1250.0, 925.0, 208.0, 20.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 1252.0, 716.0, 208.0, 20.0 ],
+					"presentation_rect" : [ 1233.5, 868.0, 208.0, 20.0 ],
 					"style" : "",
 					"text" : "Red = No Response",
 					"textcolor" : [ 0.784314, 0.145098, 0.023529, 1.0 ]
@@ -1240,9 +1418,9 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 1252.0, 808.0, 208.0, 20.0 ],
+					"patching_rect" : [ 1250.0, 906.0, 208.0, 20.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 1252.0, 697.0, 208.0, 20.0 ],
+					"presentation_rect" : [ 1233.5, 849.0, 208.0, 20.0 ],
 					"style" : "",
 					"text" : "Yellow = Check Software/Device",
 					"textcolor" : [ 0.639216, 0.458824, 0.070588, 1.0 ]
@@ -1257,9 +1435,9 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 1252.0, 790.0, 208.0, 20.0 ],
+					"patching_rect" : [ 1250.0, 888.0, 208.0, 20.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 1252.0, 679.0, 208.0, 20.0 ],
+					"presentation_rect" : [ 1233.5, 831.0, 208.0, 20.0 ],
 					"style" : "",
 					"text" : "Green = Ok",
 					"textcolor" : [ 0.0, 0.533333, 0.168627, 1.0 ]
@@ -1275,9 +1453,9 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 1252.0, 768.0, 208.0, 20.0 ],
+					"patching_rect" : [ 1250.0, 866.0, 208.0, 20.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 1252.0, 657.0, 208.0, 20.0 ],
+					"presentation_rect" : [ 1233.5, 809.0, 208.0, 20.0 ],
 					"style" : "",
 					"text" : "Status color codes:"
 				}
@@ -1391,10 +1569,10 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 1252.0, 738.0, 155.0, 33.0 ],
+					"patching_rect" : [ 1250.0, 836.0, 155.0, 33.0 ],
 					"presentation" : 1,
 					"presentation_linecount" : 2,
-					"presentation_rect" : [ 1252.0, 627.0, 155.0, 33.0 ],
+					"presentation_rect" : [ 1233.5, 779.0, 155.0, 33.0 ],
 					"style" : "",
 					"text" : "Black = Other Pis & Arduinos"
 				}
@@ -1406,9 +1584,9 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 1252.0, 719.0, 150.0, 20.0 ],
+					"patching_rect" : [ 1250.0, 817.0, 150.0, 20.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 1252.0, 608.0, 150.0, 20.0 ],
+					"presentation_rect" : [ 1233.5, 760.0, 150.0, 20.0 ],
 					"style" : "",
 					"text" : "Blue = Global Audio Pis",
 					"textcolor" : [ 0.011765, 0.396078, 0.752941, 1.0 ]
@@ -1421,9 +1599,9 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 1252.0, 698.0, 150.0, 20.0 ],
+					"patching_rect" : [ 1250.0, 796.0, 150.0, 20.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 1252.0, 587.0, 150.0, 20.0 ],
+					"presentation_rect" : [ 1233.5, 739.0, 150.0, 20.0 ],
 					"style" : "",
 					"text" : "Orange = Servers",
 					"textcolor" : [ 0.572549, 0.27451, 0.027451, 1.0 ]
@@ -1439,9 +1617,9 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 1252.0, 679.0, 150.0, 20.0 ],
+					"patching_rect" : [ 1250.0, 777.0, 150.0, 20.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 1252.0, 568.0, 150.0, 20.0 ],
+					"presentation_rect" : [ 1233.5, 720.0, 150.0, 20.0 ],
 					"style" : "",
 					"text" : "Device color codes:\n"
 				}
@@ -2094,7 +2272,7 @@
  ]
 					}
 ,
-					"patching_rect" : [ 1478.0, 92.5, 59.0, 22.0 ],
+					"patching_rect" : [ 1478.0, 79.0, 59.0, 22.0 ],
 					"saved_object_attributes" : 					{
 						"description" : "",
 						"digest" : "",
@@ -2117,7 +2295,7 @@
 					"numoutlets" : 3,
 					"outlettype" : [ "", "", "int" ],
 					"parameter_enable" : 0,
-					"patching_rect" : [ 1297.0, 92.5, 176.0, 22.0 ],
+					"patching_rect" : [ 1297.0, 79.0, 176.0, 22.0 ],
 					"presentation" : 1,
 					"presentation_rect" : [ 1231.0, 79.0, 254.0, 32.0 ],
 					"style" : "",
@@ -7353,6 +7531,7 @@
 										"tags" : "",
 										"style" : "",
 										"subpatcher_template" : "",
+										"visible" : 1,
 										"boxes" : [ 											{
 												"box" : 												{
 													"id" : "obj-21",
@@ -9057,7 +9236,7 @@
  ]
 					}
 ,
-					"patching_rect" : [ 1448.0, 252.0, 140.0, 22.0 ],
+					"patching_rect" : [ 1454.0, 181.0, 140.0, 22.0 ],
 					"saved_object_attributes" : 					{
 						"description" : "",
 						"digest" : "",
@@ -9079,9 +9258,9 @@
 					"numoutlets" : 3,
 					"outlettype" : [ "", "", "int" ],
 					"parameter_enable" : 0,
-					"patching_rect" : [ 1263.0, 252.0, 176.0, 22.0 ],
+					"patching_rect" : [ 1269.0, 181.0, 176.0, 22.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 1361.0, 196.0, 172.0, 20.0 ],
+					"presentation_rect" : [ 1361.0, 195.5, 172.0, 20.0 ],
 					"style" : "",
 					"text" : "Restart NONRESPONSIVEs",
 					"varname" : "rebootdevs[1]"
@@ -9094,9 +9273,9 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 1263.0, 285.0, 44.0, 20.0 ],
+					"patching_rect" : [ 1269.0, 214.0, 44.0, 20.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 1229.0, 245.0, 44.0, 20.0 ],
+					"presentation_rect" : [ 1229.0, 244.5, 44.0, 20.0 ],
 					"style" : "",
 					"text" : "status:",
 					"textcolor" : [ 1.0, 1.0, 1.0, 1.0 ]
@@ -9111,9 +9290,9 @@
 					"numoutlets" : 3,
 					"outlettype" : [ "", "", "int" ],
 					"parameter_enable" : 0,
-					"patching_rect" : [ 1263.0, 195.0, 100.0, 20.0 ],
+					"patching_rect" : [ 1269.0, 124.0, 100.0, 20.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 1231.0, 201.0, 100.0, 20.0 ],
+					"presentation_rect" : [ 1231.0, 200.5, 100.0, 20.0 ],
 					"style" : "",
 					"text" : "Turn Show OFF",
 					"varname" : "poeoff[2]"
@@ -9128,9 +9307,9 @@
 					"numoutlets" : 3,
 					"outlettype" : [ "", "", "int" ],
 					"parameter_enable" : 0,
-					"patching_rect" : [ 1263.0, 219.0, 100.0, 20.0 ],
+					"patching_rect" : [ 1269.0, 148.0, 100.0, 20.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 1231.0, 223.0, 100.0, 20.0 ],
+					"presentation_rect" : [ 1231.0, 222.5, 100.0, 20.0 ],
 					"style" : "",
 					"text" : "Turn Show ON",
 					"varname" : "poeon[2]"
@@ -9143,9 +9322,9 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 1310.0, 285.0, 150.0, 20.0 ],
+					"patching_rect" : [ 1316.0, 214.0, 150.0, 20.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 1275.0, 245.0, 150.0, 20.0 ],
+					"presentation_rect" : [ 1275.0, 244.5, 150.0, 20.0 ],
 					"style" : "",
 					"text" : "ready",
 					"textcolor" : [ 1.0, 1.0, 1.0, 1.0 ]
@@ -11440,7 +11619,7 @@
  ]
 					}
 ,
-					"patching_rect" : [ 1370.0, 208.0, 103.0, 22.0 ],
+					"patching_rect" : [ 1376.0, 137.0, 103.0, 22.0 ],
 					"saved_object_attributes" : 					{
 						"description" : "",
 						"digest" : "",
@@ -11462,7 +11641,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 1252.0, 862.0, 243.0, 51.0 ],
+					"patching_rect" : [ 1250.0, 960.0, 243.0, 51.0 ],
 					"style" : "",
 					"text" : "scroll down to view\nold-style watchdog list..."
 				}
@@ -11477,9 +11656,9 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 1263.0, 149.0, 254.0, 24.0 ],
+					"patching_rect" : [ 1269.0, 27.0, 254.0, 24.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 1231.0, 116.0, 254.0, 24.0 ],
+					"presentation_rect" : [ 1231.0, 120.0, 254.0, 24.0 ],
 					"style" : "",
 					"text" : "Master Show Automation"
 				}
@@ -11990,7 +12169,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 950.0, 1125.0, 170.0, 33.0 ],
+					"patching_rect" : [ 957.0, 1130.0, 170.0, 33.0 ],
 					"style" : "",
 					"text" : "please don't touch this ^^^^\nwithout talking to chris clavio"
 				}
@@ -12012,7 +12191,7 @@
 							"modernui" : 1
 						}
 ,
-						"rect" : [ 409.0, 152.0, 749.0, 662.0 ],
+						"rect" : [ 79.0, 306.0, 749.0, 662.0 ],
 						"bglocked" : 0,
 						"openinpresentation" : 0,
 						"default_fontsize" : 12.0,
@@ -12039,7 +12218,6 @@
 						"tags" : "",
 						"style" : "",
 						"subpatcher_template" : "",
-						"visible" : 1,
 						"boxes" : [ 							{
 								"box" : 								{
 									"id" : "obj-108",
@@ -12069,7 +12247,7 @@
 											"modernui" : 1
 										}
 ,
-										"rect" : [ 211.0, 226.0, 1078.0, 557.0 ],
+										"rect" : [ 83.0, 326.0, 1078.0, 557.0 ],
 										"bglocked" : 0,
 										"openinpresentation" : 0,
 										"default_fontsize" : 12.0,
@@ -12198,7 +12376,8 @@
 													"numoutlets" : 1,
 													"outlettype" : [ "" ],
 													"patching_rect" : [ 273.0, 282.0, 80.0, 22.0 ],
-													"style" : ""
+													"style" : "",
+													"text" : "/2LD-29 1"
 												}
 
 											}
@@ -12217,6 +12396,7 @@
 											}
 , 											{
 												"box" : 												{
+													"checkedcolor" : [ 0.0, 0.533333, 0.168627, 1.0 ],
 													"id" : "obj-32",
 													"maxclass" : "toggle",
 													"numinlets" : 1,
@@ -12224,12 +12404,16 @@
 													"outlettype" : [ "int" ],
 													"parameter_enable" : 0,
 													"patching_rect" : [ 986.75, 428.0, 24.0, 24.0 ],
-													"style" : ""
+													"presentation" : 1,
+													"presentation_rect" : [ 9.0, 150.0, 24.0, 24.0 ],
+													"style" : "",
+													"uncheckedcolor" : [ 0.784314, 0.145098, 0.023529, 1.0 ]
 												}
 
 											}
 , 											{
 												"box" : 												{
+													"checkedcolor" : [ 0.0, 0.533333, 0.168627, 1.0 ],
 													"id" : "obj-30",
 													"maxclass" : "toggle",
 													"numinlets" : 1,
@@ -12237,12 +12421,16 @@
 													"outlettype" : [ "int" ],
 													"parameter_enable" : 0,
 													"patching_rect" : [ 951.0625, 428.0, 24.0, 24.0 ],
-													"style" : ""
+													"presentation" : 1,
+													"presentation_rect" : [ 151.75, 116.0, 24.0, 24.0 ],
+													"style" : "",
+													"uncheckedcolor" : [ 0.784314, 0.145098, 0.023529, 1.0 ]
 												}
 
 											}
 , 											{
 												"box" : 												{
+													"checkedcolor" : [ 0.0, 0.533333, 0.168627, 1.0 ],
 													"id" : "obj-28",
 													"maxclass" : "toggle",
 													"numinlets" : 1,
@@ -12250,12 +12438,16 @@
 													"outlettype" : [ "int" ],
 													"parameter_enable" : 0,
 													"patching_rect" : [ 915.375, 428.0, 24.0, 24.0 ],
-													"style" : ""
+													"presentation" : 1,
+													"presentation_rect" : [ 116.0625, 116.0, 24.0, 24.0 ],
+													"style" : "",
+													"uncheckedcolor" : [ 0.784314, 0.145098, 0.023529, 1.0 ]
 												}
 
 											}
 , 											{
 												"box" : 												{
+													"checkedcolor" : [ 0.0, 0.533333, 0.168627, 1.0 ],
 													"id" : "obj-26",
 													"maxclass" : "toggle",
 													"numinlets" : 1,
@@ -12263,12 +12455,16 @@
 													"outlettype" : [ "int" ],
 													"parameter_enable" : 0,
 													"patching_rect" : [ 879.6875, 428.0, 24.0, 24.0 ],
-													"style" : ""
+													"presentation" : 1,
+													"presentation_rect" : [ 80.375, 116.0, 24.0, 24.0 ],
+													"style" : "",
+													"uncheckedcolor" : [ 0.784314, 0.145098, 0.023529, 1.0 ]
 												}
 
 											}
 , 											{
 												"box" : 												{
+													"checkedcolor" : [ 0.0, 0.533333, 0.168627, 1.0 ],
 													"id" : "obj-24",
 													"maxclass" : "toggle",
 													"numinlets" : 1,
@@ -12276,7 +12472,10 @@
 													"outlettype" : [ "int" ],
 													"parameter_enable" : 0,
 													"patching_rect" : [ 844.0, 428.0, 24.0, 24.0 ],
-													"style" : ""
+													"presentation" : 1,
+													"presentation_rect" : [ 44.6875, 116.0, 24.0, 24.0 ],
+													"style" : "",
+													"uncheckedcolor" : [ 0.784314, 0.145098, 0.023529, 1.0 ]
 												}
 
 											}
@@ -12289,7 +12488,7 @@
 													"outlettype" : [ "" ],
 													"patching_rect" : [ 51.0, 67.0, 132.0, 22.0 ],
 													"style" : "",
-													"text" : "bang"
+													"text" : "/2LD-11 1"
 												}
 
 											}
@@ -12313,7 +12512,8 @@
 													"numoutlets" : 1,
 													"outlettype" : [ "" ],
 													"patching_rect" : [ 395.75, 282.0, 143.0, 22.0 ],
-													"style" : ""
+													"style" : "",
+													"text" : "/Panel-2LD/2LD-29 1"
 												}
 
 											}
@@ -12369,7 +12569,7 @@
 													"outlettype" : [ "" ],
 													"patching_rect" : [ 81.666672, 277.0, 91.0, 22.0 ],
 													"style" : "",
-													"text" : "/relay 4 1"
+													"text" : "/relay 15 1"
 												}
 
 											}
@@ -12437,7 +12637,8 @@
 													"numoutlets" : 1,
 													"outlettype" : [ "" ],
 													"patching_rect" : [ 208.0, 128.0, 50.0, 22.0 ],
-													"style" : ""
+													"style" : "",
+													"text" : "4 1"
 												}
 
 											}
@@ -12508,6 +12709,7 @@
 											}
 , 											{
 												"box" : 												{
+													"checkedcolor" : [ 0.0, 0.533333, 0.168627, 1.0 ],
 													"id" : "obj-23",
 													"maxclass" : "toggle",
 													"numinlets" : 1,
@@ -12515,12 +12717,16 @@
 													"outlettype" : [ "int" ],
 													"parameter_enable" : 0,
 													"patching_rect" : [ 808.3125, 428.0, 24.0, 24.0 ],
-													"style" : ""
+													"presentation" : 1,
+													"presentation_rect" : [ 9.0, 116.0, 24.0, 24.0 ],
+													"style" : "",
+													"uncheckedcolor" : [ 0.784314, 0.145098, 0.023529, 1.0 ]
 												}
 
 											}
 , 											{
 												"box" : 												{
+													"checkedcolor" : [ 0.0, 0.533333, 0.168627, 1.0 ],
 													"id" : "obj-22",
 													"maxclass" : "toggle",
 													"numinlets" : 1,
@@ -12528,12 +12734,16 @@
 													"outlettype" : [ "int" ],
 													"parameter_enable" : 0,
 													"patching_rect" : [ 772.625, 428.0, 24.0, 24.0 ],
-													"style" : ""
+													"presentation" : 1,
+													"presentation_rect" : [ 151.75, 81.0, 24.0, 24.0 ],
+													"style" : "",
+													"uncheckedcolor" : [ 0.784314, 0.145098, 0.023529, 1.0 ]
 												}
 
 											}
 , 											{
 												"box" : 												{
+													"checkedcolor" : [ 0.0, 0.533333, 0.168627, 1.0 ],
 													"id" : "obj-21",
 													"maxclass" : "toggle",
 													"numinlets" : 1,
@@ -12541,12 +12751,16 @@
 													"outlettype" : [ "int" ],
 													"parameter_enable" : 0,
 													"patching_rect" : [ 736.9375, 428.0, 24.0, 24.0 ],
-													"style" : ""
+													"presentation" : 1,
+													"presentation_rect" : [ 116.0625, 81.0, 24.0, 24.0 ],
+													"style" : "",
+													"uncheckedcolor" : [ 0.784314, 0.145098, 0.023529, 1.0 ]
 												}
 
 											}
 , 											{
 												"box" : 												{
+													"checkedcolor" : [ 0.0, 0.533333, 0.168627, 1.0 ],
 													"id" : "obj-20",
 													"maxclass" : "toggle",
 													"numinlets" : 1,
@@ -12554,12 +12768,16 @@
 													"outlettype" : [ "int" ],
 													"parameter_enable" : 0,
 													"patching_rect" : [ 701.25, 428.0, 24.0, 24.0 ],
-													"style" : ""
+													"presentation" : 1,
+													"presentation_rect" : [ 80.375, 81.0, 24.0, 24.0 ],
+													"style" : "",
+													"uncheckedcolor" : [ 0.784314, 0.145098, 0.023529, 1.0 ]
 												}
 
 											}
 , 											{
 												"box" : 												{
+													"checkedcolor" : [ 0.0, 0.533333, 0.168627, 1.0 ],
 													"id" : "obj-19",
 													"maxclass" : "toggle",
 													"numinlets" : 1,
@@ -12567,12 +12785,16 @@
 													"outlettype" : [ "int" ],
 													"parameter_enable" : 0,
 													"patching_rect" : [ 665.5625, 428.0, 24.0, 24.0 ],
-													"style" : ""
+													"presentation" : 1,
+													"presentation_rect" : [ 44.6875, 81.0, 24.0, 24.0 ],
+													"style" : "",
+													"uncheckedcolor" : [ 0.784314, 0.145098, 0.023529, 1.0 ]
 												}
 
 											}
 , 											{
 												"box" : 												{
+													"checkedcolor" : [ 0.0, 0.533333, 0.168627, 1.0 ],
 													"id" : "obj-18",
 													"maxclass" : "toggle",
 													"numinlets" : 1,
@@ -12580,12 +12802,16 @@
 													"outlettype" : [ "int" ],
 													"parameter_enable" : 0,
 													"patching_rect" : [ 629.875, 428.0, 24.0, 24.0 ],
-													"style" : ""
+													"presentation" : 1,
+													"presentation_rect" : [ 9.0, 81.0, 24.0, 24.0 ],
+													"style" : "",
+													"uncheckedcolor" : [ 0.784314, 0.145098, 0.023529, 1.0 ]
 												}
 
 											}
 , 											{
 												"box" : 												{
+													"checkedcolor" : [ 0.0, 0.533333, 0.168627, 1.0 ],
 													"id" : "obj-17",
 													"maxclass" : "toggle",
 													"numinlets" : 1,
@@ -12593,12 +12819,16 @@
 													"outlettype" : [ "int" ],
 													"parameter_enable" : 0,
 													"patching_rect" : [ 594.1875, 428.0, 24.0, 24.0 ],
-													"style" : ""
+													"presentation" : 1,
+													"presentation_rect" : [ 151.75, 47.0, 24.0, 24.0 ],
+													"style" : "",
+													"uncheckedcolor" : [ 0.784314, 0.145098, 0.023529, 1.0 ]
 												}
 
 											}
 , 											{
 												"box" : 												{
+													"checkedcolor" : [ 0.0, 0.533333, 0.168627, 1.0 ],
 													"id" : "obj-14",
 													"maxclass" : "toggle",
 													"numinlets" : 1,
@@ -12606,12 +12836,16 @@
 													"outlettype" : [ "int" ],
 													"parameter_enable" : 0,
 													"patching_rect" : [ 558.5, 428.0, 24.0, 24.0 ],
-													"style" : ""
+													"presentation" : 1,
+													"presentation_rect" : [ 116.0625, 47.0, 24.0, 24.0 ],
+													"style" : "",
+													"uncheckedcolor" : [ 0.784314, 0.145098, 0.023529, 1.0 ]
 												}
 
 											}
 , 											{
 												"box" : 												{
+													"checkedcolor" : [ 0.0, 0.533333, 0.168627, 1.0 ],
 													"id" : "obj-13",
 													"maxclass" : "toggle",
 													"numinlets" : 1,
@@ -12619,12 +12853,16 @@
 													"outlettype" : [ "int" ],
 													"parameter_enable" : 0,
 													"patching_rect" : [ 522.8125, 428.0, 24.0, 24.0 ],
-													"style" : ""
+													"presentation" : 1,
+													"presentation_rect" : [ 80.375, 47.0, 24.0, 24.0 ],
+													"style" : "",
+													"uncheckedcolor" : [ 0.784314, 0.145098, 0.023529, 1.0 ]
 												}
 
 											}
 , 											{
 												"box" : 												{
+													"checkedcolor" : [ 0.0, 0.533333, 0.168627, 1.0 ],
 													"id" : "obj-12",
 													"maxclass" : "toggle",
 													"numinlets" : 1,
@@ -12632,12 +12870,16 @@
 													"outlettype" : [ "int" ],
 													"parameter_enable" : 0,
 													"patching_rect" : [ 487.0, 428.0, 24.0, 24.0 ],
-													"style" : ""
+													"presentation" : 1,
+													"presentation_rect" : [ 44.5625, 47.0, 24.0, 24.0 ],
+													"style" : "",
+													"uncheckedcolor" : [ 0.784314, 0.145098, 0.023529, 1.0 ]
 												}
 
 											}
 , 											{
 												"box" : 												{
+													"checkedcolor" : [ 0.0, 0.533333, 0.168627, 1.0 ],
 													"id" : "obj-11",
 													"maxclass" : "toggle",
 													"numinlets" : 1,
@@ -12645,12 +12887,16 @@
 													"outlettype" : [ "int" ],
 													"parameter_enable" : 0,
 													"patching_rect" : [ 451.4375, 428.0, 24.0, 24.0 ],
-													"style" : ""
+													"presentation" : 1,
+													"presentation_rect" : [ 9.0, 47.0, 24.0, 24.0 ],
+													"style" : "",
+													"uncheckedcolor" : [ 0.784314, 0.145098, 0.023529, 1.0 ]
 												}
 
 											}
 , 											{
 												"box" : 												{
+													"checkedcolor" : [ 0.0, 0.533333, 0.168627, 1.0 ],
 													"id" : "obj-10",
 													"maxclass" : "toggle",
 													"numinlets" : 1,
@@ -12658,12 +12904,16 @@
 													"outlettype" : [ "int" ],
 													"parameter_enable" : 0,
 													"patching_rect" : [ 415.75, 428.0, 24.0, 24.0 ],
-													"style" : ""
+													"presentation" : 1,
+													"presentation_rect" : [ 151.75, 13.0, 24.0, 24.0 ],
+													"style" : "",
+													"uncheckedcolor" : [ 0.784314, 0.145098, 0.023529, 1.0 ]
 												}
 
 											}
 , 											{
 												"box" : 												{
+													"checkedcolor" : [ 0.0, 0.533333, 0.168627, 1.0 ],
 													"id" : "obj-9",
 													"maxclass" : "toggle",
 													"numinlets" : 1,
@@ -12671,12 +12921,16 @@
 													"outlettype" : [ "int" ],
 													"parameter_enable" : 0,
 													"patching_rect" : [ 380.0625, 428.0, 24.0, 24.0 ],
-													"style" : ""
+													"presentation" : 1,
+													"presentation_rect" : [ 116.0625, 13.0, 24.0, 24.0 ],
+													"style" : "",
+													"uncheckedcolor" : [ 0.784314, 0.145098, 0.023529, 1.0 ]
 												}
 
 											}
 , 											{
 												"box" : 												{
+													"checkedcolor" : [ 0.0, 0.533333, 0.168627, 1.0 ],
 													"id" : "obj-8",
 													"maxclass" : "toggle",
 													"numinlets" : 1,
@@ -12684,12 +12938,16 @@
 													"outlettype" : [ "int" ],
 													"parameter_enable" : 0,
 													"patching_rect" : [ 344.375, 428.0, 24.0, 24.0 ],
-													"style" : ""
+													"presentation" : 1,
+													"presentation_rect" : [ 80.375, 13.0, 24.0, 24.0 ],
+													"style" : "",
+													"uncheckedcolor" : [ 0.784314, 0.145098, 0.023529, 1.0 ]
 												}
 
 											}
 , 											{
 												"box" : 												{
+													"checkedcolor" : [ 0.0, 0.533333, 0.168627, 1.0 ],
 													"id" : "obj-7",
 													"maxclass" : "toggle",
 													"numinlets" : 1,
@@ -12697,12 +12955,16 @@
 													"outlettype" : [ "int" ],
 													"parameter_enable" : 0,
 													"patching_rect" : [ 308.6875, 428.0, 24.0, 24.0 ],
-													"style" : ""
+													"presentation" : 1,
+													"presentation_rect" : [ 44.6875, 13.0, 24.0, 24.0 ],
+													"style" : "",
+													"uncheckedcolor" : [ 0.784314, 0.145098, 0.023529, 1.0 ]
 												}
 
 											}
 , 											{
 												"box" : 												{
+													"checkedcolor" : [ 0.0, 0.533333, 0.168627, 1.0 ],
 													"id" : "obj-6",
 													"maxclass" : "toggle",
 													"numinlets" : 1,
@@ -12710,7 +12972,10 @@
 													"outlettype" : [ "int" ],
 													"parameter_enable" : 0,
 													"patching_rect" : [ 273.0, 428.0, 24.0, 24.0 ],
-													"style" : ""
+													"presentation" : 1,
+													"presentation_rect" : [ 9.0, 13.0, 24.0, 24.0 ],
+													"style" : "",
+													"uncheckedcolor" : [ 0.784314, 0.145098, 0.023529, 1.0 ]
 												}
 
 											}
@@ -12724,7 +12989,7 @@
 													"outlettype" : [ "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "" ],
 													"patching_rect" : [ 273.0, 374.0, 768.4375, 35.0 ],
 													"style" : "",
-													"text" : "route /2LD-2 /2LD-4 /2LD-6 /2LD-7 /2LD-8 /2LD-9 /2LD-10 /2LD-11 /2LD-12 /2LD-13 /2LD-14 /2LD-15 /2LD16 /2LD-17 /2LD-18 /2LD-19 /2LD-20 /2LD-21 /2LD-21 /2LD-36 /2LD-38"
+													"text" : "route /2LD-2 /2LD-4 /2LD-6 /2LD-7 /2LD-8 /2LD-9 /2LD-10 /2LD-11 /2LD-12 /2LD-13 /2LD-14 /2LD-15 /2LD16 /2LD-17 /2LD-18 /2LD-19 /2LD-20 /2LD-21 /2LD-29 /2LD-36 /2LD-38"
 												}
 
 											}
@@ -12748,6 +13013,15 @@
 													"disabled" : 0,
 													"hidden" : 0,
 													"source" : [ "obj-105", 0 ]
+												}
+
+											}
+, 											{
+												"patchline" : 												{
+													"destination" : [ "obj-94", 0 ],
+													"disabled" : 0,
+													"hidden" : 0,
+													"source" : [ "obj-15", 0 ]
 												}
 
 											}
@@ -13195,7 +13469,7 @@
  ]
 									}
 ,
-									"patching_rect" : [ 183.666672, 256.0, 114.0, 22.0 ],
+									"patching_rect" : [ 157.666672, 272.0, 114.0, 22.0 ],
 									"saved_object_attributes" : 									{
 										"description" : "",
 										"digest" : "",
@@ -15245,7 +15519,7 @@
 									"outlettype" : [ "" ],
 									"patching_rect" : [ 38.5, 55.0, 159.0, 22.0 ],
 									"style" : "",
-									"text" : "/Panel-2LC/2LC-15 1."
+									"text" : "/Panel-2LD/2LD-15 1."
 								}
 
 							}
@@ -15410,7 +15684,7 @@
  ]
 					}
 ,
-					"patching_rect" : [ 1030.0, 1101.0, 90.0, 22.0 ],
+					"patching_rect" : [ 1035.0, 1105.0, 90.0, 22.0 ],
 					"saved_object_attributes" : 					{
 						"description" : "",
 						"digest" : "",
@@ -22461,7 +22735,7 @@
 					"presentation" : 1,
 					"presentation_rect" : [ 333.0, 1029.0, 401.0, 29.0 ],
 					"style" : "",
-					"text" : "SYSTEM INFO: 255 total devices, 177 OK (68%)",
+					"text" : "SYSTEM INFO: 260 total devices, 177 OK (68%)",
 					"textcolor" : [ 0.0, 0.0, 0.0, 1.0 ]
 				}
 
@@ -22485,8 +22759,8 @@
 				"box" : 				{
 					"border" : 0,
 					"bordercolor" : [ 0.0, 0.0, 0.0, 1.0 ],
-					"celldef" : [ [ 0, 0, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 1, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 2, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 3, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 4, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 5, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 6, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 7, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.498039, 0.498039, 0.498039, 1.0, 0, -1, -1 ], [ 0, 8, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 9, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 10, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 11, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 12, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 13, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 14, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 15, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 16, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 17, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 18, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 19, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 20, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 21, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 22, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 23, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 24, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 25, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 26, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 27, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 28, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 29, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 30, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.498039, 0.498039, 0.498039, 1.0, 0, -1, -1 ], [ 0, 31, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 32, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 33, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 34, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 35, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 36, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 37, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 38, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 39, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 40, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 41, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 42, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 43, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 44, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 45, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 46, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 47, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 48, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 49, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 50, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 51, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 52, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 53, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 54, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 55, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 56, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 57, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 58, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 59, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 60, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 61, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 62, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 63, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 64, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 65, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 66, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 67, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 68, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 69, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 70, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.498039, 0.498039, 0.498039, 1.0, 0, -1, -1 ], [ 0, 71, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 72, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.498039, 0.498039, 0.498039, 1.0, 0, -1, -1 ], [ 0, 73, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 74, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 75, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 76, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 77, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 78, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 79, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 80, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 81, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 82, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 83, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 84, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 85, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 86, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 87, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 88, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 89, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 90, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 91, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 92, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 93, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 94, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 95, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 96, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 97, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 98, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 99, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 2, 0, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.301961, 0.301961, 0.301961, 1.0, -1, -1, -1 ], [ 2, 1, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 2, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 3, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 4, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 5, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 6, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 7, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 8, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 9, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 10, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 11, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 12, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 13, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 14, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 15, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 16, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 17, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 18, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 19, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 4, 0, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 1, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 2, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 3, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 4, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 5, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 6, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 7, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 8, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 9, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 10, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 11, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 12, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 13, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 14, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 15, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 16, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 17, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 18, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 19, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 20, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 21, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 22, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 23, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 24, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 25, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 26, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 27, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 28, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 29, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 30, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 31, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 32, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 33, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 34, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 35, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 36, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 37, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 38, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 39, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 40, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 41, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 42, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 43, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 44, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 45, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 46, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 47, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 48, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 49, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 50, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 51, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 52, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 53, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 54, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 55, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 56, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 57, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 58, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 59, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 60, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 61, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 62, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 63, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 64, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 65, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 66, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 67, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 68, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 69, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 70, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 71, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 72, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 73, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 74, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 75, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 76, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 77, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 78, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 79, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 80, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 81, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 82, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 83, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 84, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 85, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 86, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 87, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 88, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 89, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 90, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 91, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 92, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 93, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 94, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 95, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 96, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 97, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 98, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 99, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ] ],
-					"cellmap" : [ [ 5, 1, "Arduino", "Mega2650" ], [ 5, 2, "Arduino", "Uno" ], [ 5, 3, "Arduino", "Uno" ], [ 5, 4, "Arduino", "Uno" ], [ 5, 5, "Arduino", "Uno" ], [ 5, 6, "Arduino", "Uno" ], [ 5, 7, "Windows", "PC", "-", "ian's", "build" ], [ 5, 8, "Software" ], [ 5, 9, "Raspberry", "Pi" ], [ 5, 10, "Software" ], [ 5, 11, "Software" ], [ 5, 12, "Raspberry", "Pi" ], [ 5, 13, "Software" ], [ 5, 14, "Software" ], [ 5, 15, "Software" ], [ 5, 16, "Software" ], [ 5, 17, "Raspberry", "Pi" ], [ 5, 18, 0 ], [ 5, 19, "Software" ], [ 5, 20, "Software" ], [ 5, 21, 0 ], [ 5, 22, "Raspberry", "Pi" ], [ 5, 23, "Software" ], [ 5, 24, "Raspberry", "Pi" ], [ 5, 25, "Software" ], [ 5, 26, "Software" ], [ 5, 27, "Raspberry", "Pi" ], [ 5, 28, "Software" ], [ 5, 29, "Software" ], [ 5, 30, "Windows", "PC", "-", "Media", "Server" ], [ 5, 31, "Software" ], [ 5, 32, "Raspberry", "Pi" ], [ 5, 33, "Software" ], [ 5, 34, "Software" ], [ 5, 35, "Software" ], [ 5, 36, "Software" ], [ 5, 37, "Raspberry", "Pi" ], [ 5, 38, "Software" ], [ 5, 39, "Software" ], [ 5, 40, "Software" ], [ 5, 41, "Software" ], [ 5, 42, "Raspberry", "Pi" ], [ 5, 43, "Software" ], [ 5, 44, "Software" ], [ 5, 45, "Software" ], [ 5, 46, "Software" ], [ 5, 47, "Raspberry", "Pi" ], [ 5, 48, "Software" ], [ 5, 49, "Software" ], [ 5, 50, "Software" ], [ 5, 51, "Software" ], [ 5, 52, "Raspberry", "Pi" ], [ 5, 53, "Software" ], [ 5, 54, "Software" ], [ 5, 55, "Raspberry", "Pi" ], [ 5, 56, "Software" ], [ 5, 57, "Raspberry", "Pi" ], [ 5, 58, "Software" ], [ 5, 59, "Software" ], [ 5, 60, "Raspberry", "Pi" ], [ 5, 61, "Software" ], [ 5, 62, "Software" ], [ 5, 63, "Software" ], [ 5, 64, "Software" ], [ 5, 65, "Arduino", "Uno" ], [ 5, 66, "Arduino", "Uno" ], [ 5, 67, "Arduino", "Uno" ], [ 5, 68, "Arduino", "Uno" ], [ 5, 69, "Arduino", "Uno" ], [ 5, 70, "Windows", "PC", "-", "Media", "Server" ], [ 5, 71, "Software" ], [ 5, 72, "Windows", "PC", "-", "Media", "Server" ], [ 5, 73, "Software" ], [ 5, 74, "Raspberry", "Pi" ], [ 5, 75, "Software" ], [ 5, 76, "Software" ], [ 5, 77, "Raspberry", "Pi" ], [ 5, 78, "Software" ], [ 5, 79, "Software" ], [ 5, 80, "Raspberry", "Pi" ], [ 5, 0, "type" ], [ 5, 81, "Software" ], [ 5, 82, "Raspberry", "Pi" ], [ 5, 83, "Software" ], [ 5, 84, "Raspberry", "Pi" ], [ 5, 85, "Software" ], [ 5, 86, "Software" ], [ 5, 87, "Software" ], [ 5, 88, "Arduino", "Uno" ], [ 5, 89, "Arduino", "Uno" ], [ 5, 90, "Arduino", "Uno" ], [ 5, 91, "Arduino", "Uno" ], [ 5, 92, "Arduino", "Uno" ], [ 5, 93, "Arduino", "Uno" ], [ 5, 94, "Arduino", "Uno" ], [ 5, 95, "Mac", "Pro" ], [ 5, 96, "Raspberry", "Pi" ], [ 5, 97, "Software" ], [ 5, 98, "Software" ], [ 5, 99, "Raspberry", "Pi" ], [ 6, 1, "Feb", 14, ",", 2016, "20:01:54" ], [ 6, 2, "Feb", 28, ",", 2016, "04:08:45" ], [ 6, 3, "Feb", 14, ",", 2016, "20:01:10" ], [ 6, 4, "Mar", 1, ",", 2016, "04:21:10" ], [ 6, 5, "Feb", 28, ",", 2016, "03:53:25" ], [ 6, 6, 0 ], [ 6, 7, "Jan", 20, ",", 2016, "16:22:19" ], [ 6, 8, "Jan", 20, ",", 2016, "16:22:19" ], [ 6, 9, "Feb", 5, ",", 2016, "20:38:21" ], [ 6, 10, "Feb", 5, ",", 2016, "20:38:21" ], [ 6, 11, "Feb", 5, ",", 2016, "20:38:21" ], [ 6, 12, "Feb", 26, ",", 2016, "15:00:58" ], [ 6, 13, "Feb", 26, ",", 2016, "15:00:58" ], [ 6, 14, "Feb", 26, ",", 2016, "15:00:58" ], [ 6, 15, "Feb", 26, ",", 2016, "15:00:57" ], [ 6, 16, "Feb", 26, ",", 2016, "15:00:58" ], [ 6, 17, "Feb", 17, ",", 2016, "12:05:16" ], [ 6, 18, "Feb", 23, ",", 2016, "07:47:45" ], [ 6, 19, "Feb", 23, ",", 2016, "07:47:45" ], [ 6, 20, "Feb", 23, ",", 2016, "07:47:45" ], [ 6, 21, "Feb", 17, ",", 2016, "12:05:16" ], [ 6, 22, "Feb", 23, ",", 2016, "07:47:45" ], [ 6, 23, "Feb", 23, ",", 2016, "07:47:45" ], [ 6, 24, "Feb", 26, ",", 2016, "08:44:29" ], [ 6, 25, "Feb", 26, ",", 2016, "08:44:29" ], [ 6, 26, "Feb", 26, ",", 2016, "08:44:29" ], [ 6, 27, "Feb", 25, ",", 2016, "21:45:36" ], [ 6, 28, "Feb", 25, ",", 2016, "21:45:36" ], [ 6, 29, "Feb", 25, ",", 2016, "21:45:36" ], [ 6, 30, "Feb", 25, ",", 2016, "15:17:10" ], [ 6, 31, "Feb", 25, ",", 2016, "15:17:10" ], [ 6, 32, "Feb", 23, ",", 2016, "07:47:46" ], [ 6, 33, "Feb", 23, ",", 2016, "07:47:46" ], [ 6, 34, "Feb", 23, ",", 2016, "07:47:46" ], [ 6, 35, "Feb", 23, ",", 2016, "07:47:46" ], [ 6, 36, "Feb", 23, ",", 2016, "07:47:46" ], [ 6, 37, "Feb", 23, ",", 2016, "08:11:35" ], [ 6, 38, "Feb", 23, ",", 2016, "08:11:35" ], [ 6, 39, "Feb", 23, ",", 2016, "08:11:35" ], [ 6, 40, "Feb", 23, ",", 2016, "08:11:35" ], [ 6, 41, "Feb", 23, ",", 2016, "08:11:35" ], [ 6, 42, "Feb", 23, ",", 2016, "08:11:48" ], [ 6, 43, "Feb", 23, ",", 2016, "08:11:48" ], [ 6, 44, "Feb", 23, ",", 2016, "08:11:48" ], [ 6, 45, "Feb", 23, ",", 2016, "08:11:48" ], [ 6, 46, "Feb", 23, ",", 2016, "08:11:48" ], [ 6, 47, "Mar", 2, ",", 2016, "15:02:08" ], [ 6, 48, "Mar", 2, ",", 2016, "15:02:08" ], [ 6, 49, "Mar", 2, ",", 2016, "15:02:08" ], [ 6, 50, "Mar", 2, ",", 2016, "15:02:08" ], [ 6, 51, "Mar", 2, ",", 2016, "15:02:08" ], [ 6, 52, "Mar", 4, ",", 2016, "14:09:00" ], [ 6, 53, "Mar", 4, ",", 2016, "14:09:00" ], [ 6, 54, "Mar", 4, ",", 2016, "14:09:00" ], [ 6, 55, "Feb", 23, ",", 2016, "21:56:53" ], [ 6, 56, "Feb", 23, ",", 2016, "21:56:53" ], [ 6, 57, "Mar", 4, ",", 2016, "06:01:14" ], [ 6, 58, "Mar", 4, ",", 2016, "06:01:14" ], [ 6, 59, "Mar", 4, ",", 2016, "06:01:14" ], [ 6, 60, "Mar", 2, ",", 2016, "13:50:11" ], [ 6, 61, "Mar", 2, ",", 2016, "13:50:11" ], [ 6, 62, "Mar", 2, ",", 2016, "13:50:11" ], [ 6, 63, "Mar", 2, ",", 2016, "13:50:11" ], [ 6, 64, "Mar", 2, ",", 2016, "13:50:11" ], [ 6, 65, "Feb", 25, ",", 2016, "22:51:54" ], [ 6, 66, "Feb", 17, ",", 2016, "17:32:25" ], [ 6, 67, "Feb", 13, ",", 2016, "21:12:12" ], [ 6, 68, "Feb", 17, ",", 2016, "20:03:23" ], [ 6, 69, "Feb", 15, ",", 2016, "14:18:56" ], [ 6, 70, "Feb", 26, ",", 2016, "09:07:07" ], [ 6, 71, "Feb", 26, ",", 2016, "09:07:07" ], [ 6, 72, "Feb", 9, ",", 2016, "17:40:51" ], [ 6, 73, "Feb", 9, ",", 2016, "17:40:51" ], [ 6, 74, "Mar", 4, ",", 2016, "06:01:18" ], [ 6, 75, "Mar", 4, ",", 2016, "06:01:18" ], [ 6, 76, "Mar", 4, ",", 2016, "06:01:18" ], [ 6, 77, "Mar", 4, ",", 2016, "06:01:12" ], [ 6, 78, "Mar", 4, ",", 2016, "06:01:12" ], [ 6, 79, "Mar", 4, ",", 2016, "06:01:12" ], [ 6, 80, "Mar", 4, ",", 2016, "16:02:37" ], [ 6, 0, "last", "reset" ], [ 6, 81, "Mar", 4, ",", 2016, "16:02:38" ], [ 6, 82, "Mar", 4, ",", 2016, "06:01:13" ], [ 6, 83, "Mar", 4, ",", 2016, "06:01:13" ], [ 6, 84, "Feb", 19, ",", 2016, "00:42:00" ], [ 6, 85, "Feb", 19, ",", 2016, "00:42:00" ], [ 6, 86, "Feb", 19, ",", 2016, "00:42:00" ], [ 6, 87, "Feb", 19, ",", 2016, "00:42:00" ], [ 6, 88, "Feb", 14, ",", 2016, "12:24:27" ], [ 6, 89, "Feb", 16, ",", 2016, "16:55:02" ], [ 6, 90, "Feb", 22, ",", 2016, "11:49:34" ], [ 6, 91, "Feb", 14, ",", 2016, "18:11:32" ], [ 6, 92, "Feb", 17, ",", 2016, "12:16:51" ], [ 6, 93, "Feb", 15, ",", 2016, "18:27:20" ], [ 6, 94, "Feb", 17, ",", 2016, "12:16:35" ], [ 6, 95, "Feb", 22, ",", 2016, "15:32:07" ], [ 6, 96, "Feb", 23, ",", 2016, "21:20:09" ], [ 6, 97, "Feb", 23, ",", 2016, "21:20:09" ], [ 6, 98, "Feb", 23, ",", 2016, "21:20:09" ], [ 6, 99, "Mar", 4, ",", 2016, "06:01:10" ], [ 4, 1, "NONRESPONSIVE" ], [ 4, 2, "NONRESPONSIVE" ], [ 4, 3, "OKAY" ], [ 4, 4, "NONRESPONSIVE" ], [ 4, 5, "OKAY" ], [ 4, 6, "NONRESPONSIVE" ], [ 4, 7, "NONRESPONSIVE" ], [ 4, 8, "NONRESPONSIVE" ], [ 4, 9, "OKAY" ], [ 4, 10, "OKAY" ], [ 4, 11, "NONRESPONSIVE" ], [ 4, 12, "OKAY" ], [ 4, 13, "OKAY" ], [ 4, 14, "OKAY" ], [ 4, 15, "OKAY" ], [ 4, 16, "NONRESPONSIVE" ], [ 4, 17, "OKAY" ], [ 4, 18, "OKAY" ], [ 4, 19, "OKAY" ], [ 4, 20, "NONRESPONSIVE" ], [ 4, 21, "NONRESPONSIVE" ], [ 4, 22, "OKAY" ], [ 4, 23, "OKAY" ], [ 4, 24, "OKAY" ], [ 4, 25, "OKAY" ], [ 4, 26, "NONRESPONSIVE" ], [ 4, 27, "OKAY" ], [ 4, 28, "OKAY" ], [ 4, 29, "OKAY" ], [ 4, 30, "OKAY" ], [ 4, 31, "OKAY" ], [ 4, 32, "OKAY" ], [ 4, 33, "OKAY" ], [ 4, 34, "OKAY" ], [ 4, 35, "OKAY" ], [ 4, 36, "OKAY" ], [ 4, 37, "OKAY" ], [ 4, 38, "OKAY" ], [ 4, 39, "OKAY" ], [ 4, 40, "NONRESPONSIVE" ], [ 4, 41, "NONRESPONSIVE" ], [ 4, 42, "OKAY" ], [ 4, 43, "OKAY" ], [ 4, 44, "OKAY" ], [ 4, 45, "OKAY" ], [ 4, 46, "OKAY" ], [ 4, 47, "OKAY" ], [ 4, 48, "OKAY" ], [ 4, 49, "OKAY" ], [ 4, 50, "OKAY" ], [ 4, 51, "NONRESPONSIVE" ], [ 4, 52, "OKAY" ], [ 4, 53, "OKAY" ], [ 4, 54, "OKAY" ], [ 4, 55, "OKAY" ], [ 4, 56, "OKAY" ], [ 4, 57, "OKAY" ], [ 4, 58, "OKAY" ], [ 4, 59, "OKAY" ], [ 4, 60, "OKAY" ], [ 4, 61, "OKAY" ], [ 4, 62, "OKAY" ], [ 4, 63, "OKAY" ], [ 4, 64, "OKAY" ], [ 4, 65, "OKAY" ], [ 4, 66, "NONRESPONSIVE" ], [ 4, 67, "NONRESPONSIVE" ], [ 4, 68, "NONRESPONSIVE" ], [ 4, 69, "NONRESPONSIVE" ], [ 4, 70, "OKAY" ], [ 4, 71, "OKAY" ], [ 4, 72, "NONRESPONSIVE" ], [ 4, 73, "NONRESPONSIVE" ], [ 4, 74, "OKAY" ], [ 4, 75, "OKAY" ], [ 4, 76, "OKAY" ], [ 4, 77, "OKAY" ], [ 4, 78, "OKAY" ], [ 4, 79, "OKAY" ], [ 4, 80, "OKAY" ], [ 4, 0, "status" ], [ 4, 81, "OKAY" ], [ 4, 82, "OKAY" ], [ 4, 83, "OKAY" ], [ 4, 84, "OKAY" ], [ 4, 85, "OKAY" ], [ 4, 86, "NONRESPONSIVE" ], [ 4, 87, "NONRESPONSIVE" ], [ 4, 88, "NONRESPONSIVE" ], [ 4, 89, "NONRESPONSIVE" ], [ 4, 90, "NONRESPONSIVE" ], [ 4, 91, "OKAY" ], [ 4, 92, "NONRESPONSIVE" ], [ 4, 93, "NONRESPONSIVE" ], [ 4, 94, "NONRESPONSIVE" ], [ 4, 95, "NONRESPONSIVE" ], [ 4, 96, "OKAY" ], [ 4, 97, "OKAY" ], [ 4, 98, "NONRESPONSIVE" ], [ 4, 99, "OKAY" ], [ 3, 1, 676260 ], [ 3, 2, 122592 ], [ 3, 3, 1611360 ], [ 3, 4, 107232 ], [ 3, 5, 480252 ], [ 3, 6, 60 ], [ 3, 7, 1648591 ], [ 3, 8, 1648574 ], [ 3, 9, 2407242 ], [ 3, 10, 2407222 ], [ 3, 11, 2407222 ], [ 3, 12, 613125 ], [ 3, 13, 613115 ], [ 3, 14, 613115 ], [ 3, 15, 613115 ], [ 3, 16, 613115 ], [ 3, 17, 898283 ], [ 3, 18, 898298 ], [ 3, 19, 898297 ], [ 3, 20, 898297 ], [ 3, 21, 108829 ], [ 3, 22, 898277 ], [ 3, 23, 898299 ], [ 3, 24, 635730 ], [ 3, 25, 635765 ], [ 3, 26, 635765 ], [ 3, 27, 675229 ], [ 3, 28, 675253 ], [ 3, 29, 675253 ], [ 3, 30, 698520 ], [ 3, 31, 698520 ], [ 3, 32, 898313 ], [ 3, 33, 898293 ], [ 3, 34, 898293 ], [ 3, 35, 898293 ], [ 3, 36, 898293 ], [ 3, 37, 896893 ], [ 3, 38, 896876 ], [ 3, 39, 896876 ], [ 3, 40, 896875 ], [ 3, 41, 896876 ], [ 3, 42, 896831 ], [ 3, 43, 896842 ], [ 3, 44, 896842 ], [ 3, 45, 896842 ], [ 3, 46, 896842 ], [ 3, 47, 181021 ], [ 3, 48, 181026 ], [ 3, 49, 181026 ], [ 3, 50, 181026 ], [ 3, 51, 181026 ], [ 3, 52, 11404 ], [ 3, 53, 11420 ], [ 3, 54, 11420 ], [ 3, 55, 847366 ], [ 3, 56, 847370 ], [ 3, 57, 40686 ], [ 3, 58, 40699 ], [ 3, 59, 40699 ], [ 3, 60, 185382 ], [ 3, 61, 185339 ], [ 3, 62, 185339 ], [ 3, 63, 185339 ], [ 3, 64, 185339 ], [ 3, 65, 671460 ], [ 3, 66, 180 ], [ 3, 67, 360 ], [ 3, 68, 2220 ], [ 3, 69, 112920 ], [ 3, 70, 634357 ], [ 3, 71, 634376 ], [ 3, 72, 22173 ], [ 3, 73, 7942 ], [ 3, 74, 40687 ], [ 3, 75, 40700 ], [ 3, 76, 40701 ], [ 3, 77, 40688 ], [ 3, 78, 40703 ], [ 3, 79, 40703 ], [ 3, 80, 4623 ], [ 3, 0, "uptime" ], [ 3, 81, 4599 ], [ 3, 82, 40687 ], [ 3, 83, 40694 ], [ 3, 84, 1269327 ], [ 3, 85, 1269353 ], [ 3, 86, 1269353 ], [ 3, 87, 1269354 ], [ 3, 88, 60 ], [ 3, 89, 498900 ], [ 3, 90, 60 ], [ 3, 91, 1637100 ], [ 3, 92, 29400 ], [ 3, 93, 84780 ], [ 3, 94, 29460 ], [ 3, 95, 0 ], [ 3, 96, 849538 ], [ 3, 97, 849567 ], [ 3, 98, 849567 ], [ 3, 99, 40689 ], [ 2, 1, "Mar", 4, ",", 2016, "17:19:06" ], [ 2, 2, "Mar", 4, ",", 2016, "17:17:36" ], [ 2, 3, "Mar", 4, ",", 2016, "17:19:20" ], [ 2, 4, "Mar", 4, ",", 2016, "17:17:36" ], [ 2, 5, "Mar", 4, ",", 2016, "17:19:07" ], [ 2, 6, "Mar", 4, ",", 2016, "17:17:36" ], [ 2, 7, "Mar", 4, ",", 2016, "17:19:06" ], [ 2, 8, "Mar", 4, ",", 2016, "17:19:06" ], [ 2, 9, "Mar", 4, ",", 2016, "17:19:51" ], [ 2, 10, "Mar", 4, ",", 2016, "17:19:31" ], [ 2, 11, "Mar", 4, ",", 2016, "17:19:31" ], [ 2, 12, "Mar", 4, ",", 2016, "17:19:43" ], [ 2, 13, "Mar", 4, ",", 2016, "17:19:33" ], [ 2, 14, "Mar", 4, ",", 2016, "17:19:33" ], [ 2, 15, "Mar", 4, ",", 2016, "17:19:33" ], [ 2, 16, "Mar", 4, ",", 2016, "17:19:33" ], [ 2, 17, "Mar", 4, ",", 2016, "17:19:08" ], [ 2, 18, "Mar", 4, ",", 2016, "17:19:23" ], [ 2, 19, "Mar", 4, ",", 2016, "17:19:23" ], [ 2, 20, "Mar", 4, ",", 2016, "17:19:23" ], [ 2, 21, "Mar", 4, ",", 2016, "17:17:36" ], [ 2, 22, "Mar", 4, ",", 2016, "17:19:03" ], [ 2, 23, "Mar", 4, ",", 2016, "17:19:25" ], [ 2, 24, "Mar", 4, ",", 2016, "17:19:14" ], [ 2, 25, "Mar", 4, ",", 2016, "17:19:49" ], [ 2, 26, "Mar", 4, ",", 2016, "17:19:49" ], [ 2, 27, "Mar", 4, ",", 2016, "17:19:25" ], [ 2, 28, "Mar", 4, ",", 2016, "17:19:48" ], [ 2, 29, "Mar", 4, ",", 2016, "17:19:48" ], [ 2, 30, "Mar", 4, ",", 2016, "17:19:27" ], [ 2, 31, "Mar", 4, ",", 2016, "17:19:27" ], [ 2, 32, "Mar", 4, ",", 2016, "17:19:39" ], [ 2, 33, "Mar", 4, ",", 2016, "17:19:19" ], [ 2, 34, "Mar", 4, ",", 2016, "17:19:19" ], [ 2, 35, "Mar", 4, ",", 2016, "17:19:19" ], [ 2, 36, "Mar", 4, ",", 2016, "17:19:19" ], [ 2, 37, "Mar", 4, ",", 2016, "17:19:48" ], [ 2, 38, "Mar", 4, ",", 2016, "17:19:31" ], [ 2, 39, "Mar", 4, ",", 2016, "17:19:31" ], [ 2, 40, "Mar", 4, ",", 2016, "17:19:30" ], [ 2, 41, "Mar", 4, ",", 2016, "17:19:30" ], [ 2, 42, "Mar", 4, ",", 2016, "17:18:59" ], [ 2, 43, "Mar", 4, ",", 2016, "17:19:10" ], [ 2, 44, "Mar", 4, ",", 2016, "17:19:10" ], [ 2, 45, "Mar", 4, ",", 2016, "17:19:10" ], [ 2, 46, "Mar", 4, ",", 2016, "17:19:10" ], [ 2, 47, "Mar", 4, ",", 2016, "17:19:09" ], [ 2, 48, "Mar", 4, ",", 2016, "17:19:14" ], [ 2, 49, "Mar", 4, ",", 2016, "17:19:14" ], [ 2, 50, "Mar", 4, ",", 2016, "17:19:14" ], [ 2, 51, "Mar", 4, ",", 2016, "17:19:14" ], [ 2, 52, "Mar", 4, ",", 2016, "17:19:03" ], [ 2, 53, "Mar", 4, ",", 2016, "17:19:20" ], [ 2, 54, "Mar", 4, ",", 2016, "17:19:20" ], [ 2, 55, "Mar", 4, ",", 2016, "17:19:40" ], [ 2, 56, "Mar", 4, ",", 2016, "17:19:44" ], [ 2, 57, "Mar", 4, ",", 2016, "17:19:20" ], [ 2, 58, "Mar", 4, ",", 2016, "17:19:33" ], [ 2, 59, "Mar", 4, ",", 2016, "17:19:34" ], [ 2, 60, "Mar", 4, ",", 2016, "17:19:53" ], [ 2, 61, "Mar", 4, ",", 2016, "17:19:10" ], [ 2, 62, "Mar", 4, ",", 2016, "17:19:10" ], [ 2, 63, "Mar", 4, ",", 2016, "17:19:10" ], [ 2, 64, "Mar", 4, ",", 2016, "17:19:10" ], [ 2, 65, "Mar", 4, ",", 2016, "17:19:51" ], [ 2, 66, "Mar", 4, ",", 2016, "17:17:36" ], [ 2, 67, "Mar", 4, ",", 2016, "17:19:06" ], [ 2, 68, "Mar", 4, ",", 2016, "17:19:06" ], [ 2, 69, "Mar", 4, ",", 2016, "17:19:06" ], [ 2, 70, "Mar", 4, ",", 2016, "17:19:21" ], [ 2, 71, "Mar", 4, ",", 2016, "17:19:40" ], [ 2, 72, "Mar", 4, ",", 2016, "17:19:06" ], [ 2, 73, "Mar", 4, ",", 2016, "17:19:06" ], [ 2, 74, "Mar", 4, ",", 2016, "17:19:25" ], [ 2, 75, "Mar", 4, ",", 2016, "17:19:39" ], [ 2, 76, "Mar", 4, ",", 2016, "17:19:39" ], [ 2, 77, "Mar", 4, ",", 2016, "17:19:20" ], [ 2, 78, "Mar", 4, ",", 2016, "17:19:36" ], [ 2, 79, "Mar", 4, ",", 2016, "17:19:36" ], [ 2, 80, "Mar", 4, ",", 2016, "17:19:40" ], [ 2, 0, "timestamp" ], [ 2, 81, "Mar", 4, ",", 2016, "17:19:17" ], [ 2, 82, "Mar", 4, ",", 2016, "17:19:20" ], [ 2, 83, "Mar", 4, ",", 2016, "17:19:27" ], [ 2, 84, "Mar", 4, ",", 2016, "17:18:57" ], [ 2, 85, "Mar", 4, ",", 2016, "17:19:24" ], [ 2, 86, "Mar", 4, ",", 2016, "17:19:24" ], [ 2, 87, "Mar", 4, ",", 2016, "17:19:24" ], [ 2, 88, "Mar", 4, ",", 2016, "17:19:06" ], [ 2, 89, "Mar", 4, ",", 2016, "17:17:36" ], [ 2, 90, "Mar", 4, ",", 2016, "17:19:06" ], [ 2, 91, "Mar", 4, ",", 2016, "17:19:53" ], [ 2, 92, "Mar", 4, ",", 2016, "17:19:06" ], [ 2, 93, "Mar", 4, ",", 2016, "17:19:06" ], [ 2, 94, "Mar", 4, ",", 2016, "17:19:06" ], [ 2, 95, "Mar", 4, ",", 2016, "17:19:06" ], [ 2, 96, "Mar", 4, ",", 2016, "17:19:07" ], [ 2, 97, "Mar", 4, ",", 2016, "17:19:36" ], [ 2, 98, "Mar", 4, ",", 2016, "17:19:36" ], [ 2, 99, "Mar", 4, ",", 2016, "17:19:19" ], [ 0, 1, "Treenado" ], [ 0, 2, "UV", "light", "switch" ], [ 0, 3, "Controls", "the", "IR/DVD/VCR", "Data", "sent", "to", "Max", "for", "the", "TV" ], [ 0, 4, "Oliver", "Velostat" ], [ 0, 5, "Stalagmite" ], [ 0, 6, "Temperature", "Sensor" ], [ 0, 7, "Demo", "Server", "(formerly", "watchdog", "server)" ], [ 0, 8, "Demo", "Server", "(formerl", "(Max", "MSP)" ], [ 0, 9, "standalone", "demos", "pi" ], [ 0, 10, "Piezo", "arduino" ], [ 0, 11, "Audio", "service", "for", "the", "demos", "pi" ], [ 0, 12, "Video:", "Toilet", "Audio:", "Justin's", "Strings", "1DAC", ",", "Front", "Yard", "1DAC" ], [ 0, 13, "Video:", "Toilet", "Audio:", "(video", "script)" ], [ 0, 14, "Video:", "Toilet", "Audio:", "(looping", "audio", "1)" ], [ 0, 15, "Video:", "Toilet", "Audio:", "(looping", "audio", "2)" ], [ 0, 16, "Video:", "Toilet", "Audio:", "(looping", "audio", "3)" ], [ 0, 17, "Video:", "Mirror" ], [ 0, 18, 0 ], [ 0, 19, "Video:", "Mirror", "(video", "script)" ], [ 0, 20, "Video:", "Mirror", "(looping", "audio", "1)" ], [ 0, 21, 0 ], [ 0, 22, "Video:", "Dryer", "Narrative" ], [ 0, 23, "Video:", "Dryer", "Narrati", "(video", "script)" ], [ 0, 24, "Emerson's", "Computer", "-", "Audio:", "Emerson", "Pipe", "Murmurs", "1DAC", ",", "Pipers", "Studio", "1DAC" ], [ 0, 25, "Emerson's", "Computer", "-", "(looping", "audio", "1)" ], [ 0, 26, "Emerson's", "Computer", "-", "(looping", "audio", "2)" ], [ 0, 27, "Audio:", "Cave", "Stairs", "1DAC", ",", "Parents", "Closet", "1DAC", ",", "Mud", "Room", "1DAC" ], [ 0, 28, "Audio:", "Cave", "Stairs", 1, "(looping", "audio", "1)" ], [ 0, 29, "Audio:", "Cave", "Stairs", 1, "(looping", "audio", "2)" ], [ 0, 30, "(Max", "MSP)" ], [ 0, 31, "(Max", "MSP)" ], [ 0, 32, "Video:", "Secret", "Garden", "Narrative", "-", "Audio:", "Secret", "Garden", "1DAC", "Silver", "Yard", "1DAC" ], [ 0, 33, "Video:", "Secret", "Garden", "(video", "script)" ], [ 0, 34, "Video:", "Secret", "Garden", "(looping", "audio", "1)" ], [ 0, 35, "Video:", "Secret", "Garden", "(looping", "audio", "2)" ], [ 0, 36, "Video:", "Secret", "Garden", "(looping", "audio", "3)" ], [ 0, 37, "Video:", "Inner", "Ring", "-", "Audio:", "Outer", "ring", "1DAC", ",", "Carboniferous", "1DAC", ",", "Oliver+Desert", "Doors", "1DAC" ], [ 0, 38, "Video:", "Inner", "Ring", "-", "(audio", "script)" ], [ 0, 39, "Video:", "Inner", "Ring", "-", "(video", "script)" ], [ 0, 40, "Video:", "Inner", "Ring", "-", "(looping", "audio", "1)" ], [ 0, 41, "Video:", "Inner", "Ring", "-", "(looping", "audio", "2)" ], [ 0, 42, "Video:", "Outer", "Ring", "-", "Audio", "Outer", "ring", "2DACs", ",", "Icestation+Beach", "Doors", "1DAC" ], [ 0, 43, "Video:", "Outer", "Ring", "-", "(audio", "script)" ], [ 0, 44, "Video:", "Outer", "Ring", "-", "(video", "script)" ], [ 0, 45, "Video:", "Outer", "Ring", "-", "(looping", "audio", "1)" ], [ 0, 46, "Video:", "Outer", "Ring", "-", "(looping", "audio", "2)" ], [ 0, 47, "Video:", "Desert", "Trailer", "TV", "-", "Audio:", "Desert", "trailer", "2DACs" ], [ 0, 48, "Video:", "Desert", "Traile", "(audio", "script)" ], [ 0, 49, "Video:", "Desert", "Traile", "(video", "script)" ], [ 0, 50, "Video:", "Desert", "Traile", "(looping", "audio", "1)" ], [ 0, 51, "Video:", "Desert", "Traile", "(looping", "audio", "2)" ], [ 0, 52, "Video:", "teen", "room", "TV", "-", "Audio:", "Teen", "room", 1, "DAC" ], [ 0, 53, "Video:", "teen", "room", "TV", "(audio", "script)" ], [ 0, 54, "Video:", "teen", "room", "TV", "(video", "script)" ], [ 0, 55, "Video:", "Cudney", "5screen" ], [ 0, 56, "Video:", "Cudney", "5scree", "(video", "script)" ], [ 0, 57, "Video:", "Ice", "Station", "-", "Audio:", "Art", "Hall", "Global", "1DAC" ], [ 0, 58, "Video:", "Ice", "Station", "-", "(video", "script)" ], [ 0, 59, "Video:", "Ice", "Station", "-", "(check", "server)" ], [ 0, 60, "Video:", "Glitch", "Beach", "-", "Audio:", "Glitch", "Beach", "1DAC", ",", "Icestation", "1DAC" ], [ 0, 61, "Video:", "Glitch", "Beach", "(video", "script)" ], [ 0, 62, "Video:", "Glitch", "Beach", "(looping", "audio", "1)" ], [ 0, 63, "Video:", "Glitch", "Beach", "(looping", "audio", "2)" ], [ 0, 64, "Video:", "Glitch", "Beach", "(looping", "audio", "3)" ], [ 0, 65, "Desert", "trailer", "lighting", "controller" ], [ 0, 66, "Pneumatic", "door" ], [ 0, 67, "Pneumatic", "door" ], [ 0, 68, "Pneumatic", "door" ], [ 0, 69, "Ice", "station", "lighting", "controller" ], [ 0, 70, "Arcade", "Server" ], [ 0, 71, "Arcade", "Server", "(Max", "MSP)" ], [ 0, 72, "Beam", "Server" ], [ 0, 73, "Beam", "Server", "(Max", "MSP)" ], [ 0, 74, "Video:", "Art", "Hall", "Kiosk", "-", "Audio:", "Art", "Hall", "global", "1DAC" ], [ 0, 75, "Video:", "Art", "Hall", "Kios", "(video", "script)" ], [ 0, 76, "Video:", "Art", "Hall", "Kios", "(check", "server)" ], [ 0, 77, "Video:", "Alley", "Ads", "-", "Audio:", "Alley", "Global", "1DAC" ], [ 0, 78, "Video:", "Alley", "Ads", "-", "A", "(video", "script)" ], [ 0, 79, "Video:", "Alley", "Ads", "-", "A", "(check", "server)" ], [ 0, 80, "Video:", "Cudney", "Hamster" ], [ 0, 0, "location" ], [ 0, 81, "Video:", "Cudney", "Hamste", "(video", "script)" ], [ 0, 82, "Audio:", "Aspen", "Global" ], [ 0, 83, "Audio:", "Aspen", "Global", "(check", "server)" ], [ 0, 84, "Video:", "Alley", "Ads", "NE", "-", "Audio:", "Cactus", 2, "DACs" ], [ 0, 85, "Video:", "Alley", "Ads", "NE", "(video", "script)" ], [ 0, 86, "Video:", "Alley", "Ads", "NE", "(looping", "audio", "1)" ], [ 0, 87, "Video:", "Alley", "Ads", "NE", "(looping", "audio", "2)" ], [ 0, 88, "Wayne", "Geary" ], [ 0, 89, "Pinball", "lighting" ], [ 0, 90, "Arcade", "lighting" ], [ 0, 91, "Arcade", "lighting" ], [ 0, 92, "Dave's", "alley", "lighting" ], [ 0, 93, "Chapel" ], [ 0, 94, "ATM" ], [ 0, 95, "global", "media", "server" ], [ 0, 96, "Video:", "Forest", "Narrative", "E", "-", "Audio:", "Kitchen", "Pipe", "Murmurs" ], [ 0, 97, "Video:", "Forest", "Narrat", "(video", "script)" ], [ 0, 98, "Video:", "Forest", "Narrat", "(looping", "audio", "1)" ], [ 0, 99, "Audio:", "Global", 2, "DACs" ], [ 7, 1, "**", "PROBLEM", "Host", "Alert:", "10_42_16_166", "is", "DOWN", "**" ], [ 7, 2, "**", "PROBLEM", "Host", "Alert:", "10_42_16_169", "is", "DOWN", "**" ], [ 7, 3, "--" ], [ 7, 4, "**", "PROBLEM", "Host", "Alert:", "10_42_16_178", "is", "DOWN", "**" ], [ 7, 5, "--" ], [ 7, 6, "**", "PROBLEM", "Host", "Alert:", "10_42_16_190", "is", "DOWN", "**" ], [ 7, 7, "**", "PROBLEM", "Host", "Alert:", "AUDIO-SERVER", "is", "DOWN", "**" ], [ 7, 8, "--" ], [ 7, 9, "--" ], [ 7, 10, "--" ], [ 7, 11, "--" ], [ 7, 12, "--" ], [ 7, 13, "--" ], [ 7, 14, "--" ], [ 7, 15, "--" ], [ 7, 16, "--" ], [ 7, 17, "--" ], [ 7, 18, "--" ], [ 7, 19, "--" ], [ 7, 20, "--" ], [ 7, 21, "--" ], [ 7, 22, "--" ], [ 7, 23, "--" ], [ 7, 24, "**", "PROBLEM", "Host", "Alert:", "RPi-A0106", "is", "DOWN", "**" ], [ 7, 25, "--" ], [ 7, 26, "--" ], [ 7, 27, "--" ], [ 7, 28, "--" ], [ 7, 29, "--" ], [ 7, 30, "--" ], [ 7, 31, "--" ], [ 7, 32, "**", "PROBLEM", "Host", "Alert:", "RPi-A0103", "is", "DOWN", "**" ], [ 7, 33, "--" ], [ 7, 34, "--" ], [ 7, 35, "--" ], [ 7, 36, "--" ], [ 7, 37, "--" ], [ 7, 38, "--" ], [ 7, 39, "--" ], [ 7, 40, "--" ], [ 7, 41, "--" ], [ 7, 42, "--" ], [ 7, 43, "--" ], [ 7, 44, "--" ], [ 7, 45, "--" ], [ 7, 46, "--" ], [ 7, 47, "--" ], [ 7, 48, "--" ], [ 7, 49, "--" ], [ 7, 50, "--" ], [ 7, 51, "--" ], [ 7, 52, "**", "PROBLEM", "Host", "Alert:", "RPi-C0305", "is", "DOWN", "**" ], [ 7, 53, "--" ], [ 7, 54, "--" ], [ 7, 55, "--" ], [ 7, 56, "--" ], [ 7, 57, "--" ], [ 7, 58, "--" ], [ 7, 59, "--" ], [ 7, 60, "--" ], [ 7, 61, "--" ], [ 7, 62, "--" ], [ 7, 63, "--" ], [ 7, 64, "--" ], [ 7, 65, "--" ], [ 7, 66, "**", "PROBLEM", "Host", "Alert:", "ARD-C0318", "is", "DOWN", "**" ], [ 7, 67, "--" ], [ 7, 68, "**", "PROBLEM", "Host", "Alert:", "ARD-C0321", "is", "DOWN", "**" ], [ 7, 69, "**", "PROBLEM", "Host", "Alert:", "ARD-C0323", "is", "DOWN", "**" ], [ 7, 70, "--" ], [ 7, 71, "--" ], [ 7, 72, "--" ], [ 7, 73, "--" ], [ 7, 74, "--" ], [ 7, 75, "--" ], [ 7, 76, "--" ], [ 7, 77, "--" ], [ 7, 78, "--" ], [ 7, 79, "--" ], [ 7, 80, "--" ], [ 7, 0, "alarm" ], [ 7, 81, "--" ], [ 7, 82, "--" ], [ 7, 83, "--" ], [ 7, 84, "**", "PROBLEM:", "RPi-F0607", "is", "DOWN", "**" ], [ 7, 85, "--" ], [ 7, 86, "--" ], [ 7, 87, "--" ], [ 7, 88, "**", "PROBLEM", "Host", "Alert:", "ARD-D0410", "is", "DOWN", "**" ], [ 7, 89, "**", "PROBLEM", "Host", "Alert:", "ARD-D0411", "is", "DOWN", "**" ], [ 7, 90, "**", "PROBLEM", "Host", "Alert:", "ARD-D0412", "is", "DOWN", "**" ], [ 7, 91, "--" ], [ 7, 92, "**", "PROBLEM", "Host", "Alert:", "ARD-D0414", "is", "DOWN", "**" ], [ 7, 93, "**", "PROBLEM", "Host", "Alert:", "ARD-D0415", "is", "DOWN", "**" ], [ 7, 94, "**", "PROBLEM", "Host", "Alert:", "ARD-D0416", "is", "DOWN", "**" ], [ 7, 95, "--" ], [ 7, 96, "**", "PROBLEM", "Host", "Alert:", "RPi-C0309", "is", "DOWN", "**" ], [ 7, 97, "--" ], [ 7, 98, "--" ], [ 7, 99, "--" ], [ 1, 1, "10.42.16.166" ], [ 1, 2, "10.42.16.169" ], [ 1, 3, "10.42.16.171" ], [ 1, 4, "10.42.16.178" ], [ 1, 5, "10.42.16.187" ], [ 1, 6, "10.42.16.190" ], [ 1, 7, "10.42.16.23" ], [ 1, 8, "10.42.16.23/Max.exe" ], [ 1, 9, "10.42.16.53" ], [ 1, 10, "10.42.16.53/home/pi/RUNNING/builds/piezo" ], [ 1, 11, "10.42.16.53/home/pi/RUNNING/scripts/do-audio.py" ], [ 1, 12, "10.42.17.40" ], [ 1, 13, "10.42.17.40/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 14, "10.42.17.40/home/pi/RUNNING/scripts/looping-audio.sh" ], [ 1, 15, "10.42.17.40/home/pi/RUNNING/scripts/looping-audio1.sh" ], [ 1, 16, "10.42.17.40/home/pi/RUNNING/scripts/looping-audio2.sh" ], [ 1, 17, "10.42.17.41" ], [ 1, 18, "10.42.17.41/home/pi/RUNNING/builds/start-piduino" ], [ 1, 19, "10.42.17.41/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 20, "10.42.17.41/home/pi/RUNNING/scripts/looping-audio.sh" ], [ 1, 21, "10.42.17.41/home/pi/RUNNING/scripts/looping-video.py" ], [ 1, 22, "10.42.17.42" ], [ 1, 23, "10.42.17.42/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 24, "10.42.17.43" ], [ 1, 25, "10.42.17.43/home/pi/RUNNING/scripts/looping-audio.sh" ], [ 1, 26, "10.42.17.43/home/pi/RUNNING/scripts/looping-audio1.sh" ], [ 1, 27, "10.42.17.44" ], [ 1, 28, "10.42.17.44/home/pi/RUNNING/scripts/looping-audio.sh" ], [ 1, 29, "10.42.17.44/home/pi/RUNNING/scripts/looping-audio1.sh" ], [ 1, 30, "10.42.18.21" ], [ 1, 31, "10.42.18.21/Max.exe" ], [ 1, 32, "10.42.18.40" ], [ 1, 33, "10.42.18.40/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 34, "10.42.18.40/home/pi/RUNNING/scripts/looping-audio.sh" ], [ 1, 35, "10.42.18.40/home/pi/RUNNING/scripts/looping-audio1.sh" ], [ 1, 36, "10.42.18.40/home/pi/RUNNING/scripts/looping-audio2.sh" ], [ 1, 37, "10.42.18.41" ], [ 1, 38, "10.42.18.41/home/pi/RUNNING/scripts/do-audio.py" ], [ 1, 39, "10.42.18.41/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 40, "10.42.18.41/home/pi/RUNNING/scripts/looping-audio.sh" ], [ 1, 41, "10.42.18.41/home/pi/RUNNING/scripts/looping-audio1.sh" ], [ 1, 42, "10.42.18.42" ], [ 1, 43, "10.42.18.42/home/pi/RUNNING/scripts/do-audio.py" ], [ 1, 44, "10.42.18.42/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 45, "10.42.18.42/home/pi/RUNNING/scripts/looping-audio.sh" ], [ 1, 46, "10.42.18.42/home/pi/RUNNING/scripts/looping-audio1.sh" ], [ 1, 47, "10.42.18.43" ], [ 1, 48, "10.42.18.43/home/pi/RUNNING/scripts/do-audio.py" ], [ 1, 49, "10.42.18.43/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 50, "10.42.18.43/home/pi/RUNNING/scripts/looping-audio.sh" ], [ 1, 51, "10.42.18.43/home/pi/RUNNING/scripts/looping-audio1.sh" ], [ 1, 52, "10.42.18.44" ], [ 1, 53, "10.42.18.44/home/pi/RUNNING/scripts/do-audio.py" ], [ 1, 54, "10.42.18.44/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 55, "10.42.18.45" ], [ 1, 56, "10.42.18.45/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 57, "10.42.18.46" ], [ 1, 58, "10.42.18.46/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 59, "10.42.18.46/home/pi/builds/checkServer.sh" ], [ 1, 60, "10.42.18.47" ], [ 1, 61, "10.42.18.47/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 62, "10.42.18.47/home/pi/RUNNING/scripts/looping-audio.sh" ], [ 1, 63, "10.42.18.47/home/pi/RUNNING/scripts/looping-audio1.sh" ], [ 1, 64, "10.42.18.47/home/pi/RUNNING/scripts/looping-audio2.sh" ], [ 1, 65, "10.42.18.80" ], [ 1, 66, "10.42.18.83" ], [ 1, 67, "10.42.18.84" ], [ 1, 68, "10.42.18.86" ], [ 1, 69, "10.42.18.88" ], [ 1, 70, "10.42.20.20" ], [ 1, 71, "10.42.20.20/Max.exe" ], [ 1, 72, "10.42.20.21" ], [ 1, 73, "10.42.20.21/Max.exe" ], [ 1, 74, "10.42.20.40" ], [ 1, 75, "10.42.20.40/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 76, "10.42.20.40/home/pi/builds/checkServer.sh" ], [ 1, 77, "10.42.20.41" ], [ 1, 78, "10.42.20.41/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 79, "10.42.20.41/home/pi/builds/checkServer.sh" ], [ 1, 80, "10.42.20.43" ], [ 1, 0, "id" ], [ 1, 81, "10.42.20.43/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 82, "10.42.20.44" ], [ 1, 83, "10.42.20.44/home/pi/builds/checkServer.sh" ], [ 1, 84, "10.42.20.45" ], [ 1, 85, "10.42.20.45/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 86, "10.42.20.45/home/pi/RUNNING/scripts/looping-audio.sh" ], [ 1, 87, "10.42.20.45/home/pi/RUNNING/scripts/looping-audio1.sh" ], [ 1, 88, "10.42.20.81" ], [ 1, 89, "10.42.20.82" ], [ 1, 90, "10.42.20.83" ], [ 1, 91, "10.42.20.84" ], [ 1, 92, "10.42.20.85" ], [ 1, 93, "10.42.20.86" ], [ 1, 94, "10.42.20.87" ], [ 1, 95, "10.42.21.18" ], [ 1, 96, "10.42.21.40" ], [ 1, 97, "10.42.21.40/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 98, "10.42.21.40/home/pi/RUNNING/scripts/looping-audio.sh" ], [ 1, 99, "10.42.21.42" ] ],
+					"celldef" : [ [ 0, 0, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 1, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 2, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 3, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 4, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 5, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 6, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 7, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.498039, 0.498039, 0.498039, 1.0, 0, -1, -1 ], [ 0, 8, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 9, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 10, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 11, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 12, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 13, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 14, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 15, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 16, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 17, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 18, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 19, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 20, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 21, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 22, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 23, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 24, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 25, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 26, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 27, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 28, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 29, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 30, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.498039, 0.498039, 0.498039, 1.0, 0, -1, -1 ], [ 0, 31, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 32, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 33, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 34, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 35, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 36, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 37, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 38, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 39, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 40, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 41, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 42, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 43, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 44, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 45, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 46, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 47, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 48, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 49, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 50, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 51, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 52, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 53, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 54, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 55, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 56, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 57, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 58, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 59, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 60, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 61, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 62, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 63, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 64, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 65, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 66, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 67, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 68, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 69, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 70, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.498039, 0.498039, 0.498039, 1.0, 0, -1, -1 ], [ 0, 71, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 72, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.498039, 0.498039, 0.498039, 1.0, 0, -1, -1 ], [ 0, 73, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 74, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 75, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 76, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 77, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 78, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 79, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 80, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 81, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 82, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 83, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 84, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 85, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 86, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 87, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 88, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 89, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 90, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 91, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 92, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 93, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 94, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 95, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 96, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 97, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 98, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 99, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 2, 0, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.301961, 0.301961, 0.301961, 1.0, -1, -1, -1 ], [ 2, 1, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 2, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 3, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 4, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 5, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 6, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 7, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 8, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 9, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 10, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 11, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 12, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 13, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 14, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 15, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 16, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 17, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 18, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 19, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 4, 0, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 1, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 2, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 3, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 4, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 5, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 6, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 7, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 8, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 9, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 10, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 11, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 12, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 13, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 14, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 15, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 16, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 17, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 18, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 19, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 20, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 21, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 22, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 23, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 24, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 25, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 26, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 27, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 28, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 29, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 30, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 31, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 32, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 33, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 34, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 35, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 36, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 37, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 38, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 39, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 40, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 41, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 42, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 43, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 44, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 45, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 46, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 47, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 48, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 49, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 50, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 51, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 52, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 53, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 54, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 55, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 56, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 57, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 58, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 59, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 60, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 61, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 62, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 63, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 64, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 65, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 66, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 67, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 68, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 69, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 70, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 71, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 72, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 73, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 74, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 75, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 76, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 77, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 78, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 79, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 80, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 81, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 82, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 83, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 84, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 85, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 86, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 87, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 88, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 89, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 90, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 91, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 92, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 93, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 94, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 95, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 96, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 97, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 98, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 99, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ] ],
+					"cellmap" : [ [ 5, 1, "Arduino", "Mega2650" ], [ 5, 2, "Arduino", "Uno" ], [ 5, 3, "Arduino", "Uno" ], [ 5, 4, "Arduino", "Uno" ], [ 5, 5, "Arduino", "Uno" ], [ 5, 6, "Arduino", "Uno" ], [ 5, 7, "Windows", "PC", "-", "ian's", "build" ], [ 5, 8, "Software" ], [ 5, 9, "Raspberry", "Pi" ], [ 5, 10, "Software" ], [ 5, 11, "Software" ], [ 5, 12, "Raspberry", "Pi" ], [ 5, 13, "Software" ], [ 5, 14, "Software" ], [ 5, 15, "Software" ], [ 5, 16, "Software" ], [ 5, 17, "Raspberry", "Pi" ], [ 5, 18, 0 ], [ 5, 19, "Software" ], [ 5, 20, "Software" ], [ 5, 21, 0 ], [ 5, 22, "Raspberry", "Pi" ], [ 5, 23, "Software" ], [ 5, 24, "Raspberry", "Pi" ], [ 5, 25, "Software" ], [ 5, 26, "Software" ], [ 5, 27, "Raspberry", "Pi" ], [ 5, 28, "Software" ], [ 5, 29, "Software" ], [ 5, 30, "Windows", "PC", "-", "Media", "Server" ], [ 5, 31, "Software" ], [ 5, 32, "Raspberry", "Pi" ], [ 5, 33, "Software" ], [ 5, 34, "Software" ], [ 5, 35, "Software" ], [ 5, 36, "Software" ], [ 5, 37, "Raspberry", "Pi" ], [ 5, 38, "Software" ], [ 5, 39, "Software" ], [ 5, 40, "Software" ], [ 5, 41, "Software" ], [ 5, 42, "Raspberry", "Pi" ], [ 5, 43, "Software" ], [ 5, 44, "Software" ], [ 5, 45, "Software" ], [ 5, 46, "Software" ], [ 5, 47, "Raspberry", "Pi" ], [ 5, 48, "Software" ], [ 5, 49, "Software" ], [ 5, 50, "Software" ], [ 5, 51, "Software" ], [ 5, 52, "Raspberry", "Pi" ], [ 5, 53, "Software" ], [ 5, 54, "Software" ], [ 5, 55, "Raspberry", "Pi" ], [ 5, 56, "Software" ], [ 5, 57, "Raspberry", "Pi" ], [ 5, 58, "Software" ], [ 5, 59, "Software" ], [ 5, 60, "Raspberry", "Pi" ], [ 5, 61, "Software" ], [ 5, 62, "Software" ], [ 5, 63, "Software" ], [ 5, 64, "Software" ], [ 5, 65, "Arduino", "Uno" ], [ 5, 66, "Arduino", "Uno" ], [ 5, 67, "Arduino", "Uno" ], [ 5, 68, "Arduino", "Uno" ], [ 5, 69, "Arduino", "Uno" ], [ 5, 70, "Windows", "PC", "-", "Media", "Server" ], [ 5, 71, "Software" ], [ 5, 72, "Windows", "PC", "-", "Media", "Server" ], [ 5, 73, "Software" ], [ 5, 74, "Raspberry", "Pi" ], [ 5, 75, "Software" ], [ 5, 76, "Software" ], [ 5, 77, "Raspberry", "Pi" ], [ 5, 78, "Software" ], [ 5, 79, "Software" ], [ 5, 80, "Placeholder" ], [ 5, 0, "type" ], [ 5, 81, "Software" ], [ 5, 82, "Raspberry", "Pi" ], [ 5, 83, "Software" ], [ 5, 84, "Raspberry", "Pi" ], [ 5, 85, "Software" ], [ 5, 86, "Software" ], [ 5, 87, "Software" ], [ 5, 88, "Arduino", "Uno" ], [ 5, 89, "Arduino", "Uno" ], [ 5, 90, "Arduino", "Uno" ], [ 5, 91, "Arduino", "Uno" ], [ 5, 92, "Arduino", "Uno" ], [ 5, 93, "Arduino", "Uno" ], [ 5, 94, "Arduino", "Uno" ], [ 5, 95, "Mac", "Pro" ], [ 5, 96, "Raspberry", "Pi" ], [ 5, 97, "Software" ], [ 5, 98, "Software" ], [ 5, 99, "Raspberry", "Pi" ], [ 6, 1, "Feb", 14, ",", 2016, "20:01:54" ], [ 6, 2, "Feb", 28, ",", 2016, "04:08:45" ], [ 6, 3, "Feb", 14, ",", 2016, "20:01:10" ], [ 6, 4, "Mar", 1, ",", 2016, "04:21:10" ], [ 6, 5, "Feb", 28, ",", 2016, "03:53:25" ], [ 6, 6, 0 ], [ 6, 7, "Jan", 20, ",", 2016, "16:22:19" ], [ 6, 8, "Jan", 20, ",", 2016, "16:22:19" ], [ 6, 9, "Feb", 5, ",", 2016, "20:38:21" ], [ 6, 10, "Feb", 5, ",", 2016, "20:38:21" ], [ 6, 11, "Feb", 5, ",", 2016, "20:38:21" ], [ 6, 12, "Feb", 26, ",", 2016, "15:00:58" ], [ 6, 13, "Feb", 26, ",", 2016, "15:00:58" ], [ 6, 14, "Feb", 26, ",", 2016, "15:00:58" ], [ 6, 15, "Feb", 26, ",", 2016, "15:00:57" ], [ 6, 16, "Feb", 26, ",", 2016, "15:00:58" ], [ 6, 17, "Feb", 17, ",", 2016, "12:05:16" ], [ 6, 18, "Feb", 23, ",", 2016, "07:47:45" ], [ 6, 19, "Feb", 23, ",", 2016, "07:47:45" ], [ 6, 20, "Feb", 23, ",", 2016, "07:47:45" ], [ 6, 21, "Feb", 17, ",", 2016, "12:05:16" ], [ 6, 22, "Feb", 23, ",", 2016, "07:47:45" ], [ 6, 23, "Feb", 23, ",", 2016, "07:47:45" ], [ 6, 24, "Feb", 26, ",", 2016, "08:44:29" ], [ 6, 25, "Feb", 26, ",", 2016, "08:44:29" ], [ 6, 26, "Feb", 26, ",", 2016, "08:44:29" ], [ 6, 27, "Feb", 25, ",", 2016, "21:45:36" ], [ 6, 28, "Feb", 25, ",", 2016, "21:45:36" ], [ 6, 29, "Feb", 25, ",", 2016, "21:45:36" ], [ 6, 30, "Feb", 25, ",", 2016, "15:17:10" ], [ 6, 31, "Feb", 25, ",", 2016, "15:17:10" ], [ 6, 32, "Feb", 23, ",", 2016, "07:47:46" ], [ 6, 33, "Feb", 23, ",", 2016, "07:47:46" ], [ 6, 34, "Feb", 23, ",", 2016, "07:47:46" ], [ 6, 35, "Feb", 23, ",", 2016, "07:47:46" ], [ 6, 36, "Feb", 23, ",", 2016, "07:47:46" ], [ 6, 37, "Feb", 23, ",", 2016, "08:11:35" ], [ 6, 38, "Feb", 23, ",", 2016, "08:11:35" ], [ 6, 39, "Feb", 23, ",", 2016, "08:11:35" ], [ 6, 40, "Feb", 23, ",", 2016, "08:11:35" ], [ 6, 41, "Feb", 23, ",", 2016, "08:11:35" ], [ 6, 42, "Feb", 23, ",", 2016, "08:11:48" ], [ 6, 43, "Feb", 23, ",", 2016, "08:11:48" ], [ 6, 44, "Feb", 23, ",", 2016, "08:11:48" ], [ 6, 45, "Feb", 23, ",", 2016, "08:11:48" ], [ 6, 46, "Feb", 23, ",", 2016, "08:11:48" ], [ 6, 47, "Mar", 2, ",", 2016, "15:02:08" ], [ 6, 48, "Mar", 2, ",", 2016, "15:02:08" ], [ 6, 49, "Mar", 2, ",", 2016, "15:02:08" ], [ 6, 50, "Mar", 2, ",", 2016, "15:02:08" ], [ 6, 51, "Mar", 2, ",", 2016, "15:02:08" ], [ 6, 52, "Mar", 4, ",", 2016, "14:09:00" ], [ 6, 53, "Mar", 4, ",", 2016, "14:09:00" ], [ 6, 54, "Mar", 4, ",", 2016, "14:09:00" ], [ 6, 55, "Feb", 23, ",", 2016, "21:56:53" ], [ 6, 56, "Feb", 23, ",", 2016, "21:56:53" ], [ 6, 57, "Mar", 6, ",", 2016, "06:01:14" ], [ 6, 58, "Mar", 6, ",", 2016, "06:01:13" ], [ 6, 59, "Mar", 6, ",", 2016, "06:01:13" ], [ 6, 60, "Mar", 2, ",", 2016, "13:50:11" ], [ 6, 61, "Mar", 2, ",", 2016, "13:50:11" ], [ 6, 62, "Mar", 2, ",", 2016, "13:50:11" ], [ 6, 63, "Mar", 2, ",", 2016, "13:50:11" ], [ 6, 64, "Mar", 2, ",", 2016, "13:50:11" ], [ 6, 65, "Feb", 25, ",", 2016, "22:51:54" ], [ 6, 66, "Feb", 17, ",", 2016, "17:32:25" ], [ 6, 67, "Feb", 13, ",", 2016, "21:12:12" ], [ 6, 68, "Feb", 17, ",", 2016, "20:03:23" ], [ 6, 69, "Feb", 15, ",", 2016, "14:18:56" ], [ 6, 70, "Mar", 5, ",", 2016, "11:46:36" ], [ 6, 71, "Mar", 5, ",", 2016, "11:46:36" ], [ 6, 72, "Feb", 9, ",", 2016, "17:40:51" ], [ 6, 73, "Feb", 9, ",", 2016, "17:40:51" ], [ 6, 74, "Mar", 6, ",", 2016, "06:01:14" ], [ 6, 75, "Mar", 6, ",", 2016, "06:01:14" ], [ 6, 76, "Mar", 6, ",", 2016, "06:01:13" ], [ 6, 77, "Mar", 6, ",", 2016, "06:01:13" ], [ 6, 78, "Mar", 6, ",", 2016, "06:01:14" ], [ 6, 79, "Mar", 6, ",", 2016, "06:01:14" ], [ 6, 80, "Mar", 4, ",", 2016, "16:02:38" ], [ 6, 0, "last", "reset" ], [ 6, 81, "Mar", 4, ",", 2016, "16:02:38" ], [ 6, 82, "Mar", 6, ",", 2016, "06:01:14" ], [ 6, 83, "Mar", 6, ",", 2016, "06:01:14" ], [ 6, 84, "Feb", 19, ",", 2016, "00:42:00" ], [ 6, 85, "Feb", 19, ",", 2016, "00:42:00" ], [ 6, 86, "Feb", 19, ",", 2016, "00:42:00" ], [ 6, 87, "Feb", 19, ",", 2016, "00:42:00" ], [ 6, 88, "Feb", 14, ",", 2016, "12:24:27" ], [ 6, 89, "Feb", 16, ",", 2016, "16:55:02" ], [ 6, 90, "Feb", 22, ",", 2016, "11:49:34" ], [ 6, 91, "Feb", 14, ",", 2016, "18:11:32" ], [ 6, 92, "Feb", 17, ",", 2016, "12:16:51" ], [ 6, 93, "Feb", 15, ",", 2016, "18:27:20" ], [ 6, 94, "Feb", 17, ",", 2016, "12:16:35" ], [ 6, 95, "Feb", 22, ",", 2016, "15:32:07" ], [ 6, 96, "Feb", 23, ",", 2016, "21:20:09" ], [ 6, 97, "Feb", 23, ",", 2016, "21:20:09" ], [ 6, 98, "Feb", 23, ",", 2016, "21:20:09" ], [ 6, 99, "Mar", 6, ",", 2016, "06:01:11" ], [ 4, 1, "NONRESPONSIVE" ], [ 4, 2, "NONRESPONSIVE" ], [ 4, 3, "OKAY" ], [ 4, 4, "NONRESPONSIVE" ], [ 4, 5, "OKAY" ], [ 4, 6, "NONRESPONSIVE" ], [ 4, 7, "NONRESPONSIVE" ], [ 4, 8, "NONRESPONSIVE" ], [ 4, 9, "OKAY" ], [ 4, 10, "OKAY" ], [ 4, 11, "NONRESPONSIVE" ], [ 4, 12, "OKAY" ], [ 4, 13, "OKAY" ], [ 4, 14, "OKAY" ], [ 4, 15, "OKAY" ], [ 4, 16, "NONRESPONSIVE" ], [ 4, 17, "OKAY" ], [ 4, 18, "OKAY" ], [ 4, 19, "OKAY" ], [ 4, 20, "NONRESPONSIVE" ], [ 4, 21, "NONRESPONSIVE" ], [ 4, 22, "OKAY" ], [ 4, 23, "OKAY" ], [ 4, 24, "OKAY" ], [ 4, 25, "OKAY" ], [ 4, 26, "NONRESPONSIVE" ], [ 4, 27, "OKAY" ], [ 4, 28, "OKAY" ], [ 4, 29, "OKAY" ], [ 4, 30, "OKAY" ], [ 4, 31, "OKAY" ], [ 4, 32, "OKAY" ], [ 4, 33, "OKAY" ], [ 4, 34, "OKAY" ], [ 4, 35, "OKAY" ], [ 4, 36, "OKAY" ], [ 4, 37, "OKAY" ], [ 4, 38, "OKAY" ], [ 4, 39, "OKAY" ], [ 4, 40, "NONRESPONSIVE" ], [ 4, 41, "NONRESPONSIVE" ], [ 4, 42, "OKAY" ], [ 4, 43, "OKAY" ], [ 4, 44, "OKAY" ], [ 4, 45, "OKAY" ], [ 4, 46, "OKAY" ], [ 4, 47, "OKAY" ], [ 4, 48, "OKAY" ], [ 4, 49, "OKAY" ], [ 4, 50, "OKAY" ], [ 4, 51, "NONRESPONSIVE" ], [ 4, 52, "OKAY" ], [ 4, 53, "OKAY" ], [ 4, 54, "OKAY" ], [ 4, 55, "OKAY" ], [ 4, 56, "OKAY" ], [ 4, 57, "OKAY" ], [ 4, 58, "OKAY" ], [ 4, 59, "OKAY" ], [ 4, 60, "OKAY" ], [ 4, 61, "OKAY" ], [ 4, 62, "OKAY" ], [ 4, 63, "OKAY" ], [ 4, 64, "OKAY" ], [ 4, 65, "OKAY" ], [ 4, 66, "NONRESPONSIVE" ], [ 4, 67, "NONRESPONSIVE" ], [ 4, 68, "NONRESPONSIVE" ], [ 4, 69, "NONRESPONSIVE" ], [ 4, 70, "OKAY" ], [ 4, 71, "OKAY" ], [ 4, 72, "NONRESPONSIVE" ], [ 4, 73, "NONRESPONSIVE" ], [ 4, 74, "OKAY" ], [ 4, 75, "OKAY" ], [ 4, 76, "OKAY" ], [ 4, 77, "OKAY" ], [ 4, 78, "OKAY" ], [ 4, 79, "OKAY" ], [ 4, 80, "NONRESPONSIVE" ], [ 4, 0, "status" ], [ 4, 81, "NONRESPONSIVE" ], [ 4, 82, "OKAY" ], [ 4, 83, "OKAY" ], [ 4, 84, "OKAY" ], [ 4, 85, "OKAY" ], [ 4, 86, "NONRESPONSIVE" ], [ 4, 87, "NONRESPONSIVE" ], [ 4, 88, "NONRESPONSIVE" ], [ 4, 89, "NONRESPONSIVE" ], [ 4, 90, "NONRESPONSIVE" ], [ 4, 91, "OKAY" ], [ 4, 92, "NONRESPONSIVE" ], [ 4, 93, "NONRESPONSIVE" ], [ 4, 94, "NONRESPONSIVE" ], [ 4, 95, "NONRESPONSIVE" ], [ 4, 96, "OKAY" ], [ 4, 97, "OKAY" ], [ 4, 98, "NONRESPONSIVE" ], [ 4, 99, "OKAY" ], [ 3, 1, 676260 ], [ 3, 2, 122592 ], [ 3, 3, 1786920 ], [ 3, 4, 107232 ], [ 3, 5, 656232 ], [ 3, 6, 60 ], [ 3, 7, 1648591 ], [ 3, 8, 1648574 ], [ 3, 9, 2583218 ], [ 3, 10, 2583198 ], [ 3, 11, 2583198 ], [ 3, 12, 789105 ], [ 3, 13, 789087 ], [ 3, 14, 789087 ], [ 3, 15, 789087 ], [ 3, 16, 789087 ], [ 3, 17, 1074250 ], [ 3, 18, 1074266 ], [ 3, 19, 1074266 ], [ 3, 20, 1074266 ], [ 3, 21, 108829 ], [ 3, 22, 1074258 ], [ 3, 23, 1074272 ], [ 3, 24, 811710 ], [ 3, 25, 811725 ], [ 3, 26, 811725 ], [ 3, 27, 851208 ], [ 3, 28, 851224 ], [ 3, 29, 851224 ], [ 3, 30, 874505 ], [ 3, 31, 874519 ], [ 3, 32, 1074290 ], [ 3, 33, 1074272 ], [ 3, 34, 1074272 ], [ 3, 35, 1074272 ], [ 3, 36, 1074272 ], [ 3, 37, 1072869 ], [ 3, 38, 1072859 ], [ 3, 39, 1072859 ], [ 3, 40, 1072859 ], [ 3, 41, 1072859 ], [ 3, 42, 1072865 ], [ 3, 43, 1072834 ], [ 3, 44, 1072834 ], [ 3, 45, 1072834 ], [ 3, 46, 1072834 ], [ 3, 47, 356995 ], [ 3, 48, 357024 ], [ 3, 49, 357023 ], [ 3, 50, 357023 ], [ 3, 51, 357024 ], [ 3, 52, 187394 ], [ 3, 53, 187431 ], [ 3, 54, 187431 ], [ 3, 55, 1023341 ], [ 3, 56, 1023325 ], [ 3, 57, 43868 ], [ 3, 58, 43860 ], [ 3, 59, 43860 ], [ 3, 60, 361355 ], [ 3, 61, 361355 ], [ 3, 62, 361355 ], [ 3, 63, 361355 ], [ 3, 64, 361355 ], [ 3, 65, 847440 ], [ 3, 66, 180 ], [ 3, 67, 360 ], [ 3, 68, 2220 ], [ 3, 69, 112920 ], [ 3, 70, 109542 ], [ 3, 71, 109556 ], [ 3, 72, 22173 ], [ 3, 73, 7942 ], [ 3, 74, 43868 ], [ 3, 75, 43861 ], [ 3, 76, 43861 ], [ 3, 77, 43867 ], [ 3, 78, 43860 ], [ 3, 79, 43860 ], [ 3, 80, 6783 ], [ 3, 0, "uptime" ], [ 3, 81, 6808 ], [ 3, 82, 43868 ], [ 3, 83, 43894 ], [ 3, 84, 1445351 ], [ 3, 85, 1445339 ], [ 3, 86, 1445339 ], [ 3, 87, 1445339 ], [ 3, 88, 60 ], [ 3, 89, 498900 ], [ 3, 90, 60 ], [ 3, 91, 1812900 ], [ 3, 92, 29400 ], [ 3, 93, 84780 ], [ 3, 94, 29460 ], [ 3, 95, 0 ], [ 3, 96, 1025562 ], [ 3, 97, 1025521 ], [ 3, 98, 1025521 ], [ 3, 99, 43869 ], [ 2, 1, "Mar", 6, ",", 2016, "18:12:07" ], [ 2, 2, "Mar", 6, ",", 2016, "18:12:07" ], [ 2, 3, "Mar", 6, ",", 2016, "18:11:57" ], [ 2, 4, "Mar", 6, ",", 2016, "18:12:07" ], [ 2, 5, "Mar", 6, ",", 2016, "18:12:37" ], [ 2, 6, "Mar", 6, ",", 2016, "18:12:07" ], [ 2, 7, "Mar", 6, ",", 2016, "18:12:07" ], [ 2, 8, "Mar", 6, ",", 2016, "18:12:07" ], [ 2, 9, "Mar", 6, ",", 2016, "18:12:47" ], [ 2, 10, "Mar", 6, ",", 2016, "18:12:26" ], [ 2, 11, "Mar", 6, ",", 2016, "18:12:26" ], [ 2, 12, "Mar", 6, ",", 2016, "18:12:43" ], [ 2, 13, "Mar", 6, ",", 2016, "18:12:24" ], [ 2, 14, "Mar", 6, ",", 2016, "18:12:24" ], [ 2, 15, "Mar", 6, ",", 2016, "18:12:25" ], [ 2, 16, "Mar", 6, ",", 2016, "18:12:25" ], [ 2, 17, "Mar", 6, ",", 2016, "18:11:55" ], [ 2, 18, "Mar", 6, ",", 2016, "18:12:11" ], [ 2, 19, "Mar", 6, ",", 2016, "18:12:11" ], [ 2, 20, "Mar", 6, ",", 2016, "18:12:11" ], [ 2, 21, "Mar", 6, ",", 2016, "18:12:07" ], [ 2, 22, "Mar", 6, ",", 2016, "18:12:04" ], [ 2, 23, "Mar", 6, ",", 2016, "18:12:18" ], [ 2, 24, "Mar", 6, ",", 2016, "18:12:13" ], [ 2, 25, "Mar", 6, ",", 2016, "18:12:29" ], [ 2, 26, "Mar", 6, ",", 2016, "18:12:29" ], [ 2, 27, "Mar", 6, ",", 2016, "18:12:23" ], [ 2, 28, "Mar", 6, ",", 2016, "18:12:39" ], [ 2, 29, "Mar", 6, ",", 2016, "18:12:40" ], [ 2, 30, "Mar", 6, ",", 2016, "18:12:35" ], [ 2, 31, "Mar", 6, ",", 2016, "18:12:49" ], [ 2, 32, "Mar", 6, ",", 2016, "18:12:35" ], [ 2, 33, "Mar", 6, ",", 2016, "18:12:18" ], [ 2, 34, "Mar", 6, ",", 2016, "18:12:18" ], [ 2, 35, "Mar", 6, ",", 2016, "18:12:18" ], [ 2, 36, "Mar", 6, ",", 2016, "18:12:18" ], [ 2, 37, "Mar", 6, ",", 2016, "18:12:43" ], [ 2, 38, "Mar", 6, ",", 2016, "18:12:34" ], [ 2, 39, "Mar", 6, ",", 2016, "18:12:34" ], [ 2, 40, "Mar", 6, ",", 2016, "18:12:34" ], [ 2, 41, "Mar", 6, ",", 2016, "18:12:34" ], [ 2, 42, "Mar", 6, ",", 2016, "18:12:53" ], [ 2, 43, "Mar", 6, ",", 2016, "18:12:23" ], [ 2, 44, "Mar", 6, ",", 2016, "18:12:23" ], [ 2, 45, "Mar", 6, ",", 2016, "18:12:23" ], [ 2, 46, "Mar", 6, ",", 2016, "18:12:23" ], [ 2, 47, "Mar", 6, ",", 2016, "18:12:03" ], [ 2, 48, "Mar", 6, ",", 2016, "18:12:32" ], [ 2, 49, "Mar", 6, ",", 2016, "18:12:31" ], [ 2, 50, "Mar", 6, ",", 2016, "18:12:31" ], [ 2, 51, "Mar", 6, ",", 2016, "18:12:31" ], [ 2, 52, "Mar", 6, ",", 2016, "18:12:13" ], [ 2, 53, "Mar", 6, ",", 2016, "18:12:50" ], [ 2, 54, "Mar", 6, ",", 2016, "18:12:50" ], [ 2, 55, "Mar", 6, ",", 2016, "18:12:34" ], [ 2, 56, "Mar", 6, ",", 2016, "18:12:19" ], [ 2, 57, "Mar", 6, ",", 2016, "18:12:21" ], [ 2, 58, "Mar", 6, ",", 2016, "18:12:13" ], [ 2, 59, "Mar", 6, ",", 2016, "18:12:13" ], [ 2, 60, "Mar", 6, ",", 2016, "18:12:46" ], [ 2, 61, "Mar", 6, ",", 2016, "18:12:46" ], [ 2, 62, "Mar", 6, ",", 2016, "18:12:46" ], [ 2, 63, "Mar", 6, ",", 2016, "18:12:46" ], [ 2, 64, "Mar", 6, ",", 2016, "18:12:46" ], [ 2, 65, "Mar", 6, ",", 2016, "18:12:03" ], [ 2, 66, "Mar", 6, ",", 2016, "18:12:07" ], [ 2, 67, "Mar", 6, ",", 2016, "18:12:07" ], [ 2, 68, "Mar", 6, ",", 2016, "18:12:07" ], [ 2, 69, "Mar", 6, ",", 2016, "18:12:07" ], [ 2, 70, "Mar", 6, ",", 2016, "18:12:15" ], [ 2, 71, "Mar", 6, ",", 2016, "18:12:29" ], [ 2, 72, "Mar", 6, ",", 2016, "18:12:07" ], [ 2, 73, "Mar", 6, ",", 2016, "18:12:07" ], [ 2, 74, "Mar", 6, ",", 2016, "18:12:21" ], [ 2, 75, "Mar", 6, ",", 2016, "18:12:14" ], [ 2, 76, "Mar", 6, ",", 2016, "18:12:14" ], [ 2, 77, "Mar", 6, ",", 2016, "18:12:21" ], [ 2, 78, "Mar", 6, ",", 2016, "18:12:13" ], [ 2, 79, "Mar", 6, ",", 2016, "18:12:14" ], [ 2, 80, "Mar", 6, ",", 2016, "18:12:07" ], [ 2, 0, "timestamp" ], [ 2, 81, "Mar", 6, ",", 2016, "18:12:07" ], [ 2, 82, "Mar", 6, ",", 2016, "18:12:21" ], [ 2, 83, "Mar", 6, ",", 2016, "18:12:47" ], [ 2, 84, "Mar", 6, ",", 2016, "18:12:42" ], [ 2, 85, "Mar", 6, ",", 2016, "18:12:29" ], [ 2, 86, "Mar", 6, ",", 2016, "18:12:29" ], [ 2, 87, "Mar", 6, ",", 2016, "18:12:29" ], [ 2, 88, "Mar", 6, ",", 2016, "18:12:07" ], [ 2, 89, "Mar", 6, ",", 2016, "18:12:07" ], [ 2, 90, "Mar", 6, ",", 2016, "18:12:07" ], [ 2, 91, "Mar", 6, ",", 2016, "18:12:30" ], [ 2, 92, "Mar", 6, ",", 2016, "18:12:07" ], [ 2, 93, "Mar", 6, ",", 2016, "18:12:07" ], [ 2, 94, "Mar", 6, ",", 2016, "18:12:07" ], [ 2, 95, "Mar", 6, ",", 2016, "18:12:07" ], [ 2, 96, "Mar", 6, ",", 2016, "18:12:51" ], [ 2, 97, "Mar", 6, ",", 2016, "18:12:10" ], [ 2, 98, "Mar", 6, ",", 2016, "18:12:10" ], [ 2, 99, "Mar", 6, ",", 2016, "18:12:20" ], [ 0, 1, "Treenado" ], [ 0, 2, "UV", "light", "switch" ], [ 0, 3, "Controls", "the", "IR/DVD/VCR", "Data", "sent", "to", "Max", "for", "the", "TV" ], [ 0, 4, "Oliver", "Velostat" ], [ 0, 5, "Stalagmite" ], [ 0, 6, "Temperature", "Sensor" ], [ 0, 7, "Demo", "Server", "(formerly", "watchdog", "server)" ], [ 0, 8, "Demo", "Server", "(formerl", "(Max", "MSP)" ], [ 0, 9, "standalone", "demos", "pi" ], [ 0, 10, "Piezo", "arduino" ], [ 0, 11, "Audio", "service", "for", "the", "demos", "pi" ], [ 0, 12, "Video:", "Toilet", "Audio:", "Justin's", "Strings", "1DAC", ",", "Front", "Yard", "1DAC" ], [ 0, 13, "Video:", "Toilet", "Audio:", "(video", "script)" ], [ 0, 14, "Video:", "Toilet", "Audio:", "(looping", "audio", "1)" ], [ 0, 15, "Video:", "Toilet", "Audio:", "(looping", "audio", "2)" ], [ 0, 16, "Video:", "Toilet", "Audio:", "(looping", "audio", "3)" ], [ 0, 17, "Video:", "Mirror" ], [ 0, 18, 0 ], [ 0, 19, "Video:", "Mirror", "(video", "script)" ], [ 0, 20, "Video:", "Mirror", "(looping", "audio", "1)" ], [ 0, 21, 0 ], [ 0, 22, "Video:", "Dryer", "Narrative" ], [ 0, 23, "Video:", "Dryer", "Narrati", "(video", "script)" ], [ 0, 24, "Emerson's", "Computer", "-", "Audio:", "Emerson", "Pipe", "Murmurs", "1DAC", ",", "Pipers", "Studio", "1DAC" ], [ 0, 25, "Emerson's", "Computer", "-", "(looping", "audio", "1)" ], [ 0, 26, "Emerson's", "Computer", "-", "(looping", "audio", "2)" ], [ 0, 27, "Audio:", "Cave", "Stairs", "1DAC", ",", "Parents", "Closet", "1DAC", ",", "Mud", "Room", "1DAC" ], [ 0, 28, "Audio:", "Cave", "Stairs", 1, "(looping", "audio", "1)" ], [ 0, 29, "Audio:", "Cave", "Stairs", 1, "(looping", "audio", "2)" ], [ 0, 30, "(Max", "MSP)" ], [ 0, 31, "(Max", "MSP)" ], [ 0, 32, "Video:", "Secret", "Garden", "Narrative", "-", "Audio:", "Secret", "Garden", "1DAC", "Silver", "Yard", "1DAC" ], [ 0, 33, "Video:", "Secret", "Garden", "(video", "script)" ], [ 0, 34, "Video:", "Secret", "Garden", "(looping", "audio", "1)" ], [ 0, 35, "Video:", "Secret", "Garden", "(looping", "audio", "2)" ], [ 0, 36, "Video:", "Secret", "Garden", "(looping", "audio", "3)" ], [ 0, 37, "Video:", "Inner", "Ring", "-", "Audio:", "Outer", "ring", "1DAC", ",", "Carboniferous", "1DAC", ",", "Oliver+Desert", "Doors", "1DAC" ], [ 0, 38, "Video:", "Inner", "Ring", "-", "(audio", "script)" ], [ 0, 39, "Video:", "Inner", "Ring", "-", "(video", "script)" ], [ 0, 40, "Video:", "Inner", "Ring", "-", "(looping", "audio", "1)" ], [ 0, 41, "Video:", "Inner", "Ring", "-", "(looping", "audio", "2)" ], [ 0, 42, "Video:", "Outer", "Ring", "-", "Audio", "Outer", "ring", "2DACs", ",", "Icestation+Beach", "Doors", "1DAC" ], [ 0, 43, "Video:", "Outer", "Ring", "-", "(audio", "script)" ], [ 0, 44, "Video:", "Outer", "Ring", "-", "(video", "script)" ], [ 0, 45, "Video:", "Outer", "Ring", "-", "(looping", "audio", "1)" ], [ 0, 46, "Video:", "Outer", "Ring", "-", "(looping", "audio", "2)" ], [ 0, 47, "Video:", "Desert", "Trailer", "TV", "-", "Audio:", "Desert", "trailer", "2DACs" ], [ 0, 48, "Video:", "Desert", "Traile", "(audio", "script)" ], [ 0, 49, "Video:", "Desert", "Traile", "(video", "script)" ], [ 0, 50, "Video:", "Desert", "Traile", "(looping", "audio", "1)" ], [ 0, 51, "Video:", "Desert", "Traile", "(looping", "audio", "2)" ], [ 0, 52, "Video:", "teen", "room", "TV", "-", "Audio:", "Teen", "room", 1, "DAC" ], [ 0, 53, "Video:", "teen", "room", "TV", "(audio", "script)" ], [ 0, 54, "Video:", "teen", "room", "TV", "(video", "script)" ], [ 0, 55, "Video:", "Cudney", "5screen" ], [ 0, 56, "Video:", "Cudney", "5scree", "(video", "script)" ], [ 0, 57, "Video:", "Ice", "Station", "-", "Audio:", "Art", "Hall", "Global", "1DAC" ], [ 0, 58, "Video:", "Ice", "Station", "-", "(video", "script)" ], [ 0, 59, "Video:", "Ice", "Station", "-", "(check", "server)" ], [ 0, 60, "Video:", "Glitch", "Beach", "-", "Audio:", "Glitch", "Beach", "1DAC", ",", "Icestation", "1DAC" ], [ 0, 61, "Video:", "Glitch", "Beach", "(video", "script)" ], [ 0, 62, "Video:", "Glitch", "Beach", "(looping", "audio", "1)" ], [ 0, 63, "Video:", "Glitch", "Beach", "(looping", "audio", "2)" ], [ 0, 64, "Video:", "Glitch", "Beach", "(looping", "audio", "3)" ], [ 0, 65, "Desert", "trailer", "lighting", "controller" ], [ 0, 66, "Pneumatic", "door" ], [ 0, 67, "Pneumatic", "door" ], [ 0, 68, "Pneumatic", "door" ], [ 0, 69, "Ice", "station", "lighting", "controller" ], [ 0, 70, "Arcade", "Server" ], [ 0, 71, "Arcade", "Server", "(Max", "MSP)" ], [ 0, 72, "Beam", "Server" ], [ 0, 73, "Beam", "Server", "(Max", "MSP)" ], [ 0, 74, "Video:", "Art", "Hall", "Kiosk", "-", "Audio:", "Art", "Hall", "global", "1DAC" ], [ 0, 75, "Video:", "Art", "Hall", "Kios", "(video", "script)" ], [ 0, 76, "Video:", "Art", "Hall", "Kios", "(check", "server)" ], [ 0, 77, "Video:", "Alley", "Ads", "-", "Audio:", "Alley", "Global", "1DAC" ], [ 0, 78, "Video:", "Alley", "Ads", "-", "A", "(video", "script)" ], [ 0, 79, "Video:", "Alley", "Ads", "-", "A", "(check", "server)" ], [ 0, 80, "(video", "script)" ], [ 0, 0, "location" ], [ 0, 81, "(video", "script)" ], [ 0, 82, "Audio:", "Aspen", "Global" ], [ 0, 83, "Audio:", "Aspen", "Global", "(check", "server)" ], [ 0, 84, "Video:", "Alley", "Ads", "NE", "-", "Audio:", "Cactus", 2, "DACs" ], [ 0, 85, "Video:", "Alley", "Ads", "NE", "(video", "script)" ], [ 0, 86, "Video:", "Alley", "Ads", "NE", "(looping", "audio", "1)" ], [ 0, 87, "Video:", "Alley", "Ads", "NE", "(looping", "audio", "2)" ], [ 0, 88, "Wayne", "Geary" ], [ 0, 89, "Pinball", "lighting" ], [ 0, 90, "Arcade", "lighting" ], [ 0, 91, "Arcade", "lighting" ], [ 0, 92, "Dave's", "alley", "lighting" ], [ 0, 93, "Chapel" ], [ 0, 94, "ATM" ], [ 0, 95, "global", "media", "server" ], [ 0, 96, "Video:", "Forest", "Narrative", "E", "-", "Audio:", "Kitchen", "Pipe", "Murmurs" ], [ 0, 97, "Video:", "Forest", "Narrat", "(video", "script)" ], [ 0, 98, "Video:", "Forest", "Narrat", "(looping", "audio", "1)" ], [ 0, 99, "Audio:", "Global", 2, "DACs" ], [ 7, 1, "**", "PROBLEM", "Host", "Alert:", "10_42_16_166", "is", "DOWN", "**" ], [ 7, 2, "**", "PROBLEM", "Host", "Alert:", "10_42_16_169", "is", "DOWN", "**" ], [ 7, 3, "--" ], [ 7, 4, "**", "PROBLEM", "Host", "Alert:", "10_42_16_178", "is", "DOWN", "**" ], [ 7, 5, "--" ], [ 7, 6, "**", "PROBLEM", "Host", "Alert:", "10_42_16_190", "is", "DOWN", "**" ], [ 7, 7, "**", "PROBLEM", "Host", "Alert:", "AUDIO-SERVER", "is", "DOWN", "**" ], [ 7, 8, "--" ], [ 7, 9, "--" ], [ 7, 10, "--" ], [ 7, 11, "--" ], [ 7, 12, "--" ], [ 7, 13, "--" ], [ 7, 14, "--" ], [ 7, 15, "--" ], [ 7, 16, "--" ], [ 7, 17, "--" ], [ 7, 18, "--" ], [ 7, 19, "--" ], [ 7, 20, "--" ], [ 7, 21, "--" ], [ 7, 22, "--" ], [ 7, 23, "--" ], [ 7, 24, "**", "PROBLEM", "Host", "Alert:", "RPi-A0106", "is", "DOWN", "**" ], [ 7, 25, "--" ], [ 7, 26, "--" ], [ 7, 27, "--" ], [ 7, 28, "--" ], [ 7, 29, "--" ], [ 7, 30, "--" ], [ 7, 31, "--" ], [ 7, 32, "**", "PROBLEM", "Host", "Alert:", "RPi-A0103", "is", "DOWN", "**" ], [ 7, 33, "--" ], [ 7, 34, "--" ], [ 7, 35, "--" ], [ 7, 36, "--" ], [ 7, 37, "--" ], [ 7, 38, "--" ], [ 7, 39, "--" ], [ 7, 40, "--" ], [ 7, 41, "--" ], [ 7, 42, "--" ], [ 7, 43, "--" ], [ 7, 44, "--" ], [ 7, 45, "--" ], [ 7, 46, "--" ], [ 7, 47, "--" ], [ 7, 48, "--" ], [ 7, 49, "--" ], [ 7, 50, "--" ], [ 7, 51, "--" ], [ 7, 52, "**", "PROBLEM", "Host", "Alert:", "RPi-C0305", "is", "DOWN", "**" ], [ 7, 53, "--" ], [ 7, 54, "--" ], [ 7, 55, "--" ], [ 7, 56, "--" ], [ 7, 57, "--" ], [ 7, 58, "--" ], [ 7, 59, "--" ], [ 7, 60, "--" ], [ 7, 61, "--" ], [ 7, 62, "--" ], [ 7, 63, "--" ], [ 7, 64, "--" ], [ 7, 65, "--" ], [ 7, 66, "**", "PROBLEM", "Host", "Alert:", "ARD-C0318", "is", "DOWN", "**" ], [ 7, 67, "--" ], [ 7, 68, "**", "PROBLEM", "Host", "Alert:", "ARD-C0321", "is", "DOWN", "**" ], [ 7, 69, "**", "PROBLEM", "Host", "Alert:", "ARD-C0323", "is", "DOWN", "**" ], [ 7, 70, "--" ], [ 7, 71, "--" ], [ 7, 72, "--" ], [ 7, 73, "--" ], [ 7, 74, "--" ], [ 7, 75, "--" ], [ 7, 76, "--" ], [ 7, 77, "--" ], [ 7, 78, "--" ], [ 7, 79, "--" ], [ 7, 80, "--" ], [ 7, 0, "alarm" ], [ 7, 81, "--" ], [ 7, 82, "--" ], [ 7, 83, "--" ], [ 7, 84, "**", "PROBLEM:", "RPi-F0607", "is", "DOWN", "**" ], [ 7, 85, "--" ], [ 7, 86, "--" ], [ 7, 87, "--" ], [ 7, 88, "**", "PROBLEM", "Host", "Alert:", "ARD-D0410", "is", "DOWN", "**" ], [ 7, 89, "**", "PROBLEM", "Host", "Alert:", "ARD-D0411", "is", "DOWN", "**" ], [ 7, 90, "**", "PROBLEM", "Host", "Alert:", "ARD-D0412", "is", "DOWN", "**" ], [ 7, 91, "--" ], [ 7, 92, "**", "PROBLEM", "Host", "Alert:", "ARD-D0414", "is", "DOWN", "**" ], [ 7, 93, "**", "PROBLEM", "Host", "Alert:", "ARD-D0415", "is", "DOWN", "**" ], [ 7, 94, "**", "PROBLEM", "Host", "Alert:", "ARD-D0416", "is", "DOWN", "**" ], [ 7, 95, "--" ], [ 7, 96, "**", "PROBLEM", "Host", "Alert:", "RPi-C0309", "is", "DOWN", "**" ], [ 7, 97, "--" ], [ 7, 98, "--" ], [ 7, 99, "--" ], [ 1, 1, "10.42.16.166" ], [ 1, 2, "10.42.16.169" ], [ 1, 3, "10.42.16.171" ], [ 1, 4, "10.42.16.178" ], [ 1, 5, "10.42.16.187" ], [ 1, 6, "10.42.16.190" ], [ 1, 7, "10.42.16.23" ], [ 1, 8, "10.42.16.23/Max.exe" ], [ 1, 9, "10.42.16.53" ], [ 1, 10, "10.42.16.53/home/pi/RUNNING/builds/piezo" ], [ 1, 11, "10.42.16.53/home/pi/RUNNING/scripts/do-audio.py" ], [ 1, 12, "10.42.17.40" ], [ 1, 13, "10.42.17.40/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 14, "10.42.17.40/home/pi/RUNNING/scripts/looping-audio.sh" ], [ 1, 15, "10.42.17.40/home/pi/RUNNING/scripts/looping-audio1.sh" ], [ 1, 16, "10.42.17.40/home/pi/RUNNING/scripts/looping-audio2.sh" ], [ 1, 17, "10.42.17.41" ], [ 1, 18, "10.42.17.41/home/pi/RUNNING/builds/start-piduino" ], [ 1, 19, "10.42.17.41/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 20, "10.42.17.41/home/pi/RUNNING/scripts/looping-audio.sh" ], [ 1, 21, "10.42.17.41/home/pi/RUNNING/scripts/looping-video.py" ], [ 1, 22, "10.42.17.42" ], [ 1, 23, "10.42.17.42/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 24, "10.42.17.43" ], [ 1, 25, "10.42.17.43/home/pi/RUNNING/scripts/looping-audio.sh" ], [ 1, 26, "10.42.17.43/home/pi/RUNNING/scripts/looping-audio1.sh" ], [ 1, 27, "10.42.17.44" ], [ 1, 28, "10.42.17.44/home/pi/RUNNING/scripts/looping-audio.sh" ], [ 1, 29, "10.42.17.44/home/pi/RUNNING/scripts/looping-audio1.sh" ], [ 1, 30, "10.42.18.21" ], [ 1, 31, "10.42.18.21/Max.exe" ], [ 1, 32, "10.42.18.40" ], [ 1, 33, "10.42.18.40/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 34, "10.42.18.40/home/pi/RUNNING/scripts/looping-audio.sh" ], [ 1, 35, "10.42.18.40/home/pi/RUNNING/scripts/looping-audio1.sh" ], [ 1, 36, "10.42.18.40/home/pi/RUNNING/scripts/looping-audio2.sh" ], [ 1, 37, "10.42.18.41" ], [ 1, 38, "10.42.18.41/home/pi/RUNNING/scripts/do-audio.py" ], [ 1, 39, "10.42.18.41/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 40, "10.42.18.41/home/pi/RUNNING/scripts/looping-audio.sh" ], [ 1, 41, "10.42.18.41/home/pi/RUNNING/scripts/looping-audio1.sh" ], [ 1, 42, "10.42.18.42" ], [ 1, 43, "10.42.18.42/home/pi/RUNNING/scripts/do-audio.py" ], [ 1, 44, "10.42.18.42/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 45, "10.42.18.42/home/pi/RUNNING/scripts/looping-audio.sh" ], [ 1, 46, "10.42.18.42/home/pi/RUNNING/scripts/looping-audio1.sh" ], [ 1, 47, "10.42.18.43" ], [ 1, 48, "10.42.18.43/home/pi/RUNNING/scripts/do-audio.py" ], [ 1, 49, "10.42.18.43/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 50, "10.42.18.43/home/pi/RUNNING/scripts/looping-audio.sh" ], [ 1, 51, "10.42.18.43/home/pi/RUNNING/scripts/looping-audio1.sh" ], [ 1, 52, "10.42.18.44" ], [ 1, 53, "10.42.18.44/home/pi/RUNNING/scripts/do-audio.py" ], [ 1, 54, "10.42.18.44/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 55, "10.42.18.45" ], [ 1, 56, "10.42.18.45/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 57, "10.42.18.46" ], [ 1, 58, "10.42.18.46/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 59, "10.42.18.46/home/pi/builds/checkServer.sh" ], [ 1, 60, "10.42.18.47" ], [ 1, 61, "10.42.18.47/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 62, "10.42.18.47/home/pi/RUNNING/scripts/looping-audio.sh" ], [ 1, 63, "10.42.18.47/home/pi/RUNNING/scripts/looping-audio1.sh" ], [ 1, 64, "10.42.18.47/home/pi/RUNNING/scripts/looping-audio2.sh" ], [ 1, 65, "10.42.18.80" ], [ 1, 66, "10.42.18.83" ], [ 1, 67, "10.42.18.84" ], [ 1, 68, "10.42.18.86" ], [ 1, 69, "10.42.18.88" ], [ 1, 70, "10.42.20.20" ], [ 1, 71, "10.42.20.20/Max.exe" ], [ 1, 72, "10.42.20.21" ], [ 1, 73, "10.42.20.21/Max.exe" ], [ 1, 74, "10.42.20.40" ], [ 1, 75, "10.42.20.40/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 76, "10.42.20.40/home/pi/builds/checkServer.sh" ], [ 1, 77, "10.42.20.41" ], [ 1, 78, "10.42.20.41/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 79, "10.42.20.41/home/pi/builds/checkServer.sh" ], [ 1, 80, "10.42.20.43" ], [ 1, 0, "id" ], [ 1, 81, "10.42.20.43/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 82, "10.42.20.44" ], [ 1, 83, "10.42.20.44/home/pi/builds/checkServer.sh" ], [ 1, 84, "10.42.20.45" ], [ 1, 85, "10.42.20.45/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 86, "10.42.20.45/home/pi/RUNNING/scripts/looping-audio.sh" ], [ 1, 87, "10.42.20.45/home/pi/RUNNING/scripts/looping-audio1.sh" ], [ 1, 88, "10.42.20.81" ], [ 1, 89, "10.42.20.82" ], [ 1, 90, "10.42.20.83" ], [ 1, 91, "10.42.20.84" ], [ 1, 92, "10.42.20.85" ], [ 1, 93, "10.42.20.86" ], [ 1, 94, "10.42.20.87" ], [ 1, 95, "10.42.21.18" ], [ 1, 96, "10.42.21.40" ], [ 1, 97, "10.42.21.40/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 98, "10.42.21.40/home/pi/RUNNING/scripts/looping-audio.sh" ], [ 1, 99, "10.42.21.42" ] ],
 					"coldef" : [ [ 3, 70, 1, 0.0, 0.0, 0.0, 1.0, 1, 0.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 0, 300, 1, 0.0, 0.0, 0.0, 1.0, 1, 0.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 2, 139, 1, 0.0, 0.0, 0.0, 1.0, 1, 0.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 1, 349, 1, 0.0, 0.0, 0.0, 1.0, 1, 0.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 5, 117, 1, 0.0, 0.0, 0.0, 1.0, 1, 0.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 130, 1, 0.0, 0.0, 0.0, 1.0, 1, 0.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 6, 108, 1, 0.0, 0.0, 0.0, 1.0, 1, 0.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 7, 241, 1, 0.0, 0.0, 0.0, 1.0, 1, 0.0, 0.0, 0.0, 1.0, -1, -1, -1 ] ],
 					"colhead" : 1,
 					"cols" : 8,
@@ -26892,7 +27166,7 @@
 									"outlettype" : [ "" ],
 									"patching_rect" : [ 347.0, 535.0, 50.0, 22.0 ],
 									"style" : "",
-									"text" : "255"
+									"text" : "260"
 								}
 
 							}
@@ -28856,6 +29130,33 @@
 			}
 , 			{
 				"patchline" : 				{
+					"destination" : [ "obj-414", 0 ],
+					"disabled" : 0,
+					"hidden" : 0,
+					"source" : [ "obj-424", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-424", 0 ],
+					"disabled" : 0,
+					"hidden" : 0,
+					"source" : [ "obj-426", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-429", 0 ],
+					"disabled" : 0,
+					"hidden" : 0,
+					"source" : [ "obj-427", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
 					"destination" : [ "obj-3", 0 ],
 					"disabled" : 0,
 					"hidden" : 0,
@@ -29227,6 +29528,36 @@
 			}
 , 			{
 				"name" : "onOffByZone.maxpat",
+				"bootpath" : "~/Documents/Max 7/Library/Show Automation",
+				"type" : "JSON",
+				"implicit" : 1
+			}
+, 			{
+				"name" : "RelayControl.maxpat",
+				"bootpath" : "~/Documents/Max 7/Library/Show Automation",
+				"type" : "JSON",
+				"implicit" : 1
+			}
+, 			{
+				"name" : "Panel2LD-routing.maxpat",
+				"bootpath" : "~/Documents/Max 7/Library/Show Automation",
+				"type" : "JSON",
+				"implicit" : 1
+			}
+, 			{
+				"name" : "Panel2LC-routing.maxpat",
+				"bootpath" : "~/Documents/Max 7/Library/Show Automation",
+				"type" : "JSON",
+				"implicit" : 1
+			}
+, 			{
+				"name" : "Panel2LB-routing.maxpat",
+				"bootpath" : "~/Documents/Max 7/Library/Show Automation",
+				"type" : "JSON",
+				"implicit" : 1
+			}
+, 			{
+				"name" : "serverStatus.maxpat",
 				"bootpath" : "~/Documents/Max 7/Library/Show Automation",
 				"type" : "JSON",
 				"implicit" : 1
