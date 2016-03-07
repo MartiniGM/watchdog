@@ -33,7 +33,7 @@ periodic_timer = time.time() #initialize timer
 # give a filename for the watchdog's SQLite database here, on Windows
 WINDOWS_DB_FILENAME = 'c:\\watchdog\\tcp_watchdog_server\\demosdb.db'
 #and for Linux & OSX, I just used the local directory (where this file is) 
-LINUX_OSX_DB_FILENAME = 'demosdb.db'
+LINUX_OSX_DB_FILENAME = '/Users/Aesir/Documents/watchdog/tcp_watchdog_server/demosdb.db'
 
 # set this to 0 to turn off Google spreadsheets and use local database only
 # (f.ex if Google ever breaks the API!)
@@ -42,7 +42,7 @@ USE_GOOGLE_SHEETS = 1
 
 # json file to hold Google credentials.
 # ----> DO NOT EVER UPLOAD the .json file to public access (github)! <----
-json_file = 'mwsheets-91347531e5f4.json.secret'
+json_file = '/Users/Aesir/Documents/watchdog/tcp_watchdog_server/mwsheets-91347531e5f4.json.secret'
 # ----> srsly DO NOT DO NOT DO NOT UPLOAD THE .JSON FILE <----
 
 # URL for the google sheet. this can be public
@@ -66,7 +66,7 @@ loadGoogleSheetEvery = LOADSHEET_FAST #starts with fast loads until it succeeds
 loadGoogleSheetTimer = time.time()
 
 # give a filename for the watchdog's log file here
-LOG_FILENAME = 'tcp_watchdog_server.out'
+LOG_FILENAME = '/Users/Aesir/Documents/watchdog/tcp_watchdog_server/tcp_watchdog_server.out'
 
 PORT = 6666 # port number to watch
 
@@ -211,25 +211,29 @@ def get_item_googlesheet(id_name, item_name):
     try:
         item_id = header_item.index(item_name) 
         if item_name == "Switch Interface":
-            print "getting a switch from new page"
             our_item = googleSheetDict[id_name]
             item_id = header_item.index("Device Name")
             dev_name = our_item[item_id]
             our_item2 = googleSheetDictSwitches[dev_name]
 
-            print "%s %s" % (id_name, our_item2[0])
+#            print "%s %s" % (id_name, our_item2[0])
             return str(our_item2[0])
         else:
             our_item = googleSheetDict[id_name]
-            return str(our_item[item_id])
+            return_item = re.sub(u"\u2010", "-", our_item[item_id])
+            #strips out em-dash someone put in the Master Doc
+            return str(return_item)
     except KeyError:
 #        logger.warning("dict entry '%s' not found" % id_name)
         return ""
     except IndexError:
 #        logger.warning("dict entry '%s' not found" % id_name)
         return ""
-    except ValueError:
-        logger.warning("column '%s' not found" % item_name)
+    except ValueError, e:
+        logger.warning("ValueError, column '%s' not found? %s" % (item_name, e))
+        for frame in traceback.extract_tb(sys.exc_info()[2]):
+            fname,lineno,fn,text = frame
+            logger.error( "     in %s on line %d" % (fname, lineno))
         return ""
     except Exception, e:
         logger.error( "error in get_item_googlesheet! %s" % e)
@@ -253,8 +257,8 @@ def save_googlesheet_backup():
         except lite.Error, e:
             for frame in traceback.extract_tb(sys.exc_info()[2]):
                 fname,lineno,fn,text = frame
-                print "     in %s on line %d" % (fname, lineno)
-            print " sqlite error: %s" % e
+                logger.error( "     in %s on line %d" % (fname, lineno))
+            logger.error( " sqlite error: %s" % e)
             try:
                 con.rollback()
             except Exception, e:
@@ -279,7 +283,7 @@ def get_item_from_googlesheet_backup(ip_address, item_name):
                 con.rollback()
             except Exception, e:
                 logger.error(" Can't rollback! %s" % e)
-        print(" SQL error! %s" % e)
+        logger.error(" SQL error! %s" % e)
         return "" #blank item, will show as None in SQL
             
 ############################################################
@@ -330,7 +334,7 @@ def is_known_software(id_name):
     
         return ""
     except Exception, e:
-        print "Error in is_known_software: %s" % e
+        logger.error( "Error in is_known_software: %s" % e)
         return ""
     
 ############################################################
@@ -415,10 +419,10 @@ def get_all_from_googlesheet(id_name):
     try:
         (location, device_type, zone, space, device_name, description, switch_interface, mac_address, boot_order) = get_items_from_googlesheet(id_name)
     except Exception, e:
-        print "get_all_from_googlesheet error: %s" % e
+        logger.error( "get_all_from_googlesheet error: %s" % e)
         for frame in traceback.extract_tb(sys.exc_info()[2]):
             fname,lineno,fn,text = frame
-            print "     in %s on line %d" % (fname, lineno)
+            logger.error( "     in %s on line %d" % (fname, lineno))
         return ("", "", "", "", "", "", "", "", "")
     
     return (location, device_type, zone, space, device_name, description, switch_interface, mac_address, boot_order) #return items from googlesheet dictionary
@@ -462,7 +466,7 @@ def pivot_switches():
             if i == 0: # the first row is always just the column titles/key
                 continue
             if i <= top:
-                print ""
+#                print ""
                 #                print "i %d switch %s" % (i, switch)
                 this_prefix = switch[switch_prefix_index]
 #                print "this_prefix %s" % this_prefix
@@ -476,7 +480,7 @@ def pivot_switches():
                         interface = "%s %s%d" % (this_switch, this_prefix, j)
                     #add these to a dict so you can look them up by item later
                         googleSheetDictSwitches[item] += [interface]
-                        print return_item
+#                        print return_item
             else:
                 return
         except ValueError:
@@ -519,7 +523,7 @@ def return_last_reset(new_uptime, last_uptime, id_name):
                     last_reset_timestamp = get_item_sqlite(id_name, "LAST_RESET_TIMESTAMP")
                     return last_reset_timestamp
             except Exception, e: 
-                print "Problem converting timestamp, returning ''"
+                logger.warning( "Problem converting timestamp, returning ''")
                 return ""
             
 ############################################################
@@ -569,7 +573,7 @@ def get_item_sqlite(id_name, item_name):
             return row[1]
     except lite.Error, e:
         if con:
-            print(" SQL error! %s" % e)
+            logger.error(" SQL error! %s" % e)
             try:
                 con.rollback()
             except Exception, e:
@@ -647,7 +651,7 @@ def sql_data_sqlite(data, pi_or_arduino, ip):
     non_decimal = re.compile(r'[^\d.]+')
 
     if len(datalist) != 5 or datalist[0] == "x.x.x.x":
-        print "got the IP address error %s " % ip[0]        
+        logger.warning( "got the IP address error %s " % ip[0])
         id_name = ip[0]
         timestamp = datalist[0]
         status = datalist[1]
@@ -709,7 +713,7 @@ def sql_data_sqlite(data, pi_or_arduino, ip):
         logger.error(" sqlite error: %s" % e)
         for frame in traceback.extract_tb(sys.exc_info()[2]):
             fname,lineno,fn,text = frame
-            print "     in %s on line %d" % (fname, lineno)
+            logger.error( "     in %s on line %d" % (fname, lineno))
         try:
             con.rollback()
         except Exception, e:
@@ -751,7 +755,7 @@ def parse_data_sqlite(data):
             except lite.Error, e:
                 for frame in traceback.extract_tb(sys.exc_info()[2]):
                     fname,lineno,fn,text = frame
-                    print "     in %s on line %d" % (fname, lineno)
+                    logger.error( "     in %s on line %d" % (fname, lineno))
                 logger.error("sqlite error: %s" % e)
                 try:
                     con.rollback()
@@ -779,7 +783,7 @@ def parse_data_sqlite(data):
         except lite.Error, e:
             for frame in traceback.extract_tb(sys.exc_info()[2]):
                 fname,lineno,fn,text = frame
-                print "     in %s on line %d" % (fname, lineno)
+                logger.error( "     in %s on line %d" % (fname, lineno))
             logger.error("sqlite error: %s" % e)
             try:
                 con.rollback()
@@ -859,7 +863,7 @@ if __name__ == "__main__":
         server_socket.bind(("0.0.0.0", PORT))
         server_socket.settimeout(5.0)
     except socket.error, e:
-        print "socket error: %s" % e
+        logger.error( "socket error: %s" % e)
         
     logger.info ("     Watchdog server started on port " + str(PORT))
 
