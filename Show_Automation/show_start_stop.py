@@ -26,6 +26,7 @@ WOL_COMMAND = "/Users/Aesir/Documents/watchdog/wolcmd"
 DELAY_BETWEEN_DEVICES = 0.5 #delays a half second between displaying device & stop/starting
 DELAY_BETWEEN_RELAYS = 2.0 #delays 2 seconds between commands to the relays
 DELAY_FOR_PROJECTORS = 360.0 #delays 6 minutes for projector cooldown and/or startup
+DELAY_FOR_TVARCH = 120.0 #delays 2 minutes for the TV Arch Pis to shutdown
 INIT_DELAY = 30 #delays 30 seconds before starting script so people can cancel
 
 # give a filename for the watchdog's SQLite database here, on Windows
@@ -48,7 +49,7 @@ PAUSE_COMMAND = "/pause" #pause command sent to do-audio on the Pis
 UNPAUSE_COMMAND = "/unpause" #unpause command sent to do-audio on the Pis
 
 #list of valid zones. if the zone is not in this list, don't continue
-zones_ok_list = ["arcade", "art city", "beamcade", "caves", "forest", "house", "portals", "shanty", "theater"]
+zones_ok_list = ["arcade", "art city", "beamcade", "caves", "forest", "house", "portals", "shanty", "theater", "cade"]
 #list of relay prefixes and their IP addresses, for lookup
 relay_ip_list = [["2LB", "10.42.0.111"], ["2LC","10.42.0.112"], ["2LD","10.42.0.113"]]
 
@@ -78,6 +79,27 @@ circuit_space_item_id = 0
 USE_GOOGLE_SHEETS = 1
 
 ##################
+#DELAY_WITH_COUNTDOWN
+##################
+def delay_with_countdown(delay):
+    cur_delay = 0.0
+    incr = 5.0
+    delay_string = ""
+    if (delay <= 29.0):
+        incr = 5.0
+    else:
+        if (delay <= 59.0):
+            incr = 10.0
+        else:
+            incr = 30.0
+    logger.info("Delaying %d seconds..." % (delay))
+    while (cur_delay <= delay - 1.0):
+        delay_string = str(int(delay - cur_delay)) + "..."
+        logger.info(delay_string)
+        time.sleep(incr)
+        cur_delay = cur_delay + incr
+
+##################
 # open_googlesheet
 ##################
 def open_googlesheet():
@@ -105,11 +127,11 @@ def open_googlesheet():
 
         circuit_name_item_id = find_item(list_of_lists_relays, "Circuit Name")
         circuit_on_relay_item_id = find_item(list_of_lists_relays, "On Relay")
-        circuit_zone_item_id = find_item(list_of_lists_relays, "Zone")
+        circuit_zone_item_id = find_item(list_of_lists_relays, "Automation Zone")
         circuit_space_item_id = find_item(list_of_lists_relays, "Space")
   
     except Exception, e:
-        print  "error in open_googlesheet: %s" % e
+        logger.error(  "error in open_googlesheet: %s" % e)
 
 ################################
 # find_item()
@@ -138,12 +160,51 @@ def subfinder(mylist, pattern, id_num):
                 matches.append(item)
         return matches
     except Exception, e:
-        print "error in subfinder: %s" % e
+        logger.error( "error in subfinder: %s" % e)
         for frame in traceback.extract_tb(sys.exc_info()[2]):
             fname,lineno,fn,text = frame
-            print( "     in %s on line %d" % (fname, lineno))
+            logger.error( "     in %s on line %d" % (fname, lineno))
         #otherwise return blank list                                            
         return []
+
+
+##################
+# GET RELAY ZONES
+##################
+# gets the list of relay names and pins from the Max files listed in relay_files
+def get_all_relays(relay_pin_items):
+    #reads everything from the Circuits and Relays tab                      
+    relay_list = []
+    if len(list_of_lists_relays) == 0:
+        open_googlesheet()
+    
+#    print "%d google items loaded" % len(list_of_lists_relays)
+
+    for item in list_of_lists_relays:
+        zone_item = item[circuit_zone_item_id].replace(':','').lower()
+        circuit_on_relay = item[circuit_on_relay_item_id].replace(':','').lower()
+        circuit_space = item[circuit_space_item_id]
+        circuit_name = item[circuit_name_item_id]        
+
+        #if the zone matches and this circuit is on a relay, get relay info and add it to the list
+        if circuit_on_relay == "yes":
+            pin = -1
+            #grab the pin from the relay map file
+            item = subfinder(relay_pin_items, circuit_name, 0)
+            if item != []:
+                pin = item[0][1]
+            #grab the IP address for this relay
+                remote_ip_item = subfinder(relay_ip_list, circuit_name[:3], 0) 
+                if (remote_ip_item != []):
+                    remote_ip = remote_ip_item[0][1]
+                else:
+                    remote_ip = ""
+                #and return the zone, relay name, pin, and IP plus extras
+                item2 = (zone_item, circuit_name, circuit_on_relay, pin, remote_ip, "Relay")
+                relay_list.append(item2)
+
+    #and return the list
+    return relay_list
 
 ##################
 # GET RELAY ZONES
@@ -311,32 +372,35 @@ def stop_pi(remote_ip, switch_ip, switch_interface, delay):
 #run these to check inputs before using them    
 def check_remoteip(remote_ip):
     if remote_ip is None or remote_ip == "":
-        logger.error( " ERROR: IP not set! Exiting...")
-        exit
+        return 1
+    return 0
 
 def check_macaddress(mac_address):
     if mac_address is None or mac_address == "":
-        logger.error( " ERROR: MAC address not set! Exiting...")
-        exit
+       # logger.error( " ERROR: MAC address not set! Exiting...")
+        return 1
+    return 0
         
 def check_switch(remote_ip, switch):
     if remote_ip is None or remote_ip == "":
-        logger.error( " ERROR: switch IP not set! Exiting...")
-        exit
+        #logger.error( " ERROR: switch IP not set! Exiting...")
+        return 1
     if switch is None or switch == "":
-        logger.error( " ERROR: switch interface not set! Exiting...")
-        exit
+        #logger.error( " ERROR: switch interface not set! Exiting...")
+        return 2
+    return 0
 
 def check_remoteip_switch(remote_ip, switch, switch_interface):
     if remote_ip is None or remote_ip == "":
-        logger.error( " ERROR: remote IP not set! Exiting...")
-        exit
+        #logger.error( " ERROR: remote IP not set! Exiting...")
+        return 1
     if switch is None or switch == "":
-        logger.error( " ERROR: switch IP not set! Exiting...")
-        exit
+        #logger.error( " ERROR: switch IP not set! Exiting...")
+        return 2
     if switch_interface is None or switch_interface == "":
-        logger.error( " ERROR: switch interface not set! Exiting...")
-        exit
+        #logger.error( " ERROR: switch interface not set! Exiting...")
+        return 3
+    return 0
 
 ###############
 # GET_ITEM 
@@ -370,8 +434,11 @@ def get_item(remote_ip):
 def start_device(switch_ip, switch_interface, device_type, mac_address):        
     if "berry" in device_type.lower(): 
 #        print "start pi"
+        ret = check_switch(switch_ip, switch_interface)
+        if (ret != 0):
+            logger.info( "ERROR: Switch info not set: %s %s" % (switch_ip, switch_interface))
+            return
         logger.info( " start pi: %s %s" % (switch_ip, switch_interface))
-        check_switch(switch_ip, switch_interface)
         time.sleep(DELAY_BETWEEN_DEVICES)
         if not args.disable:
             logger.info(" now starting... %s %s" %  (switch_ip, switch_interface))
@@ -379,8 +446,11 @@ def start_device(switch_ip, switch_interface, device_type, mac_address):
     else:
         if "indow" in device_type.lower():
 #            print "start windows"
+            ret = check_macaddress(mac_address)
+            if (ret != 0):
+                logger.info( "ERROR: MAC address not set!")
+                return
             logger.info(" start windows: %s" % (mac_address))
-            check_macaddress(mac_address)
             time.sleep(DELAY_BETWEEN_DEVICES)
             if (not args.disable) and not (args.no_servers):
                 logger.info("now starting... %s" % (mac_address))                
@@ -391,8 +461,11 @@ def start_device(switch_ip, switch_interface, device_type, mac_address):
         else:
             if "duino" in device_type.lower() or "eensy" in device_type.lower():
 #                print "start arduino"                    
+                ret = check_switch(switch_ip, switch_interface)
+                if (ret != 0):
+                    logger.info("ERROR: Switch info not set: %s %s" % (switch_ip, switch_interface))
+                    return
                 logger.info(" start arduino: %s %s" % (switch_ip, switch_interface))
-                check_switch(switch_ip, switch_interface)
                 time.sleep(DELAY_BETWEEN_DEVICES)
                 if not args.disable:
                     logger.info(" now starting... %s %s" % (switch_ip, switch_interface))
@@ -407,8 +480,12 @@ def start_device(switch_ip, switch_interface, device_type, mac_address):
 def stop_device(remote_ip, switch_ip, switch_interface, device_type):
     if "berry" in device_type.lower(): 
 #        print "stop pi"
+        ret = check_remoteip_switch(remote_ip, switch_ip, switch_interface)
+        if (ret != 0):
+            logger.info( "ERROR: Remote IP %s or switch info %s %s not set!" % (remote_ip, switch_ip, switch_interface))
+            return
+            #print error
         logger.info( " stop pi: %s %s %s" % (remote_ip, switch_ip, switch_interface))
-        check_remoteip_switch(remote_ip, switch_ip, switch_interface)
         time.sleep(DELAY_BETWEEN_DEVICES)
         if not args.disable:
             logger.info( " now stopping... %s %s %s" % (remote_ip, switch_ip, switch_interface))
@@ -416,8 +493,11 @@ def stop_device(remote_ip, switch_ip, switch_interface, device_type):
     else:
         if "indow" in device_type.lower():
 #            print "stop windows"
+            ret = check_remoteip(remote_ip)
+            if (ret != 0):
+                logger.info( "ERROR: Remote IP not set!")
+                return
             logger.info( " stop windows: %s" % (remote_ip))
-            check_remoteip(remote_ip)
             time.sleep(DELAY_BETWEEN_DEVICES)
 
             if not args.disable and not args.no_servers:
@@ -429,8 +509,11 @@ def stop_device(remote_ip, switch_ip, switch_interface, device_type):
         else:
             if "duino" in device_type.lower() or "eensy" in device_type.lower():            
 #                print "stop arduino"
+                ret = check_switch(switch_ip, switch_interface)
+                if (ret != 0):
+                    logger.info( "ERROR: Switch info not set: %s %s" % (switch_ip, switch_interface))
+                    return
                 logger.info( " stop arduino: %s %s" % (switch_ip, switch_interface))
-                check_switch(switch_ip, switch_interface)
                 time.sleep(DELAY_BETWEEN_DEVICES)
 
                 if not args.disable:
@@ -446,8 +529,12 @@ def stop_device(remote_ip, switch_ip, switch_interface, device_type):
 def reboot_device(remote_ip, switch_ip, switch_interface, device_type):
     if "berry" in device_type.lower(): 
 #        print "reboot pi"
+        ret = check_remoteip(remote_ip)
+        if (ret != 0):
+            logger.info( "ERROR: Remote IP not set!")
+            return
         logger.info( " reboot pi: %s" % (remote_ip))
-        check_remoteip(remote_ip)
+
         time.sleep(DELAY_BETWEEN_DEVICES)
 
         if not args.disable:
@@ -456,8 +543,11 @@ def reboot_device(remote_ip, switch_ip, switch_interface, device_type):
     else:
         if "indow" in device_type.lower():
 #            print "reboot windows"       
+            ret = check_remoteip(remote_ip)
+            if (ret != 0):
+                logger.info( "ERROR: Remote IP not set!")
+                return
             logger.info( " reboot windows: %s" % (remote_ip))
-            check_remoteip(remote_ip)
             time.sleep(DELAY_BETWEEN_DEVICES)
         
             if not args.disable and not args.no_servers:
@@ -469,9 +559,12 @@ def reboot_device(remote_ip, switch_ip, switch_interface, device_type):
         else:
             if "duino" in device_type.lower() or "eensy" in device_type.lower():            
 #                print "reboot arduino"
-                logger.info(" reboot arduino: %s %s" % (switch_ip, switch_interface))
-                check_switch(switch_ip, switch_interface)
+                ret = check_switch(switch_ip, switch_interface)
+                if (ret != 0):
+                    logger.info( "ERROR: Switch info not set: %s %s" % (switch_ip, switch_interface))
+                    return
                 time.sleep(DELAY_BETWEEN_DEVICES)
+                logger.info(" reboot arduino: %s %s" % (switch_ip, switch_interface))
 
                 if not args.disable:
                     logger.info(" now rebooting... %s %s" % (switch_ip, switch_interface))
@@ -515,26 +608,35 @@ def start_stop_reboot_show(command, limit_to_switch_ip):
             cur = con.cursor()
             where_cmd = ""
 
+            sql = "SELECT ID_NAME, DEVICE_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE, BOOT_ORDER, SPACE, ZONE, DESCRIPTION FROM DEVICES"
             if args.no_global:
-                where_cmd = where_cmd + "AND DESCRIPTION NOT LIKE '%GLOBAL%'"
-
-            if "start" in command:
-                sql = "SELECT ID_NAME, DEVICE_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE, BOOT_ORDER FROM DEVICES ORDER BY BOOT_ORDER ASC, ID_NAME ASC"
+                sql = sql + " WHERE DESCRIPTION NOT LIKE '%GLOBAL%'"
+            if ("start" in command):
+                sql = sql + " ORDER BY BOOT_ORDER ASC, ID_NAME ASC"
             else:
-                if "stop" in command:
-                    sql = "SELECT ID_NAME, DEVICE_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE, BOOT_ORDER FROM DEVICES ORDER BY BOOT_ORDER DESC, ID_NAME ASC" 
+                if ("stop" in command or "reboot" in command):
+                    sql = sql + " ORDER BY BOOT_ORDER DESC, ID_NAME ASC"
                 else:
-                    if "reboot" in command:
-                        sql = "SELECT ID_NAME, DEVICE_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE, BOOT_ORDER FROM DEVICES ORDER BY BOOT_ORDER DESC, ID_NAME ASC" 
-                    else:
-                        logger.error( " ERROR: command %s not recognized", command)
-                        return
+                    logger.error( " ERROR: command %s not recognized", command)
+                    return
+
+#            if "start" in command:
+#                sql = "SELECT ID_NAME, DEVICE_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE, BOOT_ORDER FROM DEVICES ORDER BY BOOT_ORDER ASC, ID_NAME ASC"
+#            else:
+#                if "stop" in command:
+#                    sql = "SELECT ID_NAME, DEVICE_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE, BOOT_ORDER FROM DEVICES ORDER BY BOOT_ORDER DESC, ID_NAME ASC" 
+#                else:
+#                    if "reboot" in command:
+#                        sql = "SELECT ID_NAME, DEVICE_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE, BOOT_ORDER FROM DEVICES ORDER BY BOOT_ORDER DESC, ID_NAME ASC" 
+#                    else:
+#                        logger.error( " ERROR: command %s not recognized", command)
+#                        return
 #            print "sql is: %s" % sql
             cur.execute(sql)
             data = cur.fetchall()
 #            print data
             for item in data:
-                (remote_ip, device_name, mac_address, switch_interface, device_type, boot_order) = item
+                (remote_ip, device_name, mac_address, switch_interface, device_type, boot_order, space, zone, description) = item
                 if mac_address is None:
                     mac_address = ""
 
@@ -587,14 +689,69 @@ def start_stop_reboot_show(command, limit_to_switch_ip):
                     else:
 #                            print "reboot it"
                             reboot_device(remote_ip, switch_ip, switch_interface, device_type)
+
+            #then pause before stopping/starting the relays
+            #                    time.sleep(DELAY_FOR_PROJECTORS)
+
+            if command is "stop" or command is "start":
+                if command is stop:
+                    on_or_off = "off"
+                else:
+                    on_or_off = "on"
+            #then kill or start the relays for this zone
+                get_relay_pins(relay_pin_list)
+                relay_list = get_all_relays(relay_pin_list)
+                print "zone is %s" % zone.lower()
+
+                if on_or_off == "on":
+                #the TV arch has relay dependencies because the Pi controllers
+                #are on relays, not PoE. Move their items to the front of the 
+                #list, boot them first, then wait for them to boot before
+                #powering the rest of the relays
+                    print "---before"
+                    print relay_list
+                    for item in relay_list:
+                        if item[1] == "2LD-11":
                             
+                            relay_list.insert(0, relay_list.pop(relay_list.index(item)))
+                        if item[1] == "2LD-15":
+                            relay_list.insert(0, relay_list.pop(relay_list.index(item)))
+                    print "---after"
+                    print relay_list
+                    #turn on TV arch Pis
+                    item = zone_list[0]
+                    logger.info("send to " + str(item[1]))
+                    msg = "/relays/%s 1" % item[3]
+                    send_to_osc(item[4], RELAY_PORT, msg)
+                    time.sleep(DELAY_BETWEEN_RELAYS)
+                    item = zone_list[1]
+                    logger.info("send to " + str(item[1]))
+                    msg = "/relays/%s 1" % item[3]
+                    send_to_osc(item[4], RELAY_PORT, msg)
+                    print "pause for pis..."
+                    delay_with_countdown(DELAY_FOR_TVARCH)
+                    #then the remainer of the list
+                    for item in zone_list[2:]:
+                        time.sleep(DELAY_BETWEEN_RELAYS)
+                        logger.info("send to " + str(item[1]))
+                        msg = "/relays/%s 1" % item[3]
+                        send_to_osc(item[4], RELAY_PORT, msg)
+                    return
+                else: #turn relays off in order
+                    if relay_list is not None:
+                        for item in relay_list:
+                            time.sleep(DELAY_BETWEEN_RELAYS)
+                            logger.info("send to " + str(item[1]))
+                            msg = "/relays/%s 0" % item[3]
+                            send_to_osc(item[4], RELAY_PORT, msg)
+
     except lite.Error, e:
         logger.error(" ERROR: SQL error! %s" % e)   
 
 ###############
 # REBOOT NONRESPONSIVE DEVICES
 ###############             
-#reboots the whole show. a little out of date right now...
+#reboots nonresponsives in the whole show.
 def reboot_unresponsive(limit_to_switch_ip):
     logger.info( " -----reboot unresponsive" )       
     remote_ip = ""
@@ -697,7 +854,7 @@ def on_by_zone(on_or_off, zone):
             else:
                 sql = sql + " ORDER BY BOOT_ORDER DESC, ID_NAME ASC"
             cur.execute(sql)
-            print "sql " + str(sql)
+#            print "sql " + str(sql)
             data = cur.fetchall()
 #            logger.info( data)
 
@@ -727,10 +884,10 @@ def on_by_zone(on_or_off, zone):
 
                 #kill or start each device
                 if on_or_off == "on":
-                    print device_name
+                    logger.info( device_name)
                     start_device(switch_ip, switch_interface, device_type, mac_address)               
                 else:
-                    print device_name
+                    logger.info( device_name)
                     stop_device(remote_ip, switch_ip, switch_interface, device_type)
 
             #then pause
@@ -739,10 +896,47 @@ def on_by_zone(on_or_off, zone):
             #then kill or start the relays for this zone
             get_relay_pins(relay_list)
             zone_list = get_relay_zones(zone, relay_list)
+            print "zone is %s" % zone.lower()
 
+            if zone.lower() == "art city" and on_or_off == "on":
+                #the TV arch has relay dependencies because the Pi controllers
+                #are on relays, not PoE. Move their items to the front of the 
+                #list, boot them first, then wait for them to boot before
+                #powering the rest of the relays
+                print "---before"
+                print zone_list
+                for item in zone_list:
+                    if item[1] == "2LD-11":
+                        
+                        zone_list.insert(0, zone_list.pop(zone_list.index(item)))
+                    if item[1] == "2LD-15":
+                        zone_list.insert(0, zone_list.pop(zone_list.index(item)))
+                print "---after"
+                print zone_list
+                #turn on the TV arch Pis first
+                item = zone_list[0]
+                logger.info("send to " + str(item[1]))
+                msg = "/relays/%s 1" % item[3]
+                send_to_osc(item[4], RELAY_PORT, msg)
+                time.sleep(DELAY_BETWEEN_RELAYS)
+                item = zone_list[1]
+                logger.info("send to " + str(item[1]))
+                msg = "/relays/%s 1" % item[3]
+                send_to_osc(item[4], RELAY_PORT, msg)
+                print "pause for pis..."
+                delay_with_countdown(DELAY_FOR_TVARCH)
+                #then the remainder of the list
+                for item in zone_list[2:]:
+                    time.sleep(DELAY_BETWEEN_RELAYS)
+                    logger.info("send to " + str(item[1]))
+                    msg = "/relays/%s 1" % item[3]
+                    send_to_osc(item[4], RELAY_PORT, msg)
+                return
+
+            #if this isn't art city or we're turning art city off, just do each
             if zone_list is not None:
                 for item in zone_list:
-#                    time.sleep(DELAY_BETWEEN_RELAYS)
+                    time.sleep(DELAY_BETWEEN_RELAYS)
                     if (on_or_off == "on"):
                         logger.info("send to " + str(item[1]))
                         msg = "/relays/%s 1" % item[3]
@@ -751,6 +945,93 @@ def on_by_zone(on_or_off, zone):
                         logger.info("send to " + str(item[1]))
                         msg = "/relays/%s 0" % item[3]
                         send_to_osc(item[4], RELAY_PORT, msg)
+
+#on boot order
+    #start media server
+    #start Pis
+    #wait 6 minutes
+    #start projectors etc
+
+#off boot order
+    #kill the Pis
+    #kill the media server
+    #wait 6 minutes 
+    #kill the projectors etc
+    except lite.Error, e:
+        logger.error(" ERROR: SQL error! %s" % e)
+
+###############
+# BY ZONE FUNCTIONS
+###############            
+#turns on/off a given zone. See the valid zones at the top of the file.
+def on_by_space(on_or_off, space):
+    logger.info( " -----turn %s %s" % (on_or_off, space))
+    remote_ip = ""
+    mac_address = ""
+    switch_interface = ""
+    device_type = ""
+    
+    #zone must be given AND must be in the list of valid zones at the top of the file. otherwise exit
+    if space == "" or space is None:
+        logger.error( " ERROR: no space given with _by_space, exiting")
+        return
+
+    try:
+        # Open database connection, create cursor
+        if os.name == 'nt':
+            con = lite.connect(WINDOWS_DB_FILENAME)
+        else:
+            con = lite.connect(LINUX_OSX_DB_FILENAME)     
+    except Exception, e:
+        logger.error( " ERROR: Can't connect to demosdb! %s" % e)
+        
+    try:
+        with con:
+            #select everything for this zone, in the proper boot/shutdown order
+            cur = con.cursor()
+            sql = "SELECT ID_NAME, DEVICE_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE, BOOT_ORDER, SPACE, ZONE, DESCRIPTION FROM DEVICES WHERE SPACE LIKE '" + ('%' + space + "%'")   
+            if args.no_global:
+                sql = sql + " AND DESCRIPTION NOT LIKE '%GLOBAL%'"
+            if (on_or_off == "on"):
+                sql = sql + " ORDER BY BOOT_ORDER ASC, ID_NAME ASC"
+            else:
+                sql = sql + " ORDER BY BOOT_ORDER DESC, ID_NAME ASC"
+            cur.execute(sql)
+#            print "sql " + str(sql)
+            data = cur.fetchall()
+#            logger.info( data)
+
+            #and step through devices, turning them on/off
+            for item in data:
+                (remote_ip, device_name, mac_address, switch_interface, device_type, boot_order, space, zone, description) = item
+                if mac_address is None:
+                    mac_address = ""
+
+                if switch_interface is None:
+                    switch_interface = ""
+                    switch_ip = ""
+                else:
+                    switch_group = switch_interface.split()
+                    switch_ip = switch_group[0]
+                    switch_interface = switch_group[1]
+
+                if remote_ip is None:
+                    remote_ip = ""
+
+                if device_type is None:
+                    device_type = ""
+
+                if "software" in device_type.lower():
+                    #don't do anything for software
+                    continue
+
+                #kill or start each device
+                if on_or_off == "on":
+                    logger.info( device_name)
+                    start_device(switch_ip, switch_interface, device_type, mac_address)               
+                else:
+                    logger.info( device_name)
+                    stop_device(remote_ip, switch_ip, switch_interface, device_type)
 
 #on boot order
     #start media server
@@ -808,14 +1089,14 @@ def pause(remote_ip, cmd):
 
 #sends "concert mode on" commands to one Pi
 def concert_on(remote_ip):
-    print "concert on %s" % remote_ip
+    logger.info( "concert on %s" % remote_ip)
     pause(remote_ip, PAUSE_COMMAND)
     kill_looping_audio(remote_ip)
     #more goes here, set up the lights
 
 #sends "concert mode off" commands to one Pi
 def concert_off(remote_ip):
-    print "concert off %s" % remote_ip
+    logger.info( "concert off %s" % remote_ip)
     pause(remote_ip, UNPAUSE_COMMAND)
     start_looping_audio(remote_ip)
     #more goes here, send to watchdog to kill process
@@ -868,7 +1149,7 @@ def concert_mode(on_or_off):
                     continue
 
                 #turn on or off concert mode for each device
-                print "%s send concert %s" % (device_name, on_or_off)
+#                logger.info( "%s send concert %s" % (device_name, on_or_off))
                 if (on_or_off is "on"):
                     concert_on(remote_ip)
                 else:
@@ -1004,6 +1285,16 @@ if __name__ == "__main__":
                         action='store_true',
                         help='turns everything in the given zone off, in reverse boot order')
 
+
+    group.add_argument('--on_by_space',
+                        action='store_true',
+                        help='turns everything in the given space on, in boot order')
+
+
+    group.add_argument('--off_by_space',
+                        action='store_true',
+                        help='turns everything in the given space off, in reverse boot order')
+
     ##### add-on arguments (can be applied to the above)
     parser.add_argument("--switch",
                        type=str,
@@ -1036,6 +1327,10 @@ if __name__ == "__main__":
     parser.add_argument('--zone', 
                         type=str,
                         help='Zone to use with _zone commands')
+
+    parser.add_argument('--space', 
+                        type=str,
+                        help='Space to use with _space commands')
     
     args = parser.parse_args()
 
@@ -1077,6 +1372,8 @@ if __name__ == "__main__":
         cmd = cmd + (", limited to switch %s" % args.switch)
     if args.zone:
         cmd = cmd + (", for zone %s" % args.zone)
+    if args.space:
+        cmd = cmd + (", for space %s" % args.space)
     logger.info(cmd)
 
     if args.disable:
@@ -1089,21 +1386,11 @@ if __name__ == "__main__":
         
         if not (single_item):
             if not (args.no_delay):
-                cur_delay = 0.0
-                delay_string = ""
-                logger.info("Delaying %d seconds..." % (INIT_DELAY))
-                while (cur_delay <= INIT_DELAY - 1.0):
-                    if (int(INIT_DELAY - cur_delay) == 5):
-                        delay_string = str(int(INIT_DELAY - cur_delay)) + " seconds left, last chance!"
-                    else:
-                        delay_string = str(int(INIT_DELAY - cur_delay)) + "..."
-                    logger.info(delay_string)
-                    time.sleep(5.0)
-                    cur_delay = cur_delay + 5.0
+                delay_with_countdown(INIT_DELAY)
 
     #if we included the IP, check it to make sure it's in the Master Doc
     if args.ip:
-        if args.start_device or args.stop_device or args.reboot_device or args.pause_audio_device or args.unpause_audio_device or args.kill_proc_device or args.start_proc_device:
+        if not (single_item):
             remote_ip = args.ip
             (mac_address, switch_interface, device_type) = get_item(remote_ip)
             if device_type is None:
@@ -1132,6 +1419,14 @@ if __name__ == "__main__":
         if args.zone is None or args.zone == "":
             logger.error( " ERROR: --off_by_zone or --on_by_zone selected but no zone name was given with --zone. Exiting...")
             logger.error("Valid zones are: " + str(zones_ok_list))
+        else:
+            if args.zone.lower() == "arcade" or args.zone.lower() == "beamcade":
+                args.zone = "cade"
+
+    if args.off_by_space or args.on_by_space:
+        if args.space is None or args.space == "":
+            logger.error( " ERROR: --off_by_space or --on_by_space selected but no space name was given with --space. Exiting...")
+
 
     ###############
     # START DEVICE
@@ -1145,6 +1440,7 @@ if __name__ == "__main__":
     ###############
                     
     if args.stop_device:
+        logger.info("in stop device")
         stop_device(remote_ip, switch_ip, switch_interface, device_type)
 
     ###############
@@ -1247,6 +1543,23 @@ if __name__ == "__main__":
     if args.off_by_zone:
         if (args.zone):
             on_by_zone("off", args.zone.lower())
+
+
+    #################
+    # ON BY SPACE
+    #################
+
+    if args.on_by_space:
+        if (args.space):
+            on_by_space("on", args.space.lower())
+
+    #################
+    # OFF BY SPACE
+    #################
+
+    if args.off_by_space:
+        if (args.space):
+            on_by_space("off", args.space.lower())
 
     #################
     # CONCERT MODE ON DEVICE
