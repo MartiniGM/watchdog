@@ -254,19 +254,32 @@ def autodetect_softwarelist():
 
 def kill_proc(process_name):
     try:
-        os.system('pkill -f ' + process_name)
+        if sys.platform == 'linux' or sys.platform == 'linux2': 
+            os.system('pkill -f ' + process_name)
+        else:
+            if os.name == 'nt':
+                os.system('taskkill /im ' + process_name)
     except Exception, e:
         print "error in kill-proc: can't kill %s: %s" % (process_name, e)
 
 def start_proc(process_name):
-    try:
+    if sys.platform == 'linux' or sys.platform == 'linux2': 
+        try:
         # preexec_fn=os.setsid, close_fds=True is the key to not killing the
         # process when the watchdog dies or is ctrl-c'd, and not letting
         # child processes hold onto the watchdog's own ports
-        tmp_process = subprocess.Popen(process_name, preexec_fn=os.setsid, close_fds=True)
-    except Exception, e:
-        print "error in start-proc: can't start %s: %s" % (process_name, e)
-            
+            tmp_process = subprocess.Popen(process_name, preexec_fn=os.setsid, close_fds=True)
+        except Exception, e:
+            print "error in start-proc: can't start %s: %s" % (process_name, e)
+    else:
+        if os.name == 'nt':
+            try:
+        # preexec_fn=os.setsid, close_fds=True is the key to not killing the
+        # process when the watchdog dies or is ctrl-c'd, and not letting
+        # child processes hold onto the watchdog's own ports
+                tmp_process = subprocess.Popen(process_name, close_fds=True)
+            except Exception, e:
+                print "error in start-proc: can't start %s: %s" % (process_name, e)
 ############################################################
 # rebootscript()
 ############################################################
@@ -332,6 +345,7 @@ def parse_command(data):
     global reboot_in
     global reboot_timer
     global reboot_cmd
+    print "got a command " + str(data)
     try:
     # at this point we got data, so do something with it
         if ("reboot now" in data or "halt now" in data):
