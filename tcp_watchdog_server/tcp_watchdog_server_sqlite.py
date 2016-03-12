@@ -728,6 +728,7 @@ def parse_data_sqlite(data):
     num_okay = 0
     num_total = 0
     for row in data:
+        num_total += 1
         id_name = row[0]
         timestamp = row[1]
         status = row[2]
@@ -747,8 +748,7 @@ def parse_data_sqlite(data):
             status = "NONRESPONSIVE"
             device_type = ""
             (location, device_type, zone, space, device_name, description, switch_interface, mac_address, boot_order) = get_all_from_googlesheet(id_name)
-            if (device_type is not None and "software" not in device_type.lower()):
-                num_total += 1
+            #if (device_type is not None and "software" not in device_type.lower()):
             old_status = get_item_sqlite(id_name, "STATUS")
             if old_status != "NONRESPONSIVE" and "NOREPLY" not in old_status: #don't print if we already detected this!
                 logger.info(id_name + " silent for " + str(total_seconds) + " seconds, setting " + status + " with uptime " + uptime)
@@ -767,9 +767,10 @@ def parse_data_sqlite(data):
                     logger.error(" Can't rollback! %s" % e)
         else:
             #this item was OK if its status says OKAY
-            device_type = ""
-            device_type = get_item_sqlite(id_name, "DEVICE_TYPE")
-            if (new_status == "OKAY" and device_type is not None and "software" not in device_type.lower()):
+#            device_type = ""
+#            device_type = get_item_sqlite(id_name, "DEVICE_TYPE")
+#            if (new_status == "OKAY" and device_type is not None and "software" not in device_type.lower()):
+            if (new_status == "OKAY"):
                 num_okay += 1
     # report / save system stats            
     if (num_total == 0):
