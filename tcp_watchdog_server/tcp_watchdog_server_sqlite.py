@@ -767,6 +767,8 @@ def parse_data_sqlite(data):
                     logger.error(" Can't rollback! %s" % e)
         else:
             #this item was OK if its status says OKAY
+            device_type = ""
+            device_type = get_item_sqlite(id_name, "DEVICE_TYPE")
             if (new_status == "OKAY" and device_type is not None and "software" not in device_type.lower()):
                 num_okay += 1
     # report / save system stats            
