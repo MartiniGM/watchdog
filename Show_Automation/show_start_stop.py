@@ -26,6 +26,7 @@ POE_COMMAND = "/Users/Aesir/Documents/watchdog/set_power.exp"
 #command to use to send Wake on Lan messages 
 WOL_COMMAND = "/Users/Aesir/Documents/watchdog/wolcmd"
 DELAY_AFTER_SERVERS = 120.0 #delays 2 minutes between booting windows servers and pis
+DELAY_STOP_PI = 6.0 #delays 6 seconds between halting Pis and cutting PoE
 DELAY_BETWEEN_DEVICES = 0.5 #delays a half second between stop/starting devices
 DELAY_BETWEEN_RELAYS = 2.0 #delays 2 seconds between commands to the relays
 DELAY_FOR_PROJECTORS = 360.0 #delays 6 minutes for projector cooldown and/or startup
@@ -79,6 +80,41 @@ circuit_on_relay_item_id = 0
 circuit_zone_item_id = 0
 circuit_space_item_id = 0 
 USE_GOOGLE_SHEETS = 1
+
+####################################
+#DUMP DEVICES
+####################################
+#dumps okay or nonresponsive devices to the log
+def dump_devices(okay_or_nonresponsive):
+    try:
+        if os.name == 'nt':
+            con = lite.connect(WINDOWS_DB_FILENAME)
+        else:
+            con = lite.connect(LINUX_OSX_DB_FILENAME)     
+    except Exception, e:
+        logger.error( " ERROR: Can't connect to demosdb! %s" % e)
+
+    try:
+        with con:
+            cur = con.cursor()
+            cur.execute("SELECT * FROM DEVICES ORDER BY DEVICE_TYPE, ID_NAME ")
+            rows = cur.fetchall()
+            logger.info( " *-*-*-Now dumping:  %s" % (okay_or_nonresponsive))
+            i = 0
+            for row in rows:
+                device_name = str(row[11])
+                if device_name is not None and device_name != "None" and device_name != "default":
+                    if str(row[5]) == okay_or_nonresponsive:
+                        logger.info( str(row[11]) + ":" + str(row[0]) + " last message: " + str(row[2]))
+                        i = i + 1
+
+            logger.info( " *-*-*-TOTAL %s: %s" % (okay_or_nonresponsive, str(i)))
+    except lite.Error, e:
+        logger.error(" ERROR: SQL error! %s" % e)   
+
+#dump_devices("OKAY")
+#time.sleep(1.0)
+#dump_devices("NONRESPONSIVE")
 
 ####################################
 #DELAY_WITH_COUNTDOWN
@@ -522,7 +558,7 @@ def stop_device(remote_ip, switch_ip, switch_interface, device_type):
         time.sleep(DELAY_BETWEEN_DEVICES)
         if not args.disable:
             logger.info( " now stopping... %s %s %s" % (remote_ip, switch_ip, switch_interface))
-            stop_pi(remote_ip, switch_ip, switch_interface, 6)        
+            stop_pi(remote_ip, switch_ip, switch_interface, DELAY_STOP_PI)        
     else:
         if "indow" in device_type.lower():
 #            print "stop windows"
@@ -611,6 +647,10 @@ def reboot_device(remote_ip, switch_ip, switch_interface, device_type):
 #turns on/off all relays (for the given zone, or "" for no zone) given a list of relays  
 def relays_on_off(on_or_off, zone_list, zone): 
     
+    if (args.no_relays or args.with_relays == 0):
+        logger.warning("--no_relays, or --with_relays not found, skipping relays")
+        return
+
     if (zone.lower() == "art city" and on_or_off == "on") or (on_or_off == "on" and zone == "") :
         #the TV arch has relay dependencies because the Pi controllers
         #are on relays, not PoE. Move their items to the front of the 
@@ -673,11 +713,14 @@ def relays_on_off(on_or_off, zone_list, zone):
 # START/STOP/REBOOT SHOW
 ##############################            
 #start, stops, or reboots the whole show.
-def start_stop_reboot_show(command, limit_to_switch_ip):
+def start_stop_reboot_show(command, limit_to_switch_ip, type):
     remote_ip = ""
     mac_address = ""
     switch_interface = ""
     device_type = ""
+    start_pi_type = 0
+    start_arduino_type = 0
+    start_windows_type = 0
 
     if limit_to_switch_ip is None:
         limit_to_switch_ip = ""
@@ -689,6 +732,15 @@ def start_stop_reboot_show(command, limit_to_switch_ip):
         cmd = cmd + ", ***START/STOP DISABLED"
 
     logger.info(cmd)       
+
+    if type != None and type != "":
+        logger.info( "for type %s %s" % (type.lower(), device_type.lower()))
+        if "berry" in type.lower() or "pi" in type.lower():
+                start_pi_type = 1
+        if "indows" in type.lower():
+                start_windows_type = 1
+        if "duino" in type.lower():
+                start_arduino_type = 1
 
     try:
         # Open database connection, create cursor
@@ -748,6 +800,17 @@ def start_stop_reboot_show(command, limit_to_switch_ip):
 
                 if command is "start":
                     #start each item
+                    if start_pi_type and "berry" in device_type.lower():
+                        start_device(switch_ip, switch_interface, device_type, mac_address)
+                        continue
+                    if start_windows_type and "indow" in device_type.lower():
+                        start_device(switch_ip, switch_interface, device_type, mac_address)
+                        continue
+                    if start_arduino_type and "duino" in device_type.lower():
+                        start_device(switch_ip, switch_interface, device_type, mac_address)
+                        continue
+
+                    #otherwise just start stuff
                     if "berry" in device_type.lower() and done_server_delay == 0:
                         #delays before the first Pi
                         done_server_delay = 1;
@@ -761,6 +824,17 @@ def start_stop_reboot_show(command, limit_to_switch_ip):
                         
                 if command is "stop":
                     #stop each item
+                    if start_pi_type and "berry" in device_type.lower():
+                        stop_device(remote_ip, switch_ip, switch_interface, device_type)
+                        continue
+                    if start_windows_type and "indow" in device_type.lower():
+                        stop_device(remote_ip, switch_ip, switch_interface, device_type)
+                        continue
+                    if start_arduino_type and "duino" in device_type.lower():
+                        stop_device(remote_ip, switch_ip, switch_interface, device_type)
+                        continue
+
+                    #otherwise just reboot stuff
                     if limit_to_switch_ip is not None and limit_to_switch_ip != "":
                         if limit_to_switch_ip in switch_group:
                             stop_device(remote_ip, switch_ip, switch_interface, device_type)
@@ -769,10 +843,21 @@ def start_stop_reboot_show(command, limit_to_switch_ip):
 
                 if command is "reboot":
                     #reboot each item
+                    if start_pi_type and "berry" in device_type.lower():
+                        reboot_device(remote_ip, switch_ip, switch_interface, device_type)
+                        continue
+                    if start_windows_type and "indow" in device_type.lower():
+                        reboot_device(remote_ip, switch_ip, switch_interface, device_type)
+                        continue
+                    if start_arduino_type and "duino" in device_type.lower():
+                        reboot_device(remote_ip, switch_ip, switch_interface, device_type)
+                        continue
+
+                    #otherwise just reboot stuff
                     if limit_to_switch_ip is not None and limit_to_switch_ip != "":
                         if limit_to_switch_ip in switch_group:
                             reboot_device(remote_ip, switch_ip, switch_interface, device_type)
-                    else:
+                        else:
                             reboot_device(remote_ip, switch_ip, switch_interface, device_type)
 
             #then pause before stopping/starting the relays
@@ -784,6 +869,10 @@ def start_stop_reboot_show(command, limit_to_switch_ip):
                 else:
                     on_or_off = "on"
                 #then kill or start all relays 
+
+                if (args.no_relays or args.with_relays == 0):
+                    logger.warning("--no_relays, or --with_relays not found, skipping relays")
+                    return
                 get_relay_pins(relay_pin_list)
                 relay_list = get_all_relays(relay_pin_list)
 
@@ -933,6 +1022,9 @@ def on_by_zone(on_or_off, zone):
             #                    time.sleep(DELAY_FOR_PROJECTORS)
 
             #then kill or start the relays for this zone
+            if (args.no_relays or args.with_relays == 0):
+                logger.warning("--no_relays, or --with_relays not found, skipping relays")
+                return
             get_relay_pins(relay_pin_list)
             zone_list = get_relay_zones(zone, relay_pin_list)
             print "zone is %s" % zone.lower()
@@ -1058,6 +1150,18 @@ def start_looping_audio(remote_ip):
     send_to_osc(remote_ip, WATCHDOG_PORT, "start_proc /home/pi/RUNNING/scripts/looping-audio1.sh")
     send_to_osc(remote_ip, WATCHDOG_PORT, "start_proc /home/pi/RUNNING/scripts/looping-audio2.sh")
 
+#starts looping video on a given Pi
+def start_looping_video(remote_ip):
+    send_to_osc(remote_ip, WATCHDOG_PORT, "start_proc /home/pi/RUNNING/scripts/do-video.py")
+
+#kills looping video on a given Pi
+def kill_looping_video(remote_ip):
+    #kill do-video
+    send_to_osc(remote_ip, WATCHDOG_PORT, "kill_proc do-video.py")
+    sleep(5.0)
+    #pause to let it die, then kill all its children
+    send_to_osc(remote_ip, WATCHDOG_PORT, "kill_proc omxplayer")
+
 #sends audio pause or unpause command to the given Pi
 def pause(remote_ip, cmd):
     send_to_osc(remote_ip, OSC_PORT, cmd)
@@ -1067,6 +1171,7 @@ def concert_on(remote_ip):
     logger.info( "concert on %s" % remote_ip)
     pause(remote_ip, PAUSE_COMMAND)
     kill_looping_audio(remote_ip)
+    kill_looping_video(remote_ip)
     #more goes here, set up the lights
 
 #sends "concert mode off" commands to one Pi
@@ -1074,6 +1179,7 @@ def concert_off(remote_ip):
     logger.info( "concert off %s" % remote_ip)
     pause(remote_ip, UNPAUSE_COMMAND)
     start_looping_audio(remote_ip)
+    start_looping_video(remote_ip)
     #more goes here, set up the lights
 
 # turns concert mode (for live shows) on or off. Kills/starts audio on all Pis in Shanty Town, plus sends 
@@ -1265,6 +1371,10 @@ if __name__ == "__main__":
                         action='store_true',
                         help='turns everything in the given space off, in reverse boot order')
 
+    group.add_argument('--dump_devices',
+                        action='store_true',
+                        help='dumps device list to the log')
+
     ##### add-on arguments (can be applied to the above)
     parser.add_argument("--switch",
                        type=str,
@@ -1277,6 +1387,15 @@ if __name__ == "__main__":
     parser.add_argument('--no_servers',
                         action='store_true',
                         help='Skip start/stop/reboot commands for servers (Windows/Mac); start/stop/reboot Pis and Arduinos only')
+
+
+    parser.add_argument('--no_relays',
+                        action='store_true',
+                        help='Skip start/stop/reboot commands for power relays (managed outlets); start/stop/reboot Pis, servers, and Arduinos only')
+
+    parser.add_argument('--with_relays',
+                        action='store_true',
+                        help='Adds start/stop/reboot commands for power relays (managed outlets); start/stop/reboot Pis, servers, and Arduinos PLUS send relay commands')
 
     parser.add_argument('--no_global',
                         action='store_true',
@@ -1294,9 +1413,17 @@ if __name__ == "__main__":
                         type=str,
                         help='Process to use with proc_ commands')
 
+    parser.add_argument('--with_dump', 
+                        action='store_true',
+                        help='Dumps OKAY and NONRESPONSIVE lists to the log')
+
     parser.add_argument('--zone', 
                         type=str,
                         help='Zone to use with _zone commands')
+
+    parser.add_argument('--type', 
+                        type=str,
+                        help='Zone to use with _type commands')
 
     parser.add_argument('--space', 
                         type=str,
@@ -1309,6 +1436,11 @@ if __name__ == "__main__":
     ###############################################            
 
     cmd = " Show start/stop script OPENED"
+
+    if args.dump_devices:
+        dump_devices("OKAY")
+        dump_devices("NONRESPONSIVE")
+        exit()
 
     if args.start_show:
         cmd = cmd + (", starting show")
@@ -1334,6 +1466,10 @@ if __name__ == "__main__":
         cmd = cmd + (" with IP %s" % args.ip)
     if args.proc:
         cmd = cmd + (" with process %s" % args.proc)
+    if args.no_relays:
+        cmd = cmd + (", with --no_relays")      
+    if args.with_relays:
+        cmd = cmd + (", with --with_relays")      
     if args.no_servers:
         cmd = cmd + (", with --no_servers")      
     if args.no_global:
@@ -1342,9 +1478,15 @@ if __name__ == "__main__":
         cmd = cmd + (", limited to switch %s" % args.switch)
     if args.zone:
         cmd = cmd + (", for zone %s" % args.zone)
+    if args.type:
+        cmd = cmd + (", for zone %s" % args.type)
     if args.space:
         cmd = cmd + (", for space %s" % args.space)
     logger.info(cmd)
+
+    if args.with_dump:
+        dump_devices("OKAY")
+        dump_devices("NONRESPONSIVE")
 
     if args.disable:
         logger.warning(" WARNING: disable (test/dry run) option has been selected.")
@@ -1455,7 +1597,7 @@ if __name__ == "__main__":
     if args.start_show:
         if args.switch:
             switch_interface = args.switch            
-        start_stop_reboot_show("start", switch_interface)
+        start_stop_reboot_show("start", switch_interface, args.type)
 
     ###############
     # STOP SHOW
@@ -1464,7 +1606,7 @@ if __name__ == "__main__":
     if args.stop_show:
         if args.switch:
             switch_interface = args.switch
-        start_stop_reboot_show("stop", switch_interface)
+        start_stop_reboot_show("stop", switch_interface, args.type)
 
     ###############
     # REBOOT SHOW
@@ -1473,7 +1615,7 @@ if __name__ == "__main__":
     if args.reboot_show:
         if args.switch:
             switch_interface = args.switch            
-        start_stop_reboot_show("reboot", switch_interface)
+        start_stop_reboot_show("reboot", switch_interface, args.type)
 
     ###############
     # REBOOT NONRESPONSIVE

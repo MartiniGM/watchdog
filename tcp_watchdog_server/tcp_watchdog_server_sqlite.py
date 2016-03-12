@@ -728,7 +728,6 @@ def parse_data_sqlite(data):
     num_okay = 0
     num_total = 0
     for row in data:
-        num_total += 1
         id_name = row[0]
         timestamp = row[1]
         status = row[2]
@@ -746,8 +745,13 @@ def parse_data_sqlite(data):
             # more than X seconds since last message. update this entry with NOREPLY
             timestamp = str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
             status = "NONRESPONSIVE"
+            device_type = ""
             (location, device_type, zone, space, device_name, description, switch_interface, mac_address, boot_order) = get_all_from_googlesheet(id_name)
-            logger.info(id_name + " silent for " + str(total_seconds) + " seconds, setting " + status + " with uptime " + uptime)
+            if (device_type is not None and "software" not in device_type.lower()):
+                num_total += 1
+            old_status = get_item_sqlite(id_name, "STATUS")
+            if old_status != "NONRESPONSIVE" and "NOREPLY" not in old_status: #don't print if we already detected this!
+                logger.info(id_name + " silent for " + str(total_seconds) + " seconds, setting " + status + " with uptime " + uptime)
             try:
                 cur = con.cursor()
                 cur.execute("INSERT OR REPLACE INTO DEVICES(ID_NAME, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME, LAST_UPTIME_SEC, LOCATION, DEVICE_TYPE, LAST_RESET_TIMESTAMP, ZONE, SPACE, DEVICE_NAME, DESCRIPTION, SWITCH_INTERFACE, MAC_ADDRESS, BOOT_ORDER) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",  (id_name,timestamp,status, uptime_sec,uptime,uptime_sec, location, device_type, last_reset_timestamp, zone, space, device_name, description, switch_interface, mac_address, boot_order))
@@ -763,7 +767,7 @@ def parse_data_sqlite(data):
                     logger.error(" Can't rollback! %s" % e)
         else:
             #this item was OK if its status says OKAY
-            if (new_status == "OKAY"):
+            if (new_status == "OKAY" and device_type is not None and "software" not in device_type.lower()):
                 num_okay += 1
     # report / save system stats            
     if (num_total == 0):
