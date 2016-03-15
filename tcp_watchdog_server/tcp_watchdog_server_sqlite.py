@@ -12,9 +12,8 @@ import signal
 import traceback
 from collections import defaultdict
 # to install the three below:
-# "pip install gspread; pip install oauth2client; pip install PyOpenSSL"
-# install pip first if you don't have it, on windows just google "get-pip.py".
-# on Mac OS use "easy_install pip"
+# on Mac OS use "easy_install pip" 
+# then "pip install gspread; pip install oauth2client; pip install PyOpenSSL"
 import json
 import gspread
 from oauth2client.client import SignedJwtAssertionCredentials
@@ -50,14 +49,14 @@ googleSheetKey = "1kHAcbAo8saNSTBc7ffidzrwu_FGK3FaBpmh7rO7hT-U"
 googleWorksheetName = "Networked Devices" #name of the tab on the google sheet
 googleWorksheetName_Switches = "Switch Interface Map" #name of the tab on the google sheet
 
-# dictionary to load Google spreadsheet into (for device types and descriptions)
-googleSheetDict = {}
-list_of_lists = []
+googleSheetDict = {} # dictionary to load Google spreadsheet into (for Networked Devices)
+list_of_lists = [] #list of items on the networked devices tab
 # dictionary to load Google spreadsheet into (for Switch Interface Map)
-googleSheetDictSwitches = {}
-list_of_lists_switches = []
-switch_prefix_index = 0
-switch_ip_index = 0
+googleSheetDictSwitches = {} #dict of items on the switch map tab
+list_of_lists_switches = [] #list of items on the switch map tab
+switch_prefix_index = 0 #index for the switch prefix on the switch map tab
+switch_ip_index = 0 #index for the switch IP address on the switch map tab
+googlesheet_failures = 0 # counts successive sheet failures to suppress messages
 
 # load google sheet every hour. it's a bit slow to get the data back so it doesn't reload often, but if you want to trigger it immediately just restart the program
 LOADSHEET_SLOW = 3600 #seconds, once the initial load gets at least 1 row
@@ -98,19 +97,6 @@ signal.signal(signal.SIGINT, signal_handler)
 ####################
 
 ############################################################
-#find_item()
-############################################################
-def find_item(mylist, item_name):
-     #gets the position of "item" in the sublists & returns
-    for item in mylist:
-        i = 0
-        for subitem in item:
-            if subitem == item_name:
-                item_id = i
-                return item_id
-            i = i + 1
-
-############################################################
 #open_googlesheet()
 ############################################################
 # opens Google spreadsheet for later use. Call every hour or so to refresh the data from the Google sheet, then use get_item_googlesheet to access the data as often as you like in the interim.
@@ -129,7 +115,11 @@ def open_googlesheet():
         global list_of_lists_switches
         global switch_ip_index
         global switch_prefix_index
-        global loadGoogleSheetEvery 
+        global loadGoogleSheetEvery
+        global googlesheet_failures
+        googleSheetLenSwitches = 0
+        googleSheetLen = 0
+        googlesheet_failures = 0
         json_key = json.load(open(json_file))
         scope = ['https://spreadsheets.google.com/feeds']
         
@@ -138,9 +128,11 @@ def open_googlesheet():
         gc = gspread.authorize(credentials)
         sh = gc.open_by_key(googleSheetKey)
         
+        #load the Networked Devices tab
         googleWorksheet = sh.worksheet(googleWorksheetName)
         list_of_lists = googleWorksheet.get_all_values()
 
+        #load the and the Switch Interface Map tab
         googleWorksheet_switches = sh.worksheet(googleWorksheetName_Switches)
         list_of_lists_switches = googleWorksheet_switches.get_all_values()
         googleSheetLenSwitches = len(list_of_lists_switches)
@@ -173,17 +165,18 @@ def open_googlesheet():
         #finds location of "IP ADDRESS" column to use as key
         ip_address_column = 1 #default
         ip_address_column = find_item(list_of_lists, "IP ADDRESS")
-        next_column = ip_address_column + 1
-        for listy in list_of_lists:
-            googleSheetDict[listy[ip_address_column]] += listy[next_column:]
-        googleSheetLen = len(googleSheetDict)    
+        if ip_address_column is not None:
+            next_column = ip_address_column + 1
+            for listy in list_of_lists:
+                googleSheetDict[listy[ip_address_column]] += listy[next_column:]
+            googleSheetLen = len(googleSheetDict)    
         #for keys,values in googleSheetDict.items():
         #    print(keys)
         #    print(values)
         if googleSheetLen == 0 or googleSheetLenSwitches == 0:
             # set slower loads after load gets at least one row
             # if not, try to reload much more often.
-            loadGoogleSheetEvery = LOADSHEET_FAST #seconds
+            loadGoogleSheetEvery = LOADSHEET_FAST 
             logger.info("     Google Sheets load failed? %s rows loaded plus %s switch interfaces" % (googleSheetLen, googleSheetLenSwitches))      
         else:
             #the load got at least one row. Save everything in the DB 
@@ -204,10 +197,14 @@ def open_googlesheet():
 # otherwise returns empty string ("")
 def get_item_googlesheet(id_name, item_name):
     global googleSheetDict
+    global googlesheet_failures
     if (bool(googleSheetDict) == False):
-        logger.error( "empty dictionary in get_item_googlesheet! Please check google sheets access?")
+        googlesheet_failures = googlesheet_failures + 1
+        if googlesheet_failures < 2:
+            logger.error( "empty dictionary in get_item_googlesheet! Please check google sheets access!")
         return ""
     header_item = googleSheetDict["IP ADDRESS"]
+    googlesheet_failures = 0
     try:
         item_id = header_item.index(item_name) 
         if item_name == "Switch Interface":
@@ -221,7 +218,7 @@ def get_item_googlesheet(id_name, item_name):
         else:
             our_item = googleSheetDict[id_name]
             return_item = re.sub(u"\u2010", "-", our_item[item_id])
-            #strips out em-dash someone put in the Master Doc
+            #strips out em-dashes in the Master Doc
             return str(return_item)
     except KeyError:
 #        logger.warning("dict entry '%s' not found" % id_name)
@@ -466,12 +463,8 @@ def pivot_switches():
             if i == 0: # the first row is always just the column titles/key
                 continue
             if i <= top:
-#                print ""
-                #                print "i %d switch %s" % (i, switch)
                 this_prefix = switch[switch_prefix_index]
-#                print "this_prefix %s" % this_prefix
                 this_switch = switch[switch_ip_index]
-#                print "this_switch_ip %s" % this_switch
                 j = 0
                 for item in switch[switch_prefix_index+1:]:
                     j = j + 1
@@ -547,7 +540,6 @@ def return_status(stat):
 # get_pis_sqlite()
 ############################################################        
 # returns data from arduinos and pis (as a list of tuples)
-
 def get_pis_sqlite(pi_or_arduino):
     global con
     with con:
@@ -561,7 +553,6 @@ def get_pis_sqlite(pi_or_arduino):
 # get_item_sqlite()
 ############################################################        
 # returns location/description string, given an id_name
-
 def get_item_sqlite(id_name, item_name):
     global con
     try:
@@ -586,7 +577,6 @@ def get_item_sqlite(id_name, item_name):
 # splits string input into a formatted list of tuples and returns it.
 # this is intended to match the way SQLite returns values, so we can use the
 # same functions to parse both. Also checks msg for validity & truncates strings
-
 def listify_data(data):
     MAX_STATUS_STRING = 50 #strings longer than 50 chars are truncated
     MAX_ID_STRING = 150 #strings longer than 150 chars are truncated
@@ -639,8 +629,7 @@ def listify_data(data):
 ############################################################        
 # parses data (as a list of tuples, either from SQLite or listify_data) a
 # and updates SQLite
-
-def sql_data_sqlite(data, pi_or_arduino, ip):
+def sql_data_sqlite(data, ip):
     global con
     if data is None:
         return
@@ -675,8 +664,6 @@ def sql_data_sqlite(data, pi_or_arduino, ip):
         uptime_sec = non_decimal.sub('', uptime_sec)
         #strips out dumb characters at the end of strings sent by Max
         uptime_sec = uptime_sec.replace('\x00', '')
-        #prints with dumb characters if present
-#        print(repr(uptime_sec))
         uptime = datalist[4]
     if (len(uptime) == 0):
         # for now only loneduinos fail to send uptime as a string.
@@ -723,7 +710,6 @@ def sql_data_sqlite(data, pi_or_arduino, ip):
 # parse_data_sqlite()
 ############################################################        
 # parses/checks for periodic disconnects; if found, inserts NOREPLY into SQLite
-
 def parse_data_sqlite(data):
     num_okay = 0
     num_total = 0
@@ -744,7 +730,8 @@ def parse_data_sqlite(data):
         total_seconds = ((time_cur-time_ts).seconds)
         if (total_seconds > periodic_period):
             # more than X seconds since last message. update this entry with NOREPLY
-            timestamp = str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
+            timestamp = get_item_sqlite(id_name, "TIMESTAMP")
+            #timestamp = str(datetime.datetime.now().strftime("%b %d, %Y %H:%M:%S"))
             status = "NONRESPONSIVE"
             device_type = ""
             (location, device_type, zone, space, device_name, description, switch_interface, mac_address, boot_order) = get_all_from_googlesheet(id_name)
@@ -767,9 +754,6 @@ def parse_data_sqlite(data):
                     logger.error(" Can't rollback! %s" % e)
         else:
             #this item was OK if its status says OKAY
-#            device_type = ""
-#            device_type = get_item_sqlite(id_name, "DEVICE_TYPE")
-#            if (new_status == "OKAY" and device_type is not None and "software" not in device_type.lower()):
             if (new_status == "OKAY"):
                 num_okay += 1
     # report / save system stats            
@@ -906,9 +890,8 @@ if __name__ == "__main__":
             #######################
             # DATA RECEIVED
             #######################
-            # at this point we got data, so log it
-            
-                if data.count("ERRPI") + data.count("ERRDUINO") > 1:
+            # at this point we got data, so log it            
+                if data.count("ERRPI") + data.count("ERRDUINO") + data.count("OKAY") + data.count("NONRESPONSIVE") > 1: 
                 # we may get more than one message at a time
                 # due to the way TCP works. If so, split 'em.
                 # probably can't happen w/ UDP but I'm leaving it here in case
@@ -918,11 +901,11 @@ if __name__ == "__main__":
                             data2 = "ERR"+data
                             logger.debug("line is " + data2)
                             data3 = listify_data(data2)
-                            sql_data_sqlite(data3, "ARDUINOS", address)
+                            sql_data_sqlite(data3, address)
             # otherwise, just log one message
                 else:
                     data2 = listify_data(data)
-                    sql_data_sqlite(data2, "ARDUINOS", address)
+                    sql_data_sqlite(data2, address)
             else:
                 continue
         except socket.timeout:
