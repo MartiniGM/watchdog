@@ -64,7 +64,7 @@ send_ok_period = 30 #sends OKAY every N seconds
 if os.name == 'nt':
     LOG_FILENAME = 'c:\watchdog\watchdog.out'
 else:
-    LOG_FILENAME = '/home/tech/RUNNING/scripts/watchdog.out'
+    LOG_FILENAME = '/home/pi/RUNNING/scripts/watchdog.out'
 LOCAL_LOG_FILENAME = 'watchdog.out' #if the above doesn't work, we'll use this
 
 # give a filename for the optional software list file.
