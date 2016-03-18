@@ -1,0 +1,34 @@
+#!/usr/bin/env expect -f
+
+# usage: ./power.exp (never | auto) ip interface
+
+set ip [lindex $argv 0]
+set interface [lindex $argv 2]
+
+#set timeout 1
+set user "meow"
+#DO NOT upload these files to github, they have our passwords in them!
+set pass1 "p@ss"
+
+spawn telnet $ip
+expect "Connected"
+
+send "$user\r"
+expect "Password:"
+
+send "$pass1\r"
+expect ">"
+
+send "show power inline\r"
+expect {
+    ">" {
+        # Found prompt
+    }
+    -ex "--More--" {
+        send "\r"    ;
+        exp_continue ;# Keep on expecting please
+    }
+}
+
+send "exit\r"
+expect "Connection closed by foreign host.\r"
