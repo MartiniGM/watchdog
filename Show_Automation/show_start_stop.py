@@ -51,6 +51,14 @@ WATCHDOG_PORT = 6666 #port to send commands to the watchdog on the Pis
 PAUSE_COMMAND = "/pause" #pause command sent to do-audio on the Pis
 UNPAUSE_COMMAND = "/unpause" #unpause command sent to do-audio on the Pis
 
+#list of Pis with videos to kill/start for concert mode
+concert_mode_video_list = ["10.42.22.42", "10.42.22.54", "10.42.23.40", "10.42.23.44", "10.42.23.45", "10.42.22.53", "10.42.23.43",  "10.42.22.50"]
+#list of Pis with audio to kill/start for concert mode
+concert_mode_audio_list = ["10.42.23.40", "10.42.22.50", "10.42.23.43", "10.42.22.52", "10.42.22.54", "10.42.22.53"]
+#Beamspace controller IP / port for DMX control
+DMX_IP = "10.42.20.21"
+DMX_PORT = 6667
+
 #list of valid zones
 zones_ok_list = ["arcade", "art city", "beamcade", "caves", "forest", "house", "portals", "shanty", "theater", "cade"]
 #list of relay prefixes and their IP addresses, for lookup
@@ -1112,8 +1120,6 @@ def on_by_space(on_or_off, space):
 def send_to_osc(remote_ip, port, cmd):
     if not args.disable:
         logger.info( " -----sending %s to %s" % (cmd, remote_ip))
-    else:
-        logger.info( " -----would send %s to %s" % (cmd, remote_ip))
         try:
             c = OSC.OSCClient()
             c.connect((remote_ip, port)) 
@@ -1125,6 +1131,8 @@ def send_to_osc(remote_ip, port, cmd):
             for frame in traceback.extract_tb(sys.exc_info()[2]):
                 fname,lineno,fn,text = frame
                 logger.error( "     in %s on line %d" % (fname, lineno))
+    else:
+        logger.info( " -----would send %s to %s" % (cmd, remote_ip))
                 
 #tells the watchdog to kill a process (example: "looping-audio" kills all such functions) on the given Pi
 def kill_proc_device(remote_ip, procname):
@@ -1142,45 +1150,126 @@ def start_proc_device(remote_ip, procname):
 
 #kills looping audio for a given Pi
 def kill_looping_audio(remote_ip):
-    send_to_osc(remote_ip, WATCHDOG_PORT, "kill_proc looping-audio")
+    if not args.disable:
+        send_to_osc(remote_ip, WATCHDOG_PORT, "kill_proc looping-audio")
+#        send_to_osc(remote_ip, WATCHDOG_PORT, "kill_proc omxplayer") 
 
 #starts looping audio on a given Pi
 def start_looping_audio(remote_ip):
-    send_to_osc(remote_ip, WATCHDOG_PORT, "start_proc /home/pi/RUNNING/scripts/looping-audio.sh")
-    send_to_osc(remote_ip, WATCHDOG_PORT, "start_proc /home/pi/RUNNING/scripts/looping-audio1.sh")
-    send_to_osc(remote_ip, WATCHDOG_PORT, "start_proc /home/pi/RUNNING/scripts/looping-audio2.sh")
+    if not args.disable:
+        send_to_osc(remote_ip, WATCHDOG_PORT, "start_proc /home/pi/RUNNING/scripts/looping-audio.sh")
+        send_to_osc(remote_ip, WATCHDOG_PORT, "start_proc /home/pi/RUNNING/scripts/looping-audio1.sh")
+        send_to_osc(remote_ip, WATCHDOG_PORT, "start_proc /home/pi/RUNNING/scripts/looping-audio2.sh")
 
 #starts looping video on a given Pi
 def start_looping_video(remote_ip):
-    send_to_osc(remote_ip, WATCHDOG_PORT, "start_proc /home/pi/RUNNING/scripts/do-video.py")
+    if not args.disable:
+        send_to_osc(remote_ip, WATCHDOG_PORT, "start_proc /home/pi/RUNNING/scripts/do-video.py")
 
 #kills looping video on a given Pi
 def kill_looping_video(remote_ip):
     #kill do-video
-    send_to_osc(remote_ip, WATCHDOG_PORT, "kill_proc do-video.py")
-    sleep(5.0)
+    if not args.disable:
+        send_to_osc(remote_ip, WATCHDOG_PORT, "kill_proc do-video.py")
+#        time.sleep(5.0)
     #pause to let it die, then kill all its children
-    send_to_osc(remote_ip, WATCHDOG_PORT, "kill_proc omxplayer")
+        send_to_osc(remote_ip, WATCHDOG_PORT, "kill_proc omxplayer")
 
 #sends audio pause or unpause command to the given Pi
 def pause(remote_ip, cmd):
-    send_to_osc(remote_ip, OSC_PORT, cmd)
+    if not args.disable:
+#        udpsend(cmd, DMX_IP, DMX_PORT) 
+        send_to_osc(remote_ip, OSC_PORT, cmd)
+
+#sends "concert mode on" commands to one Pi
+def concert_on_video(remote_ip):
+    if not args.disable:
+        logger.info( "concert on, kill video on %s" % remote_ip)
+        kill_looping_video(remote_ip)
+    else:
+        logger.info( "would send concert on, kill video %s" % remote_ip)
+
+#    pause(remote_ip, PAUSE_COMMAND)
+#    kill_looping_audio(remote_ip)
+
+    #more goes here, set up the lights
+
+#sends "concert mode off" commands to one Pi
+def concert_off_video(remote_ip):
+    if not args.disable:
+        logger.info( "concert off, start video %s" % remote_ip)
+        reboot_pi(remote_ip);
+#        start_looping_video(remote_ip)
+    else:
+        logger.info( "would send concert off, start video %s" % remote_ip)
+#    pause(remote_ip, UNPAUSE_COMMAND)
+#    start_looping_audio(remote_ip)
+
+    #more goes here, set up the lights
+
+#sends "concert mode on" commands to one Pi
+def concert_on_audio(remote_ip):
+    if not args.disable:
+        logger.info( "concert on, kill audio %s" % remote_ip)
+        pause(remote_ip, PAUSE_COMMAND)
+        kill_looping_audio(remote_ip)
+    else:
+        logger.info( "would send concert on, kill audio %s" % remote_ip)
+    #kill_looping_video(remote_ip)
+    #more goes here, set up the lights
+
+#sends "concert mode off" commands to one Pi
+def concert_off_audio(remote_ip):
+    if not args.disable:
+        logger.info( "concert off, start audio %s" % remote_ip)
+        reboot_pi(remote_ip);
+        #pause(remote_ip, UNPAUSE_COMMAND)
+        #start_looping_audio(remote_ip)
+    else:
+        logger.info( "would send concert off, start audio %s" % remote_ip)
+#    start_looping_video(remote_ip)
+    #more goes here, set up the lights
 
 #sends "concert mode on" commands to one Pi
 def concert_on(remote_ip):
-    logger.info( "concert on %s" % remote_ip)
-    pause(remote_ip, PAUSE_COMMAND)
-    kill_looping_audio(remote_ip)
-    kill_looping_video(remote_ip)
+    if not args.disable:
+        logger.info( "concert on %s" % remote_ip)
+        pause(remote_ip, PAUSE_COMMAND)
+        kill_looping_audio(remote_ip)
+        kill_looping_video(remote_ip)
+    else:
+        logger.info( "would send concert on %s" % remote_ip)
     #more goes here, set up the lights
 
 #sends "concert mode off" commands to one Pi
 def concert_off(remote_ip):
-    logger.info( "concert off %s" % remote_ip)
-    pause(remote_ip, UNPAUSE_COMMAND)
-    start_looping_audio(remote_ip)
-    start_looping_video(remote_ip)
+    if not args.disable:
+        logger.info( "concert off %s" % remote_ip)
+        pause(remote_ip, UNPAUSE_COMMAND)
+        start_looping_audio(remote_ip)
+        start_looping_video(remote_ip)
+    else:
+        logger.info( "would send concert off %s" % remote_ip)
     #more goes here, set up the lights
+
+def concert_on_dmx():
+    if not args.disable:
+        logger.info( "setting dmx preset 2 on %s: entering concert mode" % DMX_IP)
+        msg = "/dmxMode 2"
+#        udpsend(msg, DMX_IP, DMX_PORT) 
+#        udpsend(cmd, remote_ip, WATCHDOG_PORT)
+#        send_to_osc(DMX_IP, DMX_PORT, msg)
+    else:
+        logger.info( "would set dmx preset 2 on %s: to enter concert mode" % DMX_IP)
+
+def concert_off_dmx():
+    if not args.disable:
+        logger.info( "setting dmx preset 1 on %s: entering exhibition mode" % DMX_IP)
+        msg = "/dmxMode 1"
+#        udpsend(msg, DMX_IP, DMX_PORT) 
+#        send_to_osc(DMX_IP, DMX_PORT, msg)
+    else:
+        logger.info( "would set dmx preset 1 on %s: to enter exhibition mode" % DMX_IP)
 
 # turns concert mode (for live shows) on or off. Kills/starts audio on all Pis in Shanty Town, plus sends 
 # DMX light control to/from the light console
@@ -1200,6 +1289,32 @@ def concert_mode(on_or_off):
         logger.error( " ERROR: Can't connect to demosdb! %s" % e)
         
     try:
+#        if (on_or_off is "on"):
+            #enter concert mode, set DMX to preset 2
+#            concert_on_dmx()
+#        else:
+            #enter exhibition mode, set DMX to preset 1
+#            concert_off_dmx()
+
+        #turn on or off concert mode for each device                                          
+        for item in concert_mode_video_list:
+            if (on_or_off is "on"):
+                #enter concert mode, kill video/audio and move DMX control to console
+                concert_on_video(item)
+            else:
+                #enter exhibition mode, start video & move DMX control back
+                concert_off_video(item)
+
+        for item in concert_mode_audio_list:
+            if (on_or_off is "on"):
+                #enter concert mode, kill video/audio and move DMX control to console
+                concert_on_audio(item)
+            else:
+                #enter exhibition mode, start video & move DMX control back
+                concert_off_audio(item)
+
+        return
+        #old stuff, currently we are using a custom list instead. see above
         with con:
             cur = con.cursor()
             sql = "SELECT ID_NAME, DEVICE_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE, BOOT_ORDER, ZONE FROM DEVICES WHERE ZONE LIKE '%SHANTY%'"
@@ -1442,6 +1557,10 @@ if __name__ == "__main__":
         dump_devices("NONRESPONSIVE")
         exit()
 
+    if args.with_dump:
+        dump_devices("OKAY")
+        dump_devices("NONRESPONSIVE")
+
     if args.start_show:
         cmd = cmd + (", starting show")
     if args.stop_show:
@@ -1479,14 +1598,10 @@ if __name__ == "__main__":
     if args.zone:
         cmd = cmd + (", for zone %s" % args.zone)
     if args.type:
-        cmd = cmd + (", for zone %s" % args.type)
+        cmd = cmd + (", for device type %s" % args.type)
     if args.space:
         cmd = cmd + (", for space %s" % args.space)
     logger.info(cmd)
-
-    if args.with_dump:
-        dump_devices("OKAY")
-        dump_devices("NONRESPONSIVE")
 
     if args.disable:
         logger.warning(" WARNING: disable (test/dry run) option has been selected.")
