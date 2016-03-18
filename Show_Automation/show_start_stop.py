@@ -1148,6 +1148,13 @@ def start_proc_device(remote_ip, procname):
         logger.info( " -----sending %s to %s" % (cmd, remote_ip))
         udpsend(cmd, remote_ip, WATCHDOG_PORT)
 
+def send_volume(remote_ip, volume):
+    cmd = "amixer set Speaker " + volume
+    start_proc_device(remote_ip, cmd)
+    time.sleep(0.5);
+    cmd = "amixer set PCM  " + volume
+    start_proc_device(remote_ip, cmd)
+
 #kills looping audio for a given Pi
 def kill_looping_audio(remote_ip):
     if not args.disable:
@@ -1188,10 +1195,6 @@ def concert_on_video(remote_ip):
         kill_looping_video(remote_ip)
     else:
         logger.info( "would send concert on, kill video %s" % remote_ip)
-
-#    pause(remote_ip, PAUSE_COMMAND)
-#    kill_looping_audio(remote_ip)
-
     #more goes here, set up the lights
 
 #sends "concert mode off" commands to one Pi
@@ -1202,17 +1205,14 @@ def concert_off_video(remote_ip):
 #        start_looping_video(remote_ip)
     else:
         logger.info( "would send concert off, start video %s" % remote_ip)
-#    pause(remote_ip, UNPAUSE_COMMAND)
-#    start_looping_audio(remote_ip)
-
-    #more goes here, set up the lights
 
 #sends "concert mode on" commands to one Pi
 def concert_on_audio(remote_ip):
     if not args.disable:
         logger.info( "concert on, kill audio %s" % remote_ip)
-        pause(remote_ip, PAUSE_COMMAND)
-        kill_looping_audio(remote_ip)
+        send_volume(remote_ip, "0%");
+#        pause(remote_ip, PAUSE_COMMAND)
+#        kill_looping_audio(remote_ip)
     else:
         logger.info( "would send concert on, kill audio %s" % remote_ip)
     #kill_looping_video(remote_ip)
@@ -1222,7 +1222,8 @@ def concert_on_audio(remote_ip):
 def concert_off_audio(remote_ip):
     if not args.disable:
         logger.info( "concert off, start audio %s" % remote_ip)
-        reboot_pi(remote_ip);
+        send_volume(remote_ip, "90%");
+#        reboot_pi(remote_ip);
         #pause(remote_ip, UNPAUSE_COMMAND)
         #start_looping_audio(remote_ip)
     else:
