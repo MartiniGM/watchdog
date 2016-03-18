@@ -1,0 +1,23 @@
+#!/usr/bin/expect -f
+# usage: ./set_pi_volume 10.42.24.42 90%
+
+set ip [lindex $argv 0]
+set volume [lindex $argv 1]
+#DO NOT upload these files to github, they have our passwords in them!
+set pass1 [read [open "pi_passphrase1.secret" r]]
+
+set timeout -1
+eval spawn ssh -oConnectTimeout=20 -oStrictHostKeyChecking=no -oCheckHostIP=no pi@$ip
+match_max 100000
+set prompt ":|#|\\\$"
+interact -o -nobuffer "password:" return
+send -- "$pass1\r"
+interact -o -nobuffer -re $prompt return
+send -- "amixer set Speaker $volume\r"
+interact -o -nobuffer -re $prompt return
+send -- "amixer set Headphone $volume\r"
+interact -o -nobuffer -re $prompt return
+send -- "amixer set PCM $volume\r"
+interact -o -nobuffer -re $prompt return
+send -- "exit\r"
+expect eof
