@@ -26,7 +26,7 @@ POE_COMMAND = "/Users/Aesir/Documents/watchdog/set_power.exp"
 #command to use to send Wake on Lan messages 
 WOL_COMMAND = "/Users/Aesir/Documents/watchdog/wolcmd"
 DELAY_AFTER_SERVERS = 120.0 #delays 2 minutes between booting windows servers and pis
-DELAY_STOP_PI = 6.0 #delays 6 seconds between halting Pis and cutting PoE
+DELAY_STOP_PI = 25.0 #delays 6 seconds between halting Pis and cutting PoE
 DELAY_BETWEEN_DEVICES = 0.5 #delays a half second between stop/starting devices
 DELAY_BETWEEN_RELAYS = 2.0 #delays 2 seconds between commands to the relays
 DELAY_FOR_PROJECTORS = 360.0 #delays 6 minutes for projector cooldown and/or startup
@@ -48,13 +48,20 @@ LOG_NUM_BACKUPS = 5 # five .out files before they roll over
 OSC_PORT = 9998 #port to send pause/unpause messages to do-audio on the Pis
 RELAY_PORT = 9999 #port to send on/off messages to power relays
 WATCHDOG_PORT = 6666 #port to send commands to the watchdog on the Pis
+DO_VIDEO_PORT = 9995 #port to send commands to do-video
 PAUSE_COMMAND = "/pause" #pause command sent to do-audio on the Pis
 UNPAUSE_COMMAND = "/unpause" #unpause command sent to do-audio on the Pis
+PAUSE_VIDEO_COMMAND = "/stopall" #pause command sent to do-audio on the Pis
+UNPAUSE_VIDEO_COMMAND = "/playnormal" #unpause command sent to do-audio on the Pis
 
 #list of Pis with videos to kill/start for concert mode
-concert_mode_video_list = ["10.42.22.42", "10.42.22.54", "10.42.23.40", "10.42.23.44", "10.42.23.45", "10.42.22.53", "10.42.23.43",  "10.42.22.50"]
+concert_mode_video_list = ["10.42.22.42", "10.42.23.45", "10.42.22.54"]
+#concert_mode_video_list_old = ["10.42.22.42", "10.42.22.54", "10.42.23.40", "10.42.23.44", "10.42.23.45", "10.42.22.53", "10.42.23.43",  "10.42.22.50"]
 #list of Pis with audio to kill/start for concert mode
-concert_mode_audio_list = ["10.42.23.40", "10.42.22.50", "10.42.23.43", "10.42.22.52", "10.42.22.54", "10.42.22.53"]
+#concert_mode_audio_list = []
+concert_mode_looping_audio_list = ["10.42.23.40"]
+concert_mode_triggered_audio_list = ["10.42.22.52"]
+#concert_mode_audio_list = ["10.42.23.40", "10.42.22.50", "10.42.23.43", "10.42.22.52", "10.42.22.54", "10.42.22.53"]
 #Beamspace controller IP / port for DMX control
 DMX_IP = "10.42.20.21"
 DMX_PORT = 6667
@@ -1148,13 +1155,6 @@ def start_proc_device(remote_ip, procname):
         logger.info( " -----sending %s to %s" % (cmd, remote_ip))
         udpsend(cmd, remote_ip, WATCHDOG_PORT)
 
-def send_volume(remote_ip, volume):
-    cmd = "amixer set Speaker " + volume
-    start_proc_device(remote_ip, cmd)
-    time.sleep(0.5);
-    cmd = "amixer set PCM  " + volume
-    start_proc_device(remote_ip, cmd)
-
 #kills looping audio for a given Pi
 def kill_looping_audio(remote_ip):
     if not args.disable:
@@ -1171,16 +1171,18 @@ def start_looping_audio(remote_ip):
 #starts looping video on a given Pi
 def start_looping_video(remote_ip):
     if not args.disable:
-        send_to_osc(remote_ip, WATCHDOG_PORT, "start_proc /home/pi/RUNNING/scripts/do-video.py")
+        send_to_osc(remote_ip, DO_VIDEO_PORT, "/playnormal")
+#        send_to_osc(remote_ip, WATCHDOG_PORT, "start_proc /home/pi/RUNNING/scripts/do-video.py")
 
 #kills looping video on a given Pi
 def kill_looping_video(remote_ip):
     #kill do-video
     if not args.disable:
-        send_to_osc(remote_ip, WATCHDOG_PORT, "kill_proc do-video.py")
+        send_to_osc(remote_ip, DO_VIDEO_PORT, "/stopall")
+#        send_to_osc(remote_ip, WATCHDOG_PORT, "kill_proc do-video.py")
 #        time.sleep(5.0)
     #pause to let it die, then kill all its children
-        send_to_osc(remote_ip, WATCHDOG_PORT, "kill_proc omxplayer")
+#        send_to_osc(remote_ip, WATCHDOG_PORT, "kill_proc omxplayer")
 
 #sends audio pause or unpause command to the given Pi
 def pause(remote_ip, cmd):
@@ -1195,37 +1197,65 @@ def concert_on_video(remote_ip):
         kill_looping_video(remote_ip)
     else:
         logger.info( "would send concert on, kill video %s" % remote_ip)
+
+#    pause(remote_ip, PAUSE_COMMAND)
+#    kill_looping_audio(remote_ip)
+
     #more goes here, set up the lights
 
 #sends "concert mode off" commands to one Pi
 def concert_off_video(remote_ip):
     if not args.disable:
         logger.info( "concert off, start video %s" % remote_ip)
-        reboot_pi(remote_ip);
-#        start_looping_video(remote_ip)
+#        reboot_pi(remote_ip);
+        start_looping_video(remote_ip)
     else:
         logger.info( "would send concert off, start video %s" % remote_ip)
+#    pause(remote_ip, UNPAUSE_COMMAND)
+#    start_looping_audio(remote_ip)
+
+    #more goes here, set up the lights
 
 #sends "concert mode on" commands to one Pi
-def concert_on_audio(remote_ip):
+def concert_on_audio_looping(remote_ip):
     if not args.disable:
-        logger.info( "concert on, kill audio %s" % remote_ip)
-        send_volume(remote_ip, "0%");
+        logger.info( "concert on, kill looping audio %s" % remote_ip)
 #        pause(remote_ip, PAUSE_COMMAND)
+        kill_looping_audio(remote_ip)
+    else:
+        logger.info( "would send concert on, kill triggered audio %s" % remote_ip)
+    #kill_looping_video(remote_ip)
+    #more goes here, set up the lights
+
+def concert_on_audio_triggered(remote_ip):
+    if not args.disable:
+        logger.info( "concert on, kill triggered audio %s" % remote_ip)
+        pause(remote_ip, PAUSE_COMMAND)
 #        kill_looping_audio(remote_ip)
     else:
-        logger.info( "would send concert on, kill audio %s" % remote_ip)
+        logger.info( "would send concert on, kill triggered audio %s" % remote_ip)
     #kill_looping_video(remote_ip)
     #more goes here, set up the lights
 
 #sends "concert mode off" commands to one Pi
-def concert_off_audio(remote_ip):
+def concert_off_audio_looping(remote_ip):
+    if not args.disable:
+        logger.info( "concert off, start looping audio %s" % remote_ip)
+        #reboot_pi(remote_ip);
+#        pause(remote_ip, UNPAUSE_COMMAND)
+        start_looping_audio(remote_ip)
+    else:
+        logger.info( "would send concert off, start looping audio %s" % remote_ip)
+#    start_looping_video(remote_ip)
+    #more goes here, set up the lights
+
+#sends "concert mode off" commands to one Pi
+def concert_off_audio_triggered(remote_ip):
     if not args.disable:
         logger.info( "concert off, start audio %s" % remote_ip)
-        send_volume(remote_ip, "90%");
-#        reboot_pi(remote_ip);
-        #pause(remote_ip, UNPAUSE_COMMAND)
-        #start_looping_audio(remote_ip)
+        #reboot_pi(remote_ip);
+        pause(remote_ip, UNPAUSE_COMMAND)
+#        start_looping_audio(remote_ip)
     else:
         logger.info( "would send concert off, start audio %s" % remote_ip)
 #    start_looping_video(remote_ip)
@@ -1306,13 +1336,21 @@ def concert_mode(on_or_off):
                 #enter exhibition mode, start video & move DMX control back
                 concert_off_video(item)
 
-        for item in concert_mode_audio_list:
+        for item in concert_mode_looping_audio_list:
             if (on_or_off is "on"):
                 #enter concert mode, kill video/audio and move DMX control to console
-                concert_on_audio(item)
+                concert_on_audio_looping(item)
             else:
                 #enter exhibition mode, start video & move DMX control back
-                concert_off_audio(item)
+                concert_off_audio_looping(item)
+
+        for item in concert_mode_triggered_audio_list:
+            if (on_or_off is "on"):
+                #enter concert mode, kill video/audio and move DMX control to console
+                concert_on_audio_triggered(item)
+            else:
+                #enter exhibition mode, start video & move DMX control back
+                concert_off_audio_triggered(item)
 
         return
         #old stuff, currently we are using a custom list instead. see above
