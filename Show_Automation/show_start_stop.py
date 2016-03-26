@@ -55,13 +55,11 @@ PAUSE_VIDEO_COMMAND = "/stopall" #pause command sent to do-audio on the Pis
 UNPAUSE_VIDEO_COMMAND = "/playnormal" #unpause command sent to do-audio on the Pis
 
 #list of Pis with videos to kill/start for concert mode
-concert_mode_video_list = ["10.42.22.42", "10.42.23.45", "10.42.22.54"]
-#concert_mode_video_list_old = ["10.42.22.42", "10.42.22.54", "10.42.23.40", "10.42.23.44", "10.42.23.45", "10.42.22.53", "10.42.23.43",  "10.42.22.50"]
+concert_mode_video_list = ["10.42.22.42", "10.42.23.45", "10.42.22.54", "10.42.23.44"] #benji's dance videos, lighthouse, lucius narrative
 #list of Pis with audio to kill/start for concert mode
-#concert_mode_audio_list = []
-concert_mode_looping_audio_list = ["10.42.23.40"]
-concert_mode_triggered_audio_list = ["10.42.22.52"]
-#concert_mode_audio_list = ["10.42.23.40", "10.42.22.50", "10.42.23.43", "10.42.22.52", "10.42.22.54", "10.42.22.53"]
+concert_mode_looping_audio_list = ["10.42.23.40"] #lighthouse
+concert_mode_triggered_audio_list = ["10.42.22.52"] #charter clock
+
 #Beamspace controller IP / port for DMX control
 DMX_IP = "10.42.20.21"
 DMX_PORT = 6667
