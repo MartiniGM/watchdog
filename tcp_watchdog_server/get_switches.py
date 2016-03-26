@@ -24,7 +24,7 @@ from oauth2client.client import SignedJwtAssertionCredentials
 # switch list. add more switches here if you got 'em
 switches = ["10.42.0.3","10.42.0.4","10.42.0.5","10.42.0.6","10.42.0.7",
             "10.42.0.8","10.42.0.9","10.42.0.10","10.42.0.11","10.42.0.12",
-            "10.42.0.13", "10.42.0.14"]
+            "10.42.0.13", "10.42.0.14","10.42.0.17","10.42.0.20","10.42.0.21"]
 
 device_type_item_id = 5
 device_name_item_id = 0
@@ -171,9 +171,9 @@ def return_name(c):
     global device_name_list
     for item in device_name_list:
         try:
-            print ("compare %s to %s" % (item[0].lower(), c))
+#            print ("compare %s to %s" % (item[0].lower(), c))
             if item[0].lower() == c:
-                print "matched!!!"
+#                print "matched!!!"
                 matches.append(item[1])
         except Exception, e:
             print "oops %s" % e
@@ -374,7 +374,7 @@ try:
             do_a_switch(switch)
     
         # go through the switch list, run the expect script for each to get mac addresses for connected devices
-    print interface_list
+    #print interface_list
     print ""
     print "---------DETECTED ITEMS:"
 
