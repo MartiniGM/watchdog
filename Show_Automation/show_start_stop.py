@@ -56,7 +56,7 @@ UNPAUSE_VIDEO_COMMAND = "/playnormal" #unpause command sent to do-audio on the P
 VOLUME_DOWN_COMMAND0 = "amixer -c 0 -- sset Headphone playback 0%"
 VOLUME_DOWN_COMMAND1 = "amixer -c 1 -- sset Headphone playback 0%"
 VOLUME_DOWN_COMMAND2 = "amixer -c 2 -- sset Headphone playback 0%"
-VOLUME_UP_COMMAND0 = "amixer -c 1 -- sset Headphone playback 30%" 
+VOLUME_UP_COMMAND0 = "amixer -c 0 -- sset Headphone playback 30%" 
 VOLUME_UP_COMMAND1 = "amixer -c 1 -- sset Headphone playback 30%" 
 VOLUME_UP_COMMAND2 = "amixer -c 2 -- sset Headphone playback 30%"
 
@@ -1070,9 +1070,9 @@ def on_by_zone(on_or_off, zone):
         logger.error(" ERROR: SQL error! %s" % e)
 
 ###############
-# BY ZONE FUNCTIONS
+# BY SPACE FUNCTIONS
 ###############            
-#turns on/off a given zone. See the valid zones at the top of the file.
+#turns on/off a given space. See the valid zones at the top of the file.
 def on_by_space(on_or_off, space):
     logger.info( " -----turn %s %s" % (on_or_off, space))
     remote_ip = ""
@@ -1080,7 +1080,7 @@ def on_by_space(on_or_off, space):
     switch_interface = ""
     device_type = ""
     
-    #zone must be given AND must be in the list of valid zones at the top of the file. otherwise exit
+    #space must be given
     if space == "" or space is None:
         logger.error( " ERROR: no space given with _by_space, exiting")
         return
@@ -1096,7 +1096,7 @@ def on_by_space(on_or_off, space):
         
     try:
         with con:
-            #select everything for this zone, in the proper boot/shutdown order
+            #select everything for this space, in the proper boot/shutdown order
             cur = con.cursor()
             sql = "SELECT ID_NAME, DEVICE_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE, BOOT_ORDER, SPACE, ZONE, DESCRIPTION FROM DEVICES WHERE SPACE LIKE '" + ('%' + space + "%'")   
             if args.no_global:
