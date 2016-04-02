@@ -235,7 +235,7 @@ def autodetect_softwarelist():
                     if line_entries[0] == "@reboot":
                     #but don't add yourself
                         if len(line_entries) >= 2:
-                            if "watchdog.py" not in line_entries[1]:
+                            if "watchdog.py" not in line_entries[1] and "setupDACs.sh" not in line_entries[1]:
                         #and don't add duplicate entries
                                 if line_entries[1] not in softwarelist:
                                     softwarelist.append(line_entries[1])
