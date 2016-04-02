@@ -68,7 +68,7 @@ concert_mode_video_list = ["10.42.22.42", "10.42.23.45", "10.42.22.54", "10.42.2
 #list of Pis with audio to kill/start for concert mode
 concert_mode_looping_audio_list = ["10.42.23.40"] #lighthouse
 concert_mode_triggered_audio_list = ["10.42.22.52"] #charter clock
-concert_mode_volume_list = ["10.42.22.53"] #, "10.42.22.54", "10.42.23.43", "10.42.22.50"] #bug room, dylan's cartoon room, and 2x shanty global audio
+concert_mode_volume_list = ["10.42.22.53", "10.42.22.54", "10.42.23.43", "10.42.22.50"] #bug room, dylan's cartoon room, and 2x shanty global audio
 
 #Beamspace controller IP / port for DMX control
 DMX_IP = "10.42.20.21"
@@ -308,6 +308,53 @@ def get_relay_zones(zone, zone_items):
             
         #if the zone matches and this circuit is on a relay, get relay info and add it to the list
             if zone.lower() in zone_item.lower() and circuit_on_relay == "yes":
+                pin = -1
+            #grab the pin from the relay map file
+                item = subfinder(zone_items, circuit_name, 0)
+                if item != []:
+                    pin = item[0][1]
+            #grab the IP address for this relay
+                    remote_ip_item = subfinder(relay_ip_list, circuit_name[:3], 0) 
+                    if (remote_ip_item != []):
+                        remote_ip = remote_ip_item[0][1]
+                    else:
+                        remote_ip = ""
+                #and return the zone, relay name, pin, and IP plus extras
+                    item2 = (zone_item, circuit_name, circuit_on_relay, pin, remote_ip, "Relay")
+                    relay_list.append(item2)
+
+    #and return the list
+        return relay_list
+
+    except Exception, e:
+        logger.error( "error in get_relay_zones: %s" % e)
+        for frame in traceback.extract_tb(sys.exc_info()[2]):
+            fname,lineno,fn,text = frame
+            logger.error( "     in %s on line %d" % (fname, lineno))
+        return []
+
+##################
+# GET SINGLE RELAY
+##################
+# gets the list of relay names and pins from the Max files listed in relay_files.  Gets a relay for the given Relay Name, as long as it has "yes" / "YES" in the "Circuit On Relay" column
+def get_single_relay(relay, relay_items):
+    #reads everything from the Circuits and Relays tab                      
+    relay_list = []
+    if len(list_of_lists_relays) == 0:
+        open_googlesheet()
+    
+#    print "%d google items loaded" % len(list_of_lists_relays)
+
+    try:
+
+        for item in list_of_lists_relays:
+            zone_item = item[circuit_zone_item_id].replace(':','').lower()
+            circuit_on_relay = item[circuit_on_relay_item_id].replace(':','').lower()
+            circuit_space = item[circuit_space_item_id]
+            circuit_name = item[circuit_name_item_id]        
+            
+        #if the zone matches and this circuit is on a relay, get relay info and add it to the list
+            if circuit_name.endswith(relay.lower()) and circuit_on_relay == "yes":
                 pin = -1
             #grab the pin from the relay map file
                 item = subfinder(zone_items, circuit_name, 0)
@@ -743,6 +790,32 @@ def relays_on_off(on_or_off, zone_list, zone):
     #kill the media server
     #wait 6 minutes 
     #kill the projectors etc
+
+def on_off_single_relay(on_or_off, relay_name):
+
+    if relay_name is None or relay_name == "":
+        logger.error("No relay name given for on_off_single_relay!");
+        return
+
+        #then kill or start the given relay 
+
+    if (args.no_relays or args.with_relays == 0):
+        logger.warning("--no_relays, or --with_relays not found, skipping relays")
+        return
+      
+    get_relay_pins(relay_pin_list)
+    relay_list = get_single_relay(relay_name, relay_pin_list)
+    
+    item = relay_list[0]
+
+    if (on_or_off == "on"):
+        logger.info("send to " + str(item[1]))
+        msg = "/relays/%s 1" % item[3]
+        send_to_osc(item[4], RELAY_PORT, msg)
+    else:
+        logger.info("send to " + str(item[1]))
+        msg = "/relays/%s 0" % item[3]
+        send_to_osc(item[4], RELAY_PORT, msg)
 
 ##############################
 # START/STOP/REBOOT SHOW
@@ -1206,6 +1279,10 @@ def pause(remote_ip, cmd):
 #sends volume off to the given Pi
 def volume_off_pi(remote_ip):
     if not args.disable:
+
+        cmd = "start_proc " + VOLUME_DOWN_COMMAND0
+        send_to_osc(remote_ip, WATCHDOG_PORT, cmd)
+        time.sleep(0.5)
         cmd = "start_proc " + VOLUME_DOWN_COMMAND1
         send_to_osc(remote_ip, WATCHDOG_PORT, cmd)
         time.sleep(0.5)
@@ -1217,6 +1294,9 @@ def volume_off_pi(remote_ip):
 #sends volume on (80%) to the given Pi
 def volume_on_pi(remote_ip):
     if not args.disable:
+        cmd = "start_proc " + VOLUME_UP_COMMAND0
+        send_to_osc(remote_ip, WATCHDOG_PORT, cmd)
+        time.sleep(0.5)
         cmd = "start_proc " + VOLUME_UP_COMMAND1
         send_to_osc(remote_ip, WATCHDOG_PORT, cmd)
         time.sleep(0.5)
@@ -1444,6 +1524,7 @@ if __name__ == "__main__":
 
     ##### stand-alone arguments (choose only one)
     group = parser.add_mutually_exclusive_group()
+
     group.add_argument('--start_device',
                         action='store_true',
                         help='starts a single device (given ip address in --ip)' )
@@ -1535,11 +1616,11 @@ if __name__ == "__main__":
 
     group.add_argument('--volume_up',
                         action='store_true',
-                        help='sets volume to 80% on Pis')
+                        help='sets volume to 80 percent on Pis')
 
     group.add_argument('--volume_down',
                         action='store_true',
-                        help='sets volume to 0% on Pis')
+                        help='sets volume to 0 percent on Pis')
 
     ##### add-on arguments (can be applied to the above)
     parser.add_argument("--switch",
@@ -1557,11 +1638,19 @@ if __name__ == "__main__":
 
     parser.add_argument('--no_relays',
                         action='store_true',
-                        help='Skip start/stop/reboot commands for power relays (managed outlets); start/stop/reboot Pis, servers, and Arduinos only')
+                        help='Skip start/stop/reboot commands for power relays (managed outlets)')
 
     parser.add_argument('--with_relays',
                         action='store_true',
-                        help='Adds start/stop/reboot commands for power relays (managed outlets); start/stop/reboot Pis, servers, and Arduinos PLUS send relay commands')
+                        help='Adds start/stop/reboot commands for power relays (managed outlets)')
+
+    group.add_argument('--relay_on',
+                        action='store_true',
+                        help='starts a single device (given relay name in --relay)' )
+
+    group.add_argument('--relay_off',
+                        action='store_true',
+                        help='stops a single device (given relay name in --relay)' )
 
     parser.add_argument('--no_global',
                         action='store_true',
@@ -1594,6 +1683,10 @@ if __name__ == "__main__":
     parser.add_argument('--space', 
                         type=str,
                         help='Space to use with _space commands')
+
+    parser.add_argument('--relay', 
+                        type=str,
+                        help='Relay name to use with _relay commands')
     
     args = parser.parse_args()
 
@@ -1642,6 +1735,8 @@ if __name__ == "__main__":
         cmd = cmd + (" with IP %s" % args.ip)
     if args.proc:
         cmd = cmd + (" with process %s" % args.proc)
+    if args.relay:
+        cmd = cmd + (" with relay %s" % args.relay)
     if args.no_relays:
         cmd = cmd + (", with --no_relays")      
     if args.with_relays:
@@ -1871,6 +1966,20 @@ if __name__ == "__main__":
 
     if args.volume_down:
         volume_off_pi(args.ip)
+
+    #################
+    # VOLUME UP
+    #################
+
+    if args.relay_on:
+        on_off_single_relay("on", args.relay)
+
+    #################
+    # VOLUME DOWN
+    #################
+
+    if args.relay_off:
+        on_off_single_relay("off", args.relay)
 
     #################
     # ENTRY VIDEO REBOOT

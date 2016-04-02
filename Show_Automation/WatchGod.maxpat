@@ -9,7 +9,7 @@
 			"modernui" : 1
 		}
 ,
-		"rect" : [ 14.0, 45.0, 1339.0, 967.0 ],
+		"rect" : [ 42.0, 45.0, 1584.0, 967.0 ],
 		"bglocked" : 1,
 		"openinpresentation" : 1,
 		"default_fontsize" : 12.0,
@@ -38,11 +38,709 @@
 		"subpatcher_template" : "",
 		"boxes" : [ 			{
 				"box" : 				{
+					"fontsize" : 9.0,
+					"id" : "obj-369",
+					"linecount" : 2,
+					"maxclass" : "comment",
+					"numinlets" : 1,
+					"numoutlets" : 0,
+					"patching_rect" : [ 1011.0, 79.0, 140.0, 27.0 ],
+					"presentation" : 1,
+					"presentation_linecount" : 2,
+					"presentation_rect" : [ 1011.0, 79.0, 140.0, 27.0 ],
+					"style" : "",
+					"text" : "note: I0922 is not on PoE, you must reset it manually"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"id" : "obj-309",
+					"linecount" : 3,
+					"maxclass" : "message",
+					"numinlets" : 2,
+					"numoutlets" : 1,
+					"outlettype" : [ "" ],
+					"patching_rect" : [ 1467.0, 323.0, 50.0, 49.0 ],
+					"style" : "",
+					"text" : "symbol <password>"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"id" : "obj-364",
+					"maxclass" : "newobj",
+					"numinlets" : 2,
+					"numoutlets" : 2,
+					"outlettype" : [ "bang", "" ],
+					"patching_rect" : [ 1467.0, 405.5, 100.0, 22.0 ],
+					"style" : "",
+					"text" : "sel \"000\""
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"id" : "obj-366",
+					"maxclass" : "newobj",
+					"numinlets" : 2,
+					"numoutlets" : 2,
+					"outlettype" : [ "", "bang" ],
+					"patching_rect" : [ 1467.0, 379.5, 100.0, 22.0 ],
+					"style" : "",
+					"text" : "dialog password:"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"fontface" : 1,
+					"fontsize" : 8.0,
+					"id" : "obj-380",
+					"linecount" : 3,
+					"maxclass" : "comment",
+					"numinlets" : 1,
+					"numoutlets" : 0,
+					"patching_rect" : [ 460.5, 628.5, 50.0, 33.0 ],
+					"style" : "",
+					"text" : "RPI-MATTS-COLOR-SERVER"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"args" : [ "10.42.30.99" ],
+					"bgmode" : 0,
+					"border" : 0,
+					"clickthrough" : 0,
+					"enablehscroll" : 0,
+					"enablevscroll" : 0,
+					"hint" : "10.42.30.99",
+					"id" : "obj-381",
+					"lockeddragscroll" : 0,
+					"maxclass" : "bpatcher",
+					"name" : "node.maxpat",
+					"numinlets" : 0,
+					"numoutlets" : 0,
+					"offset" : [ 0.0, 0.0 ],
+					"patching_rect" : [ 501.0, 627.0, 110.0, 12.0 ],
+					"presentation" : 1,
+					"presentation_rect" : [ 501.0, 627.0, 106.5, 12.0 ],
+					"varname" : "pi10423099",
+					"viewvisibility" : 1
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"args" : [ "10.42.17.46" ],
+					"bgmode" : 0,
+					"border" : 0,
+					"clickthrough" : 0,
+					"enablehscroll" : 0,
+					"enablevscroll" : 0,
+					"hint" : "10.42.17.46",
+					"id" : "obj-378",
+					"lockeddragscroll" : 0,
+					"maxclass" : "bpatcher",
+					"name" : "node.maxpat",
+					"numinlets" : 0,
+					"numoutlets" : 0,
+					"offset" : [ 0.0, 0.0 ],
+					"patching_rect" : [ 1086.0, 331.0, 161.0, 15.0 ],
+					"presentation" : 1,
+					"presentation_rect" : [ 1071.0, 331.0, 161.0, 15.0 ],
+					"varname" : "pi10421746",
+					"viewvisibility" : 1
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"fontface" : 1,
+					"fontsize" : 8.0,
+					"id" : "obj-379",
+					"maxclass" : "comment",
+					"numinlets" : 1,
+					"numoutlets" : 0,
+					"patching_rect" : [ 1038.5, 332.5, 56.0, 15.0 ],
+					"style" : "",
+					"text" : "RPi-A0109"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"args" : [ "10.42.17.45" ],
+					"bgmode" : 0,
+					"border" : 0,
+					"clickthrough" : 0,
+					"enablehscroll" : 0,
+					"enablevscroll" : 0,
+					"hint" : "10.42.17.45",
+					"id" : "obj-376",
+					"lockeddragscroll" : 0,
+					"maxclass" : "bpatcher",
+					"name" : "node.maxpat",
+					"numinlets" : 0,
+					"numoutlets" : 0,
+					"offset" : [ 0.0, 0.0 ],
+					"patching_rect" : [ 1087.0, 312.0, 161.0, 15.0 ],
+					"presentation" : 1,
+					"presentation_rect" : [ 1072.0, 312.0, 161.0, 15.0 ],
+					"varname" : "pi10421745",
+					"viewvisibility" : 1
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"fontface" : 1,
+					"fontsize" : 8.0,
+					"id" : "obj-377",
+					"maxclass" : "comment",
+					"numinlets" : 1,
+					"numoutlets" : 0,
+					"patching_rect" : [ 1038.5, 313.5, 56.0, 15.0 ],
+					"style" : "",
+					"text" : "RPi-A0108"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"id" : "obj-374",
+					"maxclass" : "newobj",
+					"numinlets" : 0,
+					"numoutlets" : 0,
+					"patching_rect" : [ 1303.0, 549.5, 128.0, 22.0 ],
+					"style" : "",
+					"text" : "portalsDoorSendHelp"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"fontsize" : 9.0,
+					"id" : "obj-365",
+					"linecount" : 3,
+					"maxclass" : "comment",
+					"numinlets" : 1,
+					"numoutlets" : 0,
+					"patching_rect" : [ 377.75, 209.0, 116.0, 37.0 ],
+					"presentation" : 1,
+					"presentation_linecount" : 3,
+					"presentation_rect" : [ 377.75, 209.0, 116.0, 37.0 ],
+					"style" : "",
+					"text" : "note: velostat will show unresponsive while video plays!"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"args" : [ "10.42.21.41" ],
+					"bgmode" : 0,
+					"border" : 0,
+					"clickthrough" : 0,
+					"enablehscroll" : 0,
+					"enablevscroll" : 0,
+					"hint" : "10.42.21.41",
+					"id" : "obj-336",
+					"lockeddragscroll" : 0,
+					"maxclass" : "bpatcher",
+					"name" : "node.maxpat",
+					"numinlets" : 0,
+					"numoutlets" : 0,
+					"offset" : [ 0.0, 0.0 ],
+					"patching_rect" : [ 876.0, 53.25, 127.0, 15.0 ],
+					"presentation" : 1,
+					"presentation_rect" : [ 876.0, 53.25, 106.0, 15.0 ],
+					"varname" : "pi10422141",
+					"viewvisibility" : 1
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"fontface" : 1,
+					"fontsize" : 8.0,
+					"id" : "obj-337",
+					"maxclass" : "comment",
+					"numinlets" : 1,
+					"numoutlets" : 0,
+					"patching_rect" : [ 819.5, 54.75, 56.0, 15.0 ],
+					"style" : "",
+					"text" : "RPi-E0504"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"fontface" : 1,
+					"fontsize" : 8.0,
+					"id" : "obj-334",
+					"maxclass" : "comment",
+					"numinlets" : 1,
+					"numoutlets" : 0,
+					"patching_rect" : [ 417.0, 610.5, 50.0, 15.0 ],
+					"style" : "",
+					"text" : "RPI-NEW-1"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"args" : [ "10.42.21.45" ],
+					"bgmode" : 0,
+					"border" : 0,
+					"clickthrough" : 0,
+					"enablehscroll" : 0,
+					"enablevscroll" : 0,
+					"hint" : "10.42.21.45",
+					"id" : "obj-335",
+					"lockeddragscroll" : 0,
+					"maxclass" : "bpatcher",
+					"name" : "node.maxpat",
+					"numinlets" : 0,
+					"numoutlets" : 0,
+					"offset" : [ 0.0, 0.0 ],
+					"patching_rect" : [ 467.0, 609.0, 271.0, 15.0 ],
+					"presentation" : 1,
+					"presentation_rect" : [ 467.0, 609.0, 271.0, 15.0 ],
+					"varname" : "pi10422145",
+					"viewvisibility" : 1
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"args" : [ "10.42.17.47" ],
+					"bgmode" : 0,
+					"border" : 0,
+					"clickthrough" : 0,
+					"enablehscroll" : 0,
+					"enablevscroll" : 0,
+					"hint" : "10.42.17.47",
+					"id" : "obj-91",
+					"lockeddragscroll" : 0,
+					"maxclass" : "bpatcher",
+					"name" : "node.maxpat",
+					"numinlets" : 0,
+					"numoutlets" : 0,
+					"offset" : [ 0.0, 0.0 ],
+					"patching_rect" : [ 967.5, 388.5, 163.0, 13.0 ],
+					"presentation" : 1,
+					"presentation_rect" : [ 967.5, 396.0, 163.0, 13.0 ],
+					"varname" : "pi10421747",
+					"viewvisibility" : 1
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"fontface" : 1,
+					"fontsize" : 8.0,
+					"id" : "obj-219",
+					"linecount" : 2,
+					"maxclass" : "comment",
+					"numinlets" : 1,
+					"numoutlets" : 0,
+					"patching_rect" : [ 904.5, 383.0, 56.0, 24.0 ],
+					"style" : "",
+					"text" : "RPi-temp-entertainment"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"id" : "obj-88",
+					"maxclass" : "newobj",
+					"numinlets" : 1,
+					"numoutlets" : 0,
+					"patcher" : 					{
+						"fileversion" : 1,
+						"appversion" : 						{
+							"major" : 7,
+							"minor" : 0,
+							"revision" : 6,
+							"architecture" : "x86",
+							"modernui" : 1
+						}
+,
+						"rect" : [ 192.0, 102.0, 640.0, 816.0 ],
+						"bglocked" : 0,
+						"openinpresentation" : 0,
+						"default_fontsize" : 12.0,
+						"default_fontface" : 0,
+						"default_fontname" : "Arial",
+						"gridonopen" : 1,
+						"gridsize" : [ 15.0, 15.0 ],
+						"gridsnaponopen" : 1,
+						"objectsnaponopen" : 1,
+						"statusbarvisible" : 2,
+						"toolbarvisible" : 1,
+						"lefttoolbarpinned" : 0,
+						"toptoolbarpinned" : 0,
+						"righttoolbarpinned" : 0,
+						"bottomtoolbarpinned" : 0,
+						"toolbars_unpinned_last_save" : 0,
+						"tallnewobj" : 0,
+						"boxanimatetime" : 200,
+						"enablehscroll" : 1,
+						"enablevscroll" : 1,
+						"devicewidth" : 0.0,
+						"description" : "",
+						"digest" : "",
+						"tags" : "",
+						"style" : "",
+						"subpatcher_template" : "",
+						"boxes" : [ 							{
+								"box" : 								{
+									"id" : "obj-21",
+									"linecount" : 3,
+									"maxclass" : "message",
+									"numinlets" : 2,
+									"numoutlets" : 1,
+									"outlettype" : [ "" ],
+									"patching_rect" : [ 147.0, 229.5, 50.0, 49.0 ],
+									"style" : "",
+									"text" : "symbol <password>"
+								}
+
+							}
+, 							{
+								"box" : 								{
+									"id" : "obj-44",
+									"maxclass" : "newobj",
+									"numinlets" : 1,
+									"numoutlets" : 1,
+									"outlettype" : [ "" ],
+									"patching_rect" : [ 147.0, 338.0, 100.0, 22.0 ],
+									"style" : "",
+									"text" : "v entryVidCmd"
+								}
+
+							}
+, 							{
+								"box" : 								{
+									"id" : "obj-45",
+									"maxclass" : "newobj",
+									"numinlets" : 2,
+									"numoutlets" : 2,
+									"outlettype" : [ "bang", "" ],
+									"patching_rect" : [ 147.0, 312.0, 100.0, 22.0 ],
+									"style" : "",
+									"text" : "sel \"000\""
+								}
+
+							}
+, 							{
+								"box" : 								{
+									"id" : "obj-50",
+									"maxclass" : "newobj",
+									"numinlets" : 2,
+									"numoutlets" : 2,
+									"outlettype" : [ "", "bang" ],
+									"patching_rect" : [ 147.0, 286.0, 100.0, 22.0 ],
+									"style" : "",
+									"text" : "dialog password:"
+								}
+
+							}
+, 							{
+								"box" : 								{
+									"id" : "obj-59",
+									"maxclass" : "newobj",
+									"numinlets" : 1,
+									"numoutlets" : 1,
+									"outlettype" : [ "" ],
+									"patching_rect" : [ 228.0, 236.0, 100.0, 22.0 ],
+									"style" : "",
+									"text" : "v entryVidCmd"
+								}
+
+							}
+, 							{
+								"box" : 								{
+									"id" : "obj-60",
+									"maxclass" : "newobj",
+									"numinlets" : 1,
+									"numoutlets" : 2,
+									"outlettype" : [ "bang", "" ],
+									"patching_rect" : [ 147.0, 198.0, 100.0, 22.0 ],
+									"style" : "",
+									"text" : "t b s"
+								}
+
+							}
+, 							{
+								"box" : 								{
+									"id" : "obj-40",
+									"maxclass" : "newobj",
+									"numinlets" : 1,
+									"numoutlets" : 2,
+									"outlettype" : [ "", "bang" ],
+									"patching_rect" : [ 147.0, 374.617065, 35.0, 22.0 ],
+									"style" : "",
+									"text" : "shell"
+								}
+
+							}
+, 							{
+								"box" : 								{
+									"id" : "obj-38",
+									"maxclass" : "newobj",
+									"numinlets" : 1,
+									"numoutlets" : 1,
+									"outlettype" : [ "bang" ],
+									"patching_rect" : [ 342.875, 68.0, 60.0, 22.0 ],
+									"style" : "",
+									"text" : "loadbang"
+								}
+
+							}
+, 							{
+								"box" : 								{
+									"id" : "obj-42",
+									"maxclass" : "newobj",
+									"numinlets" : 1,
+									"numoutlets" : 0,
+									"patching_rect" : [ 147.0, 427.0, 103.0, 22.0 ],
+									"style" : "",
+									"text" : "print entryVid"
+								}
+
+							}
+, 							{
+								"box" : 								{
+									"id" : "obj-34",
+									"maxclass" : "newobj",
+									"numinlets" : 1,
+									"numoutlets" : 1,
+									"outlettype" : [ "" ],
+									"patching_rect" : [ 147.0, 401.0, 73.0, 22.0 ],
+									"style" : "",
+									"text" : "fromsymbol"
+								}
+
+							}
+, 							{
+								"box" : 								{
+									"id" : "obj-77",
+									"linecount" : 4,
+									"maxclass" : "newobj",
+									"numinlets" : 1,
+									"numoutlets" : 1,
+									"outlettype" : [ "" ],
+									"patching_rect" : [ 147.0, 116.5, 289.0, 62.0 ],
+									"style" : "",
+									"text" : "sprintf \\\"/usr/bin/python /Users/Aesir/Documents/watchdog/Show_Automation/show_start_stop.py --with_dump --no_delay --reboot_entry_videos\\\""
+								}
+
+							}
+, 							{
+								"box" : 								{
+									"id" : "obj-82",
+									"maxclass" : "button",
+									"numinlets" : 1,
+									"numoutlets" : 1,
+									"outlettype" : [ "bang" ],
+									"patching_rect" : [ 193.0, 33.0, 24.0, 24.0 ],
+									"style" : ""
+								}
+
+							}
+, 							{
+								"box" : 								{
+									"comment" : "",
+									"id" : "obj-4",
+									"maxclass" : "inlet",
+									"numinlets" : 0,
+									"numoutlets" : 1,
+									"outlettype" : [ "" ],
+									"patching_rect" : [ 120.0, 30.0, 30.0, 30.0 ],
+									"style" : ""
+								}
+
+							}
+ ],
+						"lines" : [ 							{
+								"patchline" : 								{
+									"destination" : [ "obj-50", 0 ],
+									"disabled" : 0,
+									"hidden" : 0,
+									"source" : [ "obj-21", 0 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
+									"destination" : [ "obj-42", 0 ],
+									"disabled" : 0,
+									"hidden" : 0,
+									"source" : [ "obj-34", 0 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
+									"destination" : [ "obj-77", 0 ],
+									"disabled" : 0,
+									"hidden" : 0,
+									"midpoints" : [ 129.5, 87.75, 156.5, 87.75 ],
+									"source" : [ "obj-4", 0 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
+									"destination" : [ "obj-34", 0 ],
+									"disabled" : 0,
+									"hidden" : 0,
+									"source" : [ "obj-40", 0 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
+									"destination" : [ "obj-40", 0 ],
+									"disabled" : 0,
+									"hidden" : 0,
+									"source" : [ "obj-44", 0 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
+									"destination" : [ "obj-44", 0 ],
+									"disabled" : 0,
+									"hidden" : 0,
+									"source" : [ "obj-45", 0 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
+									"destination" : [ "obj-45", 0 ],
+									"disabled" : 0,
+									"hidden" : 0,
+									"source" : [ "obj-50", 0 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
+									"destination" : [ "obj-21", 0 ],
+									"disabled" : 0,
+									"hidden" : 0,
+									"source" : [ "obj-60", 0 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
+									"destination" : [ "obj-59", 0 ],
+									"disabled" : 0,
+									"hidden" : 0,
+									"source" : [ "obj-60", 1 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
+									"destination" : [ "obj-60", 0 ],
+									"disabled" : 0,
+									"hidden" : 0,
+									"source" : [ "obj-77", 0 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
+									"destination" : [ "obj-77", 0 ],
+									"disabled" : 0,
+									"hidden" : 0,
+									"midpoints" : [ 202.5, 86.25, 156.5, 86.25 ],
+									"source" : [ "obj-82", 0 ]
+								}
+
+							}
+ ],
+						"styles" : [ 							{
+								"name" : "AudioStatus_Menu",
+								"default" : 								{
+									"bgfillcolor" : 									{
+										"type" : "color",
+										"color" : [ 0.294118, 0.313726, 0.337255, 1 ],
+										"color1" : [ 0.454902, 0.462745, 0.482353, 0.0 ],
+										"color2" : [ 0.290196, 0.309804, 0.301961, 1.0 ],
+										"angle" : 270.0,
+										"proportion" : 0.39,
+										"autogradient" : 0
+									}
+
+								}
+,
+								"parentstyle" : "",
+								"multi" : 0
+							}
+ ]
+					}
+,
+					"patching_rect" : [ 1499.0, 651.0, 100.0, 22.0 ],
+					"saved_object_attributes" : 					{
+						"description" : "",
+						"digest" : "",
+						"globalpatchername" : "",
+						"style" : "",
+						"tags" : ""
+					}
+,
+					"style" : "",
+					"text" : "p rebootBenji"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"id" : "obj-89",
+					"maxclass" : "textbutton",
+					"numinlets" : 1,
+					"numoutlets" : 3,
+					"outlettype" : [ "", "", "int" ],
+					"parameter_enable" : 0,
+					"patching_rect" : [ 1303.0, 654.0, 176.0, 22.0 ],
+					"presentation" : 1,
+					"presentation_rect" : [ 1231.0, 535.0, 172.0, 20.0 ],
+					"style" : "",
+					"text" : "REBOOT entry video Pis",
+					"varname" : "rebootdevs[4]"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"id" : "obj-373",
+					"linecount" : 2,
+					"maxclass" : "comment",
+					"numinlets" : 1,
+					"numoutlets" : 0,
+					"patching_rect" : [ 1269.0, 313.0, 150.0, 33.0 ],
+					"presentation" : 1,
+					"presentation_rect" : [ 1231.0, 295.0, 230.0, 20.0 ],
+					"style" : "",
+					"text" : "^^^ press for concert mode buttons!"
+				}
+
+			}
+, 			{
+				"box" : 				{
 					"id" : "obj-314",
 					"maxclass" : "newobj",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 1297.0, 369.0, 120.0, 22.0 ],
+					"patching_rect" : [ 1297.0, 444.5, 120.0, 22.0 ],
 					"style" : "",
 					"text" : "advancedPower"
 				}
@@ -55,7 +753,7 @@
 					"numinlets" : 2,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
-					"patching_rect" : [ 1297.0, 314.5, 50.0, 22.0 ],
+					"patching_rect" : [ 1297.0, 390.0, 50.0, 22.0 ],
 					"style" : "",
 					"text" : "open"
 				}
@@ -68,7 +766,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
-					"patching_rect" : [ 1297.0, 339.5, 100.0, 22.0 ],
+					"patching_rect" : [ 1297.0, 415.0, 100.0, 22.0 ],
 					"style" : "",
 					"text" : "pcontrol"
 				}
@@ -94,16 +792,16 @@
 , 			{
 				"box" : 				{
 					"id" : "obj-367",
-					"linecount" : 2,
+					"linecount" : 4,
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 1446.0, 556.0, 150.0, 33.0 ],
+					"patching_rect" : [ 1446.0, 556.0, 150.0, 60.0 ],
 					"presentation" : 1,
-					"presentation_linecount" : 2,
-					"presentation_rect" : [ 1242.0, 530.0, 150.0, 33.0 ],
+					"presentation_linecount" : 4,
+					"presentation_rect" : [ 1242.0, 557.0, 150.0, 60.0 ],
 					"style" : "",
-					"text" : "start/stop entry hall intro video (Benji / Agent 35)"
+					"text" : "start/stop entry hall intro video (Benji / Agent 35).\n\nOr simul-reboot the Pis..."
 				}
 
 			}
@@ -123,9 +821,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 514.0, 148.0, 14.0, 14.0 ],
+					"patching_rect" : [ 566.75, 154.0, 112.5, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 514.0, 140.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 566.75, 154.0, 112.5, 15.0 ],
 					"varname" : "pi10422740",
 					"viewvisibility" : 1
 				}
@@ -139,9 +837,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 523.0, 148.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 523.0, 140.0, 56.0, 15.0 ],
+					"patching_rect" : [ 511.75, 155.5, 56.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-K1106"
 				}
@@ -163,9 +859,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 1086.0, 256.0, 14.0, 14.0 ],
+					"patching_rect" : [ 1087.0, 267.0, 100.0, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 1098.0, 244.5, 14.0, 14.0 ],
+					"presentation_rect" : [ 1079.75, 270.5, 100.0, 15.0 ],
 					"varname" : "pi10422742",
 					"viewvisibility" : 1
 				}
@@ -179,9 +875,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 1102.0, 256.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 1107.0, 244.5, 56.0, 15.0 ],
+					"patching_rect" : [ 1037.5, 268.5, 56.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-J1011"
 				}
@@ -203,9 +897,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 1093.0, 129.0, 14.0, 14.0 ],
+					"patching_rect" : [ 1093.0, 129.0, 100.0, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 1093.0, 129.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 1093.0, 129.0, 100.0, 15.0 ],
 					"varname" : "pi10422741",
 					"viewvisibility" : 1
 				}
@@ -219,9 +913,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 1102.0, 129.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 1102.0, 129.0, 56.0, 15.0 ],
+					"patching_rect" : [ 1045.5, 130.5, 56.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-J1010"
 				}
@@ -243,9 +935,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 473.0, 286.0, 12.0, 12.0 ],
+					"patching_rect" : [ 518.0, 282.5, 133.0, 12.5 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 473.0, 285.0, 12.0, 12.0 ],
+					"presentation_rect" : [ 518.0, 270.5, 133.0, 12.5 ],
 					"varname" : "pi10422421",
 					"viewvisibility" : 1
 				}
@@ -259,9 +951,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 483.0, 286.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 483.0, 285.0, 56.0, 15.0 ],
+					"patching_rect" : [ 460.5, 284.0, 56.0, 15.0 ],
 					"style" : "",
 					"text" : "MS-H0802",
 					"textcolor" : [ 0.572549, 0.27451, 0.027451, 1.0 ]
@@ -284,7 +974,7 @@
 							"modernui" : 1
 						}
 ,
-						"rect" : [ 59.0, 104.0, 640.0, 480.0 ],
+						"rect" : [ 181.0, 161.0, 640.0, 480.0 ],
 						"bglocked" : 0,
 						"openinpresentation" : 0,
 						"default_fontsize" : 12.0,
@@ -712,7 +1402,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 335.0, 495.0, 67.0, 20.0 ],
+					"patching_rect" : [ 460.0, 504.0, 67.0, 20.0 ],
 					"style" : "",
 					"text" : "cut?"
 				}
@@ -724,7 +1414,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 403.0, 442.0, 53.0, 20.0 ],
+					"patching_rect" : [ 395.0, 446.0, 53.0, 20.0 ],
 					"style" : "",
 					"text" : "cut?"
 				}
@@ -740,7 +1430,7 @@
 					"patching_rect" : [ 1432.5, 509.0, 150.0, 33.0 ],
 					"presentation" : 1,
 					"presentation_linecount" : 2,
-					"presentation_rect" : [ 1229.0, 339.0, 150.0, 33.0 ],
+					"presentation_rect" : [ 1229.0, 388.0, 150.0, 33.0 ],
 					"style" : "",
 					"text" : "press to cancel current on/off command..."
 				}
@@ -994,7 +1684,7 @@
 					"parameter_enable" : 0,
 					"patching_rect" : [ 1268.5, 483.5, 176.0, 22.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 1229.0, 316.0, 172.0, 20.0 ],
+					"presentation_rect" : [ 1229.0, 365.0, 172.0, 20.0 ],
 					"style" : "",
 					"text" : "CANCEL on/off",
 					"varname" : "rebootdevs[3]"
@@ -1033,9 +1723,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 890.0, 295.0, 14.0, 14.0 ],
+					"patching_rect" : [ 885.0, 296.5, 70.5, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 890.0, 295.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 890.0, 288.0, 70.5, 15.0 ],
 					"varname" : "pi10422580",
 					"viewvisibility" : 1
 				}
@@ -1049,9 +1739,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 899.0, 295.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 899.0, 295.0, 56.0, 15.0 ],
+					"patching_rect" : [ 843.0, 296.5, 56.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-I0910"
 				}
@@ -1073,9 +1761,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 745.0, 116.0, 14.0, 14.0 ],
+					"patching_rect" : [ 683.5, 90.25, 129.0, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 745.0, 116.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 683.5, 89.5, 125.0, 14.0 ],
 					"varname" : "pi10422544",
 					"viewvisibility" : 1
 				}
@@ -1089,9 +1777,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 754.0, 116.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 754.0, 116.0, 56.0, 15.0 ],
+					"patching_rect" : [ 623.0, 91.75, 160.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-I0907"
 				}
@@ -1105,9 +1791,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 523.0, 208.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 523.0, 208.0, 56.0, 15.0 ],
+					"patching_rect" : [ 511.75, 215.5, 56.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-H0806"
 				}
@@ -1129,9 +1813,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 514.0, 208.0, 14.0, 14.0 ],
+					"patching_rect" : [ 566.75, 214.0, 133.5, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 514.0, 208.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 566.75, 214.0, 133.5, 15.0 ],
 					"varname" : "pi10422445",
 					"viewvisibility" : 1
 				}
@@ -1153,9 +1837,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 414.0, 771.0, 12.0, 12.0 ],
+					"patching_rect" : [ 305.0, 796.0, 77.0, 10.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 414.0, 771.0, 12.0, 12.0 ],
+					"presentation_rect" : [ 305.0, 796.0, 77.0, 10.0 ],
 					"varname" : "pi10422093",
 					"viewvisibility" : 1
 				}
@@ -1169,9 +1853,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 424.0, 771.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 424.0, 771.0, 57.0, 15.0 ],
+					"patching_rect" : [ 238.5, 795.0, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-D0422"
 				}
@@ -1193,9 +1875,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 86.5, 754.0, 12.0, 12.0 ],
+					"patching_rect" : [ 66.5, 831.0, 87.0, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 86.5, 754.0, 12.0, 12.0 ],
+					"presentation_rect" : [ 66.5, 831.0, 87.0, 15.0 ],
 					"varname" : "pi10422092",
 					"viewvisibility" : 1
 				}
@@ -1209,9 +1891,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 96.5, 754.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 96.5, 754.0, 57.0, 15.0 ],
+					"patching_rect" : [ 7.0, 830.0, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-D0421"
 				}
@@ -1233,9 +1913,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 86.5, 739.0, 12.0, 12.0 ],
+					"patching_rect" : [ 66.5, 816.0, 87.0, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 86.5, 739.0, 12.0, 12.0 ],
+					"presentation_rect" : [ 66.5, 816.0, 87.0, 15.0 ],
 					"varname" : "pi10422091",
 					"viewvisibility" : 1
 				}
@@ -1249,9 +1929,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 96.5, 739.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 96.5, 739.0, 57.0, 15.0 ],
+					"patching_rect" : [ 7.0, 815.0, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-D0420"
 				}
@@ -1273,9 +1951,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 86.5, 724.0, 12.0, 12.0 ],
+					"patching_rect" : [ 66.5, 801.0, 87.0, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 86.5, 724.0, 12.0, 12.0 ],
+					"presentation_rect" : [ 66.5, 801.0, 87.0, 15.0 ],
 					"varname" : "pi10422090",
 					"viewvisibility" : 1
 				}
@@ -1289,9 +1967,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 96.5, 724.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 96.5, 724.0, 57.0, 15.0 ],
+					"patching_rect" : [ 7.0, 800.0, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-D0419"
 				}
@@ -1305,9 +1981,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 458.0, 703.0, 69.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 458.0, 703.0, 69.0, 15.0 ],
+					"patching_rect" : [ 405.5, 688.5, 50.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-C0309"
 				}
@@ -1329,9 +2003,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 448.0, 706.0, 14.0, 14.0 ],
+					"patching_rect" : [ 460.0, 690.0, 241.0, 12.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 448.0, 706.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 460.0, 690.0, 241.0, 12.0 ],
 					"varname" : "pi10422140",
 					"viewvisibility" : 1
 				}
@@ -1430,10 +2104,10 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 489.0, 635.0, 73.0, 24.0 ],
+					"patching_rect" : [ 919.0, 331.0, 67.0, 24.0 ],
 					"presentation" : 1,
 					"presentation_linecount" : 2,
-					"presentation_rect" : [ 872.0, 376.0, 73.0, 24.0 ],
+					"presentation_rect" : [ 919.0, 331.0, 67.0, 24.0 ],
 					"style" : "",
 					"text" : "  (Global Audio Server)",
 					"textcolor" : [ 0.086275, 0.309804, 0.52549, 1.0 ]
@@ -1448,9 +2122,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 492.5, 571.0, 69.5, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 498.5, 582.0, 69.5, 15.0 ],
+					"patching_rect" : [ 407.0, 555.5, 58.5, 15.0 ],
 					"style" : "",
 					"text" : "RPi-E506 (G)",
 					"textcolor" : [ 0.086275, 0.309804, 0.52549, 1.0 ]
@@ -1473,9 +2145,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 477.5, 571.0, 14.0, 14.0 ],
+					"patching_rect" : [ 465.5, 554.0, 142.0, 16.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 483.5, 582.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 465.5, 552.0, 142.0, 16.0 ],
 					"varname" : "pi10422143",
 					"viewvisibility" : 1
 				}
@@ -1489,9 +2161,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 492.5, 553.0, 69.5, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 498.5, 564.0, 69.5, 15.0 ],
+					"patching_rect" : [ 407.0, 537.5, 58.5, 15.0 ],
 					"style" : "",
 					"text" : "RPi-E505 (G)",
 					"textcolor" : [ 0.086275, 0.309804, 0.52549, 1.0 ]
@@ -1514,9 +2184,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 477.5, 553.0, 14.0, 14.0 ],
+					"patching_rect" : [ 465.5, 536.0, 142.0, 16.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 483.5, 564.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 465.5, 527.0, 142.0, 16.0 ],
 					"varname" : "pi10422142",
 					"viewvisibility" : 1
 				}
@@ -2287,9 +2957,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 196.5, 5.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 196.5, 5.0, 57.0, 15.0 ],
+					"patching_rect" : [ 128.0, 4.0, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-G0799"
 				}
@@ -2311,9 +2979,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 186.5, 5.0, 14.0, 14.0 ],
+					"patching_rect" : [ 186.5, 5.0, 82.0, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 186.5, 5.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 186.5, 5.0, 82.0, 15.0 ],
 					"varname" : "pi10420113",
 					"viewvisibility" : 1
 				}
@@ -2327,9 +2995,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 325.0, 69.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 325.0, 69.0, 57.0, 15.0 ],
+					"patching_rect" : [ 256.5, 68.0, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-G0710"
 				}
@@ -2351,9 +3017,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 315.0, 69.0, 14.0, 14.0 ],
+					"patching_rect" : [ 315.0, 69.0, 283.0, 19.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 315.0, 69.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 315.0, 69.0, 283.0, 11.0 ],
 					"varname" : "pi10422440",
 					"viewvisibility" : 1
 				}
@@ -2367,9 +3033,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 523.0, 190.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 523.0, 190.0, 56.0, 15.0 ],
+					"patching_rect" : [ 511.75, 197.5, 56.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-H0805"
 				}
@@ -2391,9 +3055,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 514.0, 190.0, 14.0, 14.0 ],
+					"patching_rect" : [ 566.75, 196.0, 133.5, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 514.0, 190.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 566.75, 196.0, 133.5, 15.0 ],
 					"varname" : "pi10422444",
 					"viewvisibility" : 1
 				}
@@ -2415,9 +3079,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 514.0, 170.0, 14.0, 14.0 ],
+					"patching_rect" : [ 566.75, 176.0, 133.5, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 514.0, 170.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 566.75, 176.0, 137.5, 15.0 ],
 					"varname" : "pi10422485",
 					"viewvisibility" : 1
 				}
@@ -2431,9 +3095,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 523.0, 170.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 523.0, 170.0, 56.0, 15.0 ],
+					"patching_rect" : [ 511.75, 177.5, 56.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-H0813"
 				}
@@ -2455,9 +3117,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 473.0, 305.0, 12.0, 12.0 ],
+					"patching_rect" : [ 518.0, 302.5, 231.0, 11.5 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 473.0, 305.0, 12.0, 12.0 ],
+					"presentation_rect" : [ 518.0, 288.0, 231.0, 11.5 ],
 					"varname" : "pi10422420",
 					"viewvisibility" : 1
 				}
@@ -2471,9 +3133,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 483.0, 305.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 483.0, 305.0, 56.0, 15.0 ],
+					"patching_rect" : [ 460.5, 305.5, 56.0, 15.0 ],
 					"style" : "",
 					"text" : "MS-H0801",
 					"textcolor" : [ 0.572549, 0.27451, 0.027451, 1.0 ]
@@ -2488,9 +3148,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 483.0, 369.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 483.0, 369.0, 56.0, 15.0 ],
+					"patching_rect" : [ 460.5, 372.0, 56.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-H0803"
 				}
@@ -2512,9 +3170,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 474.0, 369.0, 14.0, 14.0 ],
+					"patching_rect" : [ 519.0, 369.0, 153.0, 12.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 474.0, 369.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 519.0, 368.0, 153.0, 12.0 ],
 					"varname" : "pi10422442",
 					"viewvisibility" : 1
 				}
@@ -2528,9 +3186,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 483.0, 323.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 483.0, 323.0, 56.0, 15.0 ],
+					"patching_rect" : [ 460.5, 323.5, 56.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-H0804"
 				}
@@ -2552,9 +3208,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 474.0, 323.0, 14.0, 14.0 ],
+					"patching_rect" : [ 518.0, 323.0, 319.0, 12.5 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 474.0, 323.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 518.0, 309.0, 316.0, 15.0 ],
 					"varname" : "pi10422443",
 					"viewvisibility" : 1
 				}
@@ -2576,9 +3232,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 474.0, 356.0, 14.0, 14.0 ],
+					"patching_rect" : [ 519.0, 356.0, 153.0, 12.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 474.0, 356.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 519.0, 348.5, 153.0, 12.0 ],
 					"varname" : "pi10422481",
 					"viewvisibility" : 1
 				}
@@ -2592,9 +3248,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 483.0, 356.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 483.0, 356.0, 56.0, 15.0 ],
+					"patching_rect" : [ 460.5, 357.5, 56.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-H0809"
 				}
@@ -2616,9 +3270,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 474.0, 337.0, 14.0, 14.0 ],
+					"patching_rect" : [ 519.0, 338.5, 245.0, 12.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 474.0, 337.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 519.0, 331.0, 73.0, 17.0 ],
 					"varname" : "pi10422482",
 					"viewvisibility" : 1
 				}
@@ -2632,9 +3286,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 483.0, 337.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 483.0, 337.0, 56.0, 15.0 ],
+					"patching_rect" : [ 460.5, 338.5, 56.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-H0810"
 				}
@@ -2656,9 +3308,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 470.0, 273.0, 14.0, 14.0 ],
+					"patching_rect" : [ 518.0, 267.0, 133.0, 12.5 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 470.0, 273.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 518.0, 252.0, 79.0, 12.5 ],
 					"varname" : "pi10422483",
 					"viewvisibility" : 1
 				}
@@ -2672,9 +3324,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 479.0, 273.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 479.0, 273.0, 56.0, 15.0 ],
+					"patching_rect" : [ 460.5, 267.0, 56.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-H0811"
 				}
@@ -2696,9 +3346,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 554.0, 346.0, 14.0, 14.0 ],
+					"patching_rect" : [ 679.0, 452.5, 68.0, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 554.0, 346.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 666.5, 438.0, 71.5, 15.0 ],
 					"varname" : "pi10422484",
 					"viewvisibility" : 1
 				}
@@ -2712,9 +3362,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 563.0, 346.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 563.0, 346.0, 56.0, 15.0 ],
+					"patching_rect" : [ 622.5, 454.0, 56.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-H0812"
 				}
@@ -2728,9 +3376,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 410.0, 232.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 410.0, 228.0, 57.0, 15.0 ],
+					"patching_rect" : [ 182.0, 227.0, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-G0717"
 				}
@@ -2752,10 +3398,10 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 393.0, 232.0, 14.0, 14.0 ],
+					"patching_rect" : [ 239.0, 228.0, 139.0, 14.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 400.0, 228.0, 14.0, 14.0 ],
-					"varname" : "pi10422285[1]",
+					"presentation_rect" : [ 239.0, 228.0, 139.0, 14.0 ],
+					"varname" : "pi10422285",
 					"viewvisibility" : 1
 				}
 
@@ -2768,9 +3414,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 410.0, 213.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 410.0, 213.0, 57.0, 15.0 ],
+					"patching_rect" : [ 182.0, 208.0, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-G0718"
 				}
@@ -2792,9 +3436,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 400.0, 213.0, 14.0, 14.0 ],
+					"patching_rect" : [ 239.0, 209.0, 139.0, 14.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 400.0, 213.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 239.0, 209.0, 88.0, 14.0 ],
 					"varname" : "pi10422286",
 					"viewvisibility" : 1
 				}
@@ -2808,9 +3452,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 329.0, 245.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 329.0, 245.0, 57.0, 15.0 ],
+					"patching_rect" : [ 182.0, 248.0, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-G0703"
 				}
@@ -2832,9 +3474,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 319.0, 248.0, 14.0, 14.0 ],
+					"patching_rect" : [ 239.0, 249.0, 293.0, 15.5 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 319.0, 248.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 239.0, 252.0, 211.0, 12.5 ],
 					"varname" : "pi10422252",
 					"viewvisibility" : 1
 				}
@@ -2848,9 +3490,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 329.0, 228.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 329.0, 228.0, 57.0, 15.0 ],
+					"patching_rect" : [ 147.0, 162.0, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-G0702"
 				}
@@ -2872,9 +3512,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 319.0, 231.0, 14.0, 14.0 ],
+					"patching_rect" : [ 207.0, 163.0, 293.0, 15.5 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 319.0, 231.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 207.0, 163.0, 126.5, 15.5 ],
 					"varname" : "pi10422251",
 					"viewvisibility" : 1
 				}
@@ -2888,9 +3528,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 329.0, 213.0, 68.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 329.0, 213.0, 68.0, 15.0 ],
+					"patching_rect" : [ 137.0, 143.5, 68.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-G0701  (G)",
 					"textcolor" : [ 0.011765, 0.396078, 0.752941, 1.0 ]
@@ -2913,9 +3551,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 319.0, 213.0, 14.0, 14.0 ],
+					"patching_rect" : [ 207.0, 145.0, 293.0, 15.5 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 319.0, 213.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 207.0, 137.0, 293.0, 15.5 ],
 					"varname" : "pi10422250",
 					"viewvisibility" : 1
 				}
@@ -2929,9 +3567,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 393.0, 346.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 393.0, 346.0, 57.0, 15.0 ],
+					"patching_rect" : [ 305.5, 347.5, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-G0711"
 				}
@@ -2953,9 +3589,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 383.0, 349.0, 14.0, 14.0 ],
+					"patching_rect" : [ 361.875, 346.0, 90.25, 17.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 383.0, 349.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 361.875, 346.0, 90.25, 17.0 ],
 					"varname" : "pi10422255",
 					"viewvisibility" : 1
 				}
@@ -2969,9 +3605,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 393.0, 313.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 393.0, 313.0, 57.0, 15.0 ],
+					"patching_rect" : [ 305.5, 310.5, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-G0712"
 				}
@@ -2993,9 +3627,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 383.0, 316.0, 14.0, 14.0 ],
+					"patching_rect" : [ 361.875, 309.0, 90.25, 17.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 383.0, 316.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 361.875, 309.0, 90.25, 17.0 ],
 					"varname" : "pi10422256",
 					"viewvisibility" : 1
 				}
@@ -3009,9 +3643,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 393.0, 337.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 393.0, 337.0, 57.0, 15.0 ],
+					"patching_rect" : [ 305.5, 338.5, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-G0713"
 				}
@@ -3033,9 +3665,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 383.0, 340.0, 14.0, 14.0 ],
+					"patching_rect" : [ 361.875, 337.0, 90.25, 17.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 383.0, 340.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 361.875, 337.0, 90.25, 17.0 ],
 					"varname" : "pi10422257",
 					"viewvisibility" : 1
 				}
@@ -3049,9 +3681,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 393.0, 327.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 393.0, 327.0, 57.0, 15.0 ],
+					"patching_rect" : [ 305.5, 324.5, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-G0714"
 				}
@@ -3073,9 +3703,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 383.0, 330.0, 14.0, 14.0 ],
+					"patching_rect" : [ 361.875, 323.0, 90.25, 17.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 383.0, 330.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 361.875, 323.0, 90.25, 17.0 ],
 					"varname" : "pi10422258",
 					"viewvisibility" : 1
 				}
@@ -3089,9 +3719,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 292.5, 415.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 292.5, 415.0, 57.0, 15.0 ],
+					"patching_rect" : [ 173.25, 390.0, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-G0704"
 				}
@@ -3113,9 +3741,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 282.5, 418.0, 14.0, 14.0 ],
+					"patching_rect" : [ 233.75, 391.0, 239.5, 12.5 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 282.5, 418.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 233.75, 391.0, 232.5, 12.5 ],
 					"varname" : "pi10422253",
 					"viewvisibility" : 1
 				}
@@ -3129,9 +3757,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 292.5, 396.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 292.5, 396.0, 57.0, 15.0 ],
+					"patching_rect" : [ 173.25, 371.0, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-G0705"
 				}
@@ -3153,9 +3779,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 282.5, 399.0, 14.0, 14.0 ],
+					"patching_rect" : [ 233.75, 369.5, 216.5, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 282.5, 399.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 233.75, 369.5, 210.5, 15.0 ],
 					"varname" : "pi10422254",
 					"viewvisibility" : 1
 				}
@@ -3177,9 +3803,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 68.0, 396.0, 14.0, 14.0 ],
+					"patching_rect" : [ 68.0, 396.0, 71.0, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 68.0, 396.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 68.0, 396.0, 71.0, 15.0 ],
 					"varname" : "pi10422380",
 					"viewvisibility" : 1
 				}
@@ -3193,9 +3819,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 77.0, 396.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 77.0, 396.0, 56.0, 15.0 ],
+					"patching_rect" : [ 14.0, 395.0, 56.0, 15.0 ],
 					"style" : "",
 					"text" : "TEE-G0716"
 				}
@@ -3209,9 +3833,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 77.0, 333.0, 67.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 77.0, 333.0, 67.0, 15.0 ],
+					"patching_rect" : [ -2.5, 334.0, 67.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-G0707 (G)",
 					"textcolor" : [ 0.011765, 0.396078, 0.752941, 1.0 ]
@@ -3234,9 +3856,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 67.0, 336.0, 14.0, 14.0 ],
+					"patching_rect" : [ 67.0, 336.0, 238.0, 16.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 67.0, 336.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 67.0, 336.0, 233.0, 16.0 ],
 					"varname" : "pi10422343",
 					"viewvisibility" : 1
 				}
@@ -3250,9 +3872,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 77.0, 314.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 77.0, 314.0, 57.0, 15.0 ],
+					"patching_rect" : [ -2.5, 315.0, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-G0708"
 				}
@@ -3274,9 +3894,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 67.0, 317.0, 14.0, 14.0 ],
+					"patching_rect" : [ 67.0, 317.0, 238.0, 16.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 67.0, 317.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 67.0, 317.0, 148.0, 16.0 ],
 					"varname" : "pi10422344",
 					"viewvisibility" : 1
 				}
@@ -3290,9 +3910,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 77.0, 295.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 77.0, 295.0, 57.0, 15.0 ],
+					"patching_rect" : [ -2.5, 296.0, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-G0709"
 				}
@@ -3314,9 +3932,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 67.0, 295.0, 14.0, 14.0 ],
+					"patching_rect" : [ 67.0, 295.0, 238.0, 16.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 67.0, 295.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 67.0, 295.0, 238.0, 16.0 ],
 					"varname" : "pi10422345",
 					"viewvisibility" : 1
 				}
@@ -3324,13 +3942,13 @@
 			}
 , 			{
 				"box" : 				{
-					"args" : [ "10.42.24.87" ],
+					"args" : [ "10.42.21.87" ],
 					"bgmode" : 0,
 					"border" : 0,
 					"clickthrough" : 0,
 					"enablehscroll" : 0,
 					"enablevscroll" : 0,
-					"hint" : "10.42.24.87",
+					"hint" : "10.42.21.87",
 					"id" : "obj-300",
 					"lockeddragscroll" : 0,
 					"maxclass" : "bpatcher",
@@ -3338,10 +3956,10 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 530.0, 466.0, 14.0, 14.0 ],
+					"patching_rect" : [ 530.0, 466.0, 82.0, 14.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 518.0, 449.0, 14.0, 14.0 ],
-					"varname" : "pi10422487",
+					"presentation_rect" : [ 519.0, 459.0, 82.0, 14.0 ],
+					"varname" : "pi10422187",
 					"viewvisibility" : 1
 				}
 
@@ -3354,9 +3972,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 539.0, 466.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 527.0, 449.0, 56.0, 15.0 ],
+					"patching_rect" : [ 474.5, 466.0, 56.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-H0814"
 				}
@@ -3370,9 +3986,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 224.0, 482.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 224.0, 466.0, 57.0, 15.0 ],
+					"patching_rect" : [ 68.5, 463.5, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-F0609"
 				}
@@ -3394,9 +4008,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 214.0, 485.0, 14.0, 14.0 ],
+					"patching_rect" : [ 121.0, 466.0, 248.0, 12.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 214.0, 469.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 121.0, 466.0, 248.0, 12.0 ],
 					"varname" : "pi10422340",
 					"viewvisibility" : 1
 				}
@@ -3418,9 +4032,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 214.0, 446.0, 12.0, 12.0 ],
+					"patching_rect" : [ 196.5, 446.0, 82.0, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 214.0, 449.0, 12.0, 12.0 ],
+					"presentation_rect" : [ 196.5, 446.0, 82.0, 15.0 ],
 					"varname" : "pi10422381",
 					"viewvisibility" : 1
 				}
@@ -3434,9 +4048,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 224.0, 446.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 224.0, 449.0, 57.0, 15.0 ],
+					"patching_rect" : [ 142.0, 445.0, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-F0621"
 				}
@@ -3458,9 +4070,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 393.0, 407.0, 12.0, 12.0 ],
+					"patching_rect" : [ 395.0, 412.0, 146.0, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 393.0, 407.0, 12.0, 12.0 ],
+					"presentation_rect" : [ 395.0, 412.0, 146.0, 15.0 ],
 					"varname" : "pi10422284",
 					"viewvisibility" : 1
 				}
@@ -3474,9 +4086,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 403.0, 407.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 403.0, 407.0, 57.0, 15.0 ],
+					"patching_rect" : [ 337.5, 413.5, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-F0619"
 				}
@@ -3498,9 +4108,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 393.0, 428.0, 12.0, 12.0 ],
+					"patching_rect" : [ 395.0, 433.0, 146.0, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 393.0, 428.0, 12.0, 12.0 ],
+					"presentation_rect" : [ 395.0, 433.0, 78.25, 15.0 ],
 					"varname" : "pi10422283",
 					"viewvisibility" : 1
 				}
@@ -3514,9 +4124,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 403.0, 428.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 403.0, 428.0, 57.0, 15.0 ],
+					"patching_rect" : [ 337.5, 434.5, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-F0618"
 				}
@@ -3538,9 +4146,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 325.0, 482.0, 12.0, 12.0 ],
+					"patching_rect" : [ 450.0, 491.0, 72.0, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 325.0, 482.0, 12.0, 12.0 ],
+					"presentation_rect" : [ 450.0, 491.0, 72.0, 15.0 ],
 					"varname" : "pi10422282",
 					"viewvisibility" : 1
 				}
@@ -3554,9 +4162,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 335.0, 482.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 335.0, 482.0, 57.0, 15.0 ],
+					"patching_rect" : [ 395.5, 492.5, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-F0617"
 				}
@@ -3570,9 +4176,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 179.0, 553.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 234.0, 540.0, 57.0, 15.0 ],
+					"patching_rect" : [ 33.5, 587.5, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-F0608"
 				}
@@ -3594,9 +4198,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 169.0, 556.0, 14.0, 14.0 ],
+					"patching_rect" : [ 98.0, 590.5, 219.0, 12.5 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 224.0, 543.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 98.0, 590.5, 219.0, 12.5 ],
 					"varname" : "pi10422248",
 					"viewvisibility" : 1
 				}
@@ -3610,9 +4214,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 196.5, 624.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 196.5, 624.0, 57.0, 15.0 ],
+					"patching_rect" : [ 86.5, 616.0, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-F0607"
 				}
@@ -3634,9 +4236,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 186.5, 627.0, 14.0, 14.0 ],
+					"patching_rect" : [ 146.5, 617.0, 187.0, 12.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 186.5, 627.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 146.5, 617.0, 187.0, 12.0 ],
 					"varname" : "pi10422045",
 					"viewvisibility" : 1
 				}
@@ -3658,9 +4260,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 179.0, 783.0, 12.0, 12.0 ],
+					"patching_rect" : [ 70.5, 771.0, 193.5, 10.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 183.0, 757.0, 12.0, 12.0 ],
+					"presentation_rect" : [ 70.5, 771.0, 83.0, 10.0 ],
 					"varname" : "pi10422021",
 					"viewvisibility" : 1
 				}
@@ -3674,9 +4276,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 189.0, 783.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 193.0, 757.0, 57.0, 15.0 ],
+					"patching_rect" : [ 6.5, 770.0, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "MS-F0602",
 					"textcolor" : [ 0.572549, 0.27451, 0.027451, 1.0 ]
@@ -3699,9 +4299,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 179.0, 765.0, 14.0, 14.0 ],
+					"patching_rect" : [ 224.0, 837.0, 99.0, 10.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 183.0, 739.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 224.0, 837.0, 83.0, 10.0 ],
 					"varname" : "pi10422080",
 					"viewvisibility" : 1
 				}
@@ -3715,9 +4315,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 189.0, 765.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 193.0, 739.0, 56.0, 15.0 ],
+					"patching_rect" : [ 160.0, 836.0, 56.0, 15.0 ],
 					"style" : "",
 					"text" : "TEE-D0409"
 				}
@@ -3739,9 +4337,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 179.0, 748.0, 12.0, 12.0 ],
+					"patching_rect" : [ 70.5, 754.0, 193.5, 10.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 183.0, 722.0, 12.0, 12.0 ],
+					"presentation_rect" : [ 70.5, 754.0, 193.5, 10.0 ],
 					"varname" : "pi10422041",
 					"viewvisibility" : 1
 				}
@@ -3755,9 +4353,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 189.0, 748.0, 71.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 193.0, 722.0, 71.0, 15.0 ],
+					"patching_rect" : [ 6.5, 753.0, 62.5, 15.0 ],
 					"style" : "",
 					"text" : "RPi-D0402 (G)",
 					"textcolor" : [ 0.086275, 0.309804, 0.52549, 1.0 ]
@@ -3780,9 +4376,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 141.5, 671.0, 12.0, 12.0 ],
+					"patching_rect" : [ 224.0, 812.0, 68.5, 10.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 141.5, 671.0, 12.0, 12.0 ],
+					"presentation_rect" : [ 224.0, 812.0, 68.5, 10.0 ],
 					"varname" : "pi10422087",
 					"viewvisibility" : 1
 				}
@@ -3796,9 +4392,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 151.5, 671.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 151.5, 671.0, 57.0, 15.0 ],
+					"patching_rect" : [ 162.0, 811.0, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-D0416"
 				}
@@ -3820,9 +4414,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 179.0, 731.0, 12.0, 12.0 ],
+					"patching_rect" : [ 224.0, 824.0, 97.0, 10.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 183.0, 705.0, 12.0, 12.0 ],
+					"presentation_rect" : [ 224.0, 824.0, 81.0, 10.0 ],
 					"varname" : "pi10422085",
 					"viewvisibility" : 1
 				}
@@ -3836,9 +4430,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 189.0, 731.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 193.0, 705.0, 57.0, 15.0 ],
+					"patching_rect" : [ 160.0, 823.0, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-D0414"
 				}
@@ -3860,9 +4452,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 266.0, 731.0, 12.0, 12.0 ],
+					"patching_rect" : [ 329.0, 731.0, 73.0, 12.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 266.0, 731.0, 12.0, 12.0 ],
+					"presentation_rect" : [ 329.0, 731.0, 73.0, 12.0 ],
 					"varname" : "pi10422086",
 					"viewvisibility" : 1
 				}
@@ -3876,9 +4468,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 276.0, 731.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 276.0, 731.0, 57.0, 15.0 ],
+					"patching_rect" : [ 269.5, 730.0, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-D0415"
 				}
@@ -3892,9 +4482,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 276.0, 751.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 276.0, 746.5, 57.0, 15.0 ],
+					"patching_rect" : [ 269.5, 750.0, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-D0401"
 				}
@@ -3916,9 +4504,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 266.0, 754.0, 14.0, 14.0 ],
+					"patching_rect" : [ 329.0, 754.0, 225.0, 14.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 266.0, 749.5, 14.0, 14.0 ],
+					"presentation_rect" : [ 329.0, 754.0, 225.0, 14.0 ],
 					"varname" : "pi10422240",
 					"viewvisibility" : 1
 				}
@@ -3940,9 +4528,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 224.0, 526.0, 12.0, 12.0 ],
+					"patching_rect" : [ 196.5, 485.0, 72.0, 12.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 224.0, 526.0, 12.0, 12.0 ],
+					"presentation_rect" : [ 196.5, 485.0, 72.0, 12.0 ],
 					"varname" : "pi10422281",
 					"viewvisibility" : 1
 				}
@@ -3956,9 +4544,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 234.0, 526.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 234.0, 526.0, 57.0, 15.0 ],
+					"patching_rect" : [ 137.0, 482.5, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-F0616"
 				}
@@ -3980,9 +4566,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 315.0, 533.0, 12.0, 12.0 ],
+					"patching_rect" : [ 301.0, 515.0, 109.0, 12.5 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 325.0, 557.0, 12.0, 12.0 ],
+					"presentation_rect" : [ 289.0, 509.0, 109.0, 12.5 ],
 					"varname" : "pi10422220",
 					"viewvisibility" : 1
 				}
@@ -3996,9 +4582,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 325.0, 533.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 335.0, 557.0, 57.0, 15.0 ],
+					"patching_rect" : [ 234.5, 513.0, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "MS-F0601",
 					"textcolor" : [ 0.572549, 0.27451, 0.027451, 1.0 ]
@@ -4013,9 +4597,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 329.0, 552.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 335.0, 540.0, 57.0, 15.0 ],
+					"patching_rect" : [ 238.5, 532.0, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-F0604"
 				}
@@ -4037,9 +4619,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 313.0, 552.0, 14.0, 14.0 ],
+					"patching_rect" : [ 299.0, 536.0, 104.0, 11.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 325.0, 543.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 287.0, 530.0, 104.0, 11.0 ],
 					"varname" : "pi10422245",
 					"viewvisibility" : 1
 				}
@@ -4061,9 +4643,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 325.0, 591.0, 12.0, 12.0 ],
+					"patching_rect" : [ 299.0, 567.0, 109.0, 12.5 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 325.0, 591.0, 12.0, 12.0 ],
+					"presentation_rect" : [ 299.0, 574.0, 62.0, 12.5 ],
 					"varname" : "pi10422280",
 					"viewvisibility" : 1
 				}
@@ -4077,9 +4659,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 335.0, 591.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 335.0, 591.0, 57.0, 15.0 ],
+					"patching_rect" : [ 238.5, 567.0, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-F0615"
 				}
@@ -4093,9 +4673,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 335.0, 571.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 335.0, 571.0, 57.0, 15.0 ],
+					"patching_rect" : [ 238.5, 547.0, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-F0603"
 				}
@@ -4117,9 +4695,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 325.0, 574.0, 14.0, 14.0 ],
+					"patching_rect" : [ 299.0, 552.0, 92.0, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 325.0, 574.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 299.0, 552.0, 92.0, 15.0 ],
 					"varname" : "pi10422244",
 					"viewvisibility" : 1
 				}
@@ -4133,9 +4711,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 266.0, 648.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 266.0, 648.0, 57.0, 15.0 ],
+					"patching_rect" : [ 81.5, 645.0, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-F0606"
 				}
@@ -4157,9 +4733,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 256.0, 651.0, 14.0, 14.0 ],
+					"patching_rect" : [ 149.0, 646.0, 130.0, 18.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 256.0, 651.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 149.0, 646.0, 82.0, 15.0 ],
 					"varname" : "pi10422247",
 					"viewvisibility" : 1
 				}
@@ -4173,9 +4749,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 256.0, 664.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 256.0, 664.0, 57.0, 15.0 ],
+					"patching_rect" : [ 110.5, 712.0, 63.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-F0605"
 				}
@@ -4197,9 +4771,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 246.0, 667.0, 14.0, 14.0 ],
+					"patching_rect" : [ 178.0, 713.0, 224.0, 18.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 246.0, 667.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 178.0, 713.0, 224.0, 17.0 ],
 					"varname" : "pi10422246",
 					"viewvisibility" : 1
 				}
@@ -4213,9 +4787,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 339.0, 635.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 375.5, 671.0, 57.0, 15.0 ],
+					"patching_rect" : [ 270.5, 636.5, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-D0405"
 				}
@@ -4237,9 +4809,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 329.0, 638.0, 14.0, 14.0 ],
+					"patching_rect" : [ 329.0, 638.0, 121.0, 14.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 365.5, 674.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 329.0, 638.0, 121.0, 14.0 ],
 					"varname" : "pi10422242",
 					"viewvisibility" : 1
 				}
@@ -4253,9 +4825,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 339.0, 675.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 375.5, 688.0, 57.0, 15.0 ],
+					"patching_rect" : [ 270.5, 676.5, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-D0404"
 				}
@@ -4277,9 +4847,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 329.0, 675.0, 14.0, 14.0 ],
+					"patching_rect" : [ 329.0, 675.0, 121.0, 14.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 365.5, 688.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 329.0, 682.0, 121.0, 14.0 ],
 					"varname" : "pi10422241",
 					"viewvisibility" : 1
 				}
@@ -4293,9 +4863,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 339.0, 654.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 193.0, 771.0, 57.0, 15.0 ],
+					"patching_rect" : [ 270.5, 655.5, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-D0406"
 				}
@@ -4317,9 +4885,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 329.0, 657.0, 14.0, 14.0 ],
+					"patching_rect" : [ 329.0, 654.0, 106.0, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 183.0, 774.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 329.0, 657.0, 106.0, 15.0 ],
 					"varname" : "pi10422243",
 					"viewvisibility" : 1
 				}
@@ -4341,9 +4909,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 479.0, 624.0, 12.0, 12.0 ],
+					"patching_rect" : [ 890.0, 317.0, 112.0, 14.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 862.0, 365.0, 12.0, 12.0 ],
+					"presentation_rect" : [ 890.0, 317.0, 112.0, 14.0 ],
 					"varname" : "pi10422118",
 					"viewvisibility" : 1
 				}
@@ -4357,9 +4925,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 489.0, 624.0, 73.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 872.0, 365.0, 73.0, 15.0 ],
+					"patching_rect" : [ 842.5, 314.5, 67.0, 15.0 ],
 					"style" : "",
 					"text" : "MS-E0501",
 					"textcolor" : [ 0.572549, 0.27451, 0.027451, 1.0 ]
@@ -4382,9 +4948,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 479.0, 608.0, 12.0, 12.0 ],
+					"patching_rect" : [ 467.0, 591.0, 76.0, 12.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 483.5, 613.0, 15.0, 12.0 ],
+					"presentation_rect" : [ 467.0, 591.0, 76.0, 12.0 ],
 					"varname" : "pi10422181",
 					"viewvisibility" : 1
 				}
@@ -4398,9 +4964,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 489.0, 608.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 496.5, 613.0, 57.0, 15.0 ],
+					"patching_rect" : [ 403.5, 592.5, 59.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-E0513"
 				}
@@ -4422,9 +4986,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 479.0, 587.0, 12.0, 12.0 ],
+					"patching_rect" : [ 467.0, 570.0, 76.0, 12.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 483.5, 597.0, 15.0, 12.0 ],
+					"presentation_rect" : [ 467.0, 570.0, 76.0, 12.0 ],
 					"varname" : "pi10422183",
 					"viewvisibility" : 1
 				}
@@ -4438,9 +5002,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 489.0, 587.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 496.5, 597.0, 57.0, 15.0 ],
+					"patching_rect" : [ 403.5, 571.5, 59.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-E0515"
 				}
@@ -4462,9 +5024,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 448.0, 731.0, 12.0, 12.0 ],
+					"patching_rect" : [ 460.0, 706.0, 103.0, 11.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 448.0, 731.0, 12.0, 12.0 ],
+					"presentation_rect" : [ 460.0, 713.0, 103.0, 11.0 ],
 					"varname" : "pi10422094",
 					"viewvisibility" : 1
 				}
@@ -4478,9 +5040,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 458.0, 731.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 458.0, 731.0, 57.0, 15.0 ],
+					"patching_rect" : [ 405.5, 707.5, 61.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-D0423"
 				}
@@ -4494,9 +5054,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 477.0, 780.0, 69.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 477.0, 780.0, 69.0, 15.0 ],
+					"patching_rect" : [ 402.5, 779.0, 69.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-D0408 (G)",
 					"textcolor" : [ 0.086275, 0.309804, 0.52549, 1.0 ]
@@ -4519,9 +5077,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 467.0, 783.0, 14.0, 14.0 ],
+					"patching_rect" : [ 467.0, 783.0, 120.0, 14.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 467.0, 783.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 467.0, 778.0, 120.0, 14.0 ],
 					"varname" : "pi10422044",
 					"viewvisibility" : 1
 				}
@@ -4543,9 +5101,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 467.0, 799.0, 12.0, 12.0 ],
+					"patching_rect" : [ 467.0, 799.0, 118.0, 12.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 467.0, 799.0, 12.0, 12.0 ],
+					"presentation_rect" : [ 467.0, 799.0, 92.0, 12.0 ],
 					"varname" : "pi10422084",
 					"viewvisibility" : 1
 				}
@@ -4559,9 +5117,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 477.0, 799.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 477.0, 799.0, 57.0, 15.0 ],
+					"patching_rect" : [ 402.5, 798.0, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-D0413"
 				}
@@ -4583,9 +5139,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 467.0, 815.0, 12.0, 12.0 ],
+					"patching_rect" : [ 467.0, 815.0, 118.0, 12.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 467.0, 815.0, 12.0, 12.0 ],
+					"presentation_rect" : [ 467.0, 815.0, 92.0, 12.0 ],
 					"varname" : "pi10422083",
 					"viewvisibility" : 1
 				}
@@ -4599,9 +5155,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 477.0, 815.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 477.0, 815.0, 57.0, 15.0 ],
+					"patching_rect" : [ 402.5, 814.0, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-D0412"
 				}
@@ -4623,9 +5177,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 467.0, 837.0, 12.0, 12.0 ],
+					"patching_rect" : [ 467.0, 837.0, 118.0, 12.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 467.0, 837.0, 12.0, 12.0 ],
+					"presentation_rect" : [ 467.0, 837.0, 92.0, 12.0 ],
 					"varname" : "pi10422082",
 					"viewvisibility" : 1
 				}
@@ -4639,9 +5193,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 477.0, 837.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 477.0, 837.0, 57.0, 15.0 ],
+					"patching_rect" : [ 402.5, 836.0, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-D0411"
 				}
@@ -4663,9 +5215,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 623.0, 314.0, 14.0, 14.0 ],
+					"patching_rect" : [ 679.0, 430.5, 68.0, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 605.0, 313.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 666.5, 416.0, 71.5, 15.0 ],
 					"varname" : "pi10422480",
 					"viewvisibility" : 1
 				}
@@ -4679,9 +5231,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 632.0, 314.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 614.0, 313.0, 56.0, 15.0 ],
+					"patching_rect" : [ 622.5, 432.0, 56.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-H0808"
 				}
@@ -4703,9 +5253,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 1102.0, 6.0, 14.0, 14.0 ],
+					"patching_rect" : [ 1102.0, 6.0, 74.0, 11.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 1102.0, 6.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 1102.0, 6.0, 74.0, 11.0 ],
 					"varname" : "pi10420111",
 					"viewvisibility" : 1
 				}
@@ -4719,9 +5269,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 1111.0, 6.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 1111.0, 6.0, 56.0, 15.0 ],
+					"patching_rect" : [ 1045.5, 7.5, 56.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-J10999"
 				}
@@ -4743,9 +5291,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 745.0, 59.0, 14.0, 14.0 ],
+					"patching_rect" : [ 683.5, 38.25, 193.5, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 745.0, 59.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 683.5, 31.25, 193.5, 15.0 ],
 					"varname" : "pi10422541",
 					"viewvisibility" : 1
 				}
@@ -4759,11 +5307,9 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 754.0, 59.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 754.0, 59.0, 56.0, 15.0 ],
+					"patching_rect" : [ 623.0, 39.75, 160.0, 15.0 ],
 					"style" : "",
-					"text" : "RPi-i0904"
+					"text" : "RPi-I0904"
 				}
 
 			}
@@ -4783,9 +5329,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 745.0, 79.0, 14.0, 14.0 ],
+					"patching_rect" : [ 683.5, 73.25, 118.0, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 745.0, 79.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 683.5, 73.25, 80.5, 15.0 ],
 					"varname" : "pi10422591",
 					"viewvisibility" : 1
 				}
@@ -4799,9 +5345,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 754.0, 79.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 754.0, 79.0, 56.0, 15.0 ],
+					"patching_rect" : [ 623.0, 74.75, 160.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-i0923"
 				}
@@ -4823,9 +5367,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 745.0, 96.0, 14.0, 14.0 ],
+					"patching_rect" : [ 683.5, 108.75, 208.5, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 745.0, 96.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 683.5, 111.75, 111.5, 15.0 ],
 					"varname" : "pi10422542",
 					"viewvisibility" : 1
 				}
@@ -4839,9 +5383,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 754.0, 96.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 754.0, 96.0, 56.0, 15.0 ],
+					"patching_rect" : [ 623.0, 110.25, 243.5, 15.0 ],
 					"style" : "",
 					"text" : "RPi-i0905"
 				}
@@ -4863,9 +5405,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 745.0, 42.0, 14.0, 14.0 ],
+					"patching_rect" : [ 683.5, 53.25, 118.0, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 745.0, 42.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 683.5, 53.25, 118.0, 15.0 ],
 					"varname" : "pi10422521",
 					"viewvisibility" : 1
 				}
@@ -4879,9 +5421,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 754.0, 42.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 754.0, 42.0, 56.0, 15.0 ],
+					"patching_rect" : [ 623.0, 54.75, 160.0, 15.0 ],
 					"style" : "",
 					"text" : "MS-I0902",
 					"textcolor" : [ 0.572549, 0.27451, 0.027451, 1.0 ]
@@ -4904,9 +5444,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 797.0, 208.0, 14.0, 14.0 ],
+					"patching_rect" : [ 789.0, 190.0, 113.0, 13.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 797.0, 208.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 789.0, 190.0, 113.0, 13.0 ],
 					"varname" : "pi10422585",
 					"viewvisibility" : 1
 				}
@@ -4920,9 +5460,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 806.0, 208.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 806.0, 208.0, 56.0, 15.0 ],
+					"patching_rect" : [ 744.5, 191.5, 56.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-I0918"
 				}
@@ -4944,9 +5482,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 736.0, 184.5, 14.0, 14.0 ],
+					"patching_rect" : [ 744.0, 163.0, 126.0, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 748.0, 184.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 744.0, 163.0, 126.0, 15.0 ],
 					"varname" : "pi10422582",
 					"viewvisibility" : 1
 				}
@@ -4960,9 +5498,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 745.0, 184.5, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 757.0, 184.0, 56.0, 15.0 ],
+					"patching_rect" : [ 700.5, 164.5, 56.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-I0912"
 				}
@@ -4984,9 +5520,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 777.0, 236.5, 14.0, 14.0 ],
+					"patching_rect" : [ 783.5, 209.0, 118.5, 16.5 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 770.0, 239.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 783.5, 214.0, 124.0, 14.0 ],
 					"varname" : "pi10422584",
 					"viewvisibility" : 1
 				}
@@ -5000,9 +5536,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 786.0, 236.5, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 779.0, 239.0, 56.0, 15.0 ],
+					"patching_rect" : [ 739.0, 210.5, 56.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-I0914"
 				}
@@ -5024,9 +5558,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 725.0, 220.0, 14.0, 14.0 ],
+					"patching_rect" : [ 728.5, 235.0, 126.0, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 725.0, 220.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 728.5, 235.0, 126.0, 15.0 ],
 					"varname" : "pi10422583",
 					"viewvisibility" : 1
 				}
@@ -5040,9 +5574,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 734.0, 220.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 734.0, 220.0, 56.0, 15.0 ],
+					"patching_rect" : [ 685.0, 236.5, 56.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-I0913"
 				}
@@ -5064,9 +5596,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 724.0, 140.0, 14.0, 14.0 ],
+					"patching_rect" : [ 744.0, 137.0, 73.5, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 724.0, 140.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 744.0, 137.0, 73.5, 15.0 ],
 					"varname" : "pi10422589",
 					"viewvisibility" : 1
 				}
@@ -5080,9 +5612,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 733.0, 140.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 733.0, 140.0, 56.0, 15.0 ],
+					"patching_rect" : [ 689.0, 138.5, 56.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-I0921"
 				}
@@ -5104,9 +5634,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 706.0, 5.0, 14.0, 14.0 ],
+					"patching_rect" : [ 706.0, 5.0, 95.0, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 706.0, 5.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 706.0, 5.0, 95.0, 15.0 ],
 					"varname" : "pi10420112",
 					"viewvisibility" : 1
 				}
@@ -5120,9 +5650,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 715.0, 5.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 715.0, 5.0, 56.0, 15.0 ],
+					"patching_rect" : [ 656.5, 6.5, 56.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-i0999"
 				}
@@ -5144,9 +5672,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 881.0, 261.0, 14.0, 14.0 ],
+					"patching_rect" : [ 952.5, 231.0, 290.0, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 881.0, 261.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 952.5, 231.0, 280.5, 15.0 ],
 					"varname" : "pi10422520",
 					"viewvisibility" : 1
 				}
@@ -5160,9 +5688,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 890.0, 261.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 890.0, 261.0, 56.0, 15.0 ],
+					"patching_rect" : [ 902.0, 232.5, 56.0, 15.0 ],
 					"style" : "",
 					"text" : "MS-I0901",
 					"textcolor" : [ 0.572549, 0.27451, 0.027451, 1.0 ]
@@ -5185,9 +5711,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 881.0, 249.0, 14.0, 14.0 ],
+					"patching_rect" : [ 960.5, 209.0, 139.5, 10.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 881.0, 249.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 960.5, 200.5, 139.5, 10.0 ],
 					"varname" : "pi10422540",
 					"viewvisibility" : 1
 				}
@@ -5201,9 +5727,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 890.0, 249.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 890.0, 249.0, 56.0, 15.0 ],
+					"patching_rect" : [ 910.0, 210.5, 56.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-i0903"
 				}
@@ -5225,9 +5749,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 872.0, 228.0, 14.0, 14.0 ],
+					"patching_rect" : [ 965.75, 190.0, 85.5, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 872.0, 228.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 967.5, 176.0, 85.5, 15.0 ],
 					"varname" : "pi10422592",
 					"viewvisibility" : 1
 				}
@@ -5241,9 +5765,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 881.0, 228.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 881.0, 228.0, 56.0, 15.0 ],
+					"patching_rect" : [ 915.25, 191.5, 56.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-I0924"
 				}
@@ -5265,9 +5787,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 815.0, 79.0, 14.0, 14.0 ],
+					"patching_rect" : [ 876.0, 71.75, 131.0, 15.5 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 815.0, 79.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 876.0, 71.75, 83.0, 15.5 ],
 					"varname" : "pi10422593",
 					"viewvisibility" : 1
 				}
@@ -5281,9 +5803,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 824.0, 79.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 824.0, 79.0, 56.0, 15.0 ],
+					"patching_rect" : [ 819.5, 74.75, 56.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-I0927"
 				}
@@ -5305,9 +5825,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 993.0, 140.0, 14.0, 14.0 ],
+					"patching_rect" : [ 956.0, 151.0, 78.0, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 993.0, 134.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 956.0, 129.0, 78.0, 15.0 ],
 					"varname" : "pi10422594",
 					"viewvisibility" : 1
 				}
@@ -5321,9 +5841,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 1002.0, 140.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 1002.0, 134.0, 56.0, 15.0 ],
+					"patching_rect" : [ 902.5, 152.5, 56.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-I0928"
 				}
@@ -5345,9 +5863,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 815.0, 96.0, 14.0, 14.0 ],
+					"patching_rect" : [ 876.0, 88.75, 131.0, 15.5 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 815.0, 96.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 876.0, 89.5, 93.0, 14.75 ],
 					"varname" : "pi10422590",
 					"viewvisibility" : 1
 				}
@@ -5361,9 +5879,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 824.0, 96.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 824.0, 96.0, 56.0, 15.0 ],
+					"patching_rect" : [ 819.5, 91.75, 56.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-I0922"
 				}
@@ -5385,9 +5901,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 1036.0, 190.0, 14.0, 14.0 ],
+					"patching_rect" : [ 956.0, 171.0, 109.0, 13.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 1036.0, 190.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 956.0, 152.0, 109.0, 13.0 ],
 					"varname" : "pi10422543",
 					"viewvisibility" : 1
 				}
@@ -5401,9 +5917,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 1045.0, 190.0, 71.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 1045.0, 190.0, 71.0, 15.0 ],
+					"patching_rect" : [ 893.5, 172.5, 71.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-I0906 (G)",
 					"textcolor" : [ 0.086275, 0.309804, 0.52549, 1.0 ]
@@ -5426,9 +5940,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 821.0, 295.0, 14.0, 14.0 ],
+					"patching_rect" : [ 890.0, 281.25, 69.0, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 821.0, 295.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 890.0, 274.25, 69.0, 15.0 ],
 					"varname" : "pi10422581",
 					"viewvisibility" : 1
 				}
@@ -5442,9 +5956,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 830.0, 295.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 830.0, 295.0, 56.0, 15.0 ],
+					"patching_rect" : [ 835.5, 282.75, 56.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-I0911"
 				}
@@ -5466,9 +5978,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 881.0, 359.0, 14.0, 14.0 ],
+					"patching_rect" : [ 952.5, 373.5, 183.0, 13.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 878.0, 356.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 952.5, 373.5, 183.0, 13.0 ],
 					"varname" : "pi10421740",
 					"viewvisibility" : 1
 				}
@@ -5482,9 +5994,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 890.0, 359.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 887.0, 356.0, 56.0, 15.0 ],
+					"patching_rect" : [ 889.5, 369.5, 56.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-A0102"
 				}
@@ -5498,9 +6008,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 688.0, 376.0, 50.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 682.0, 359.0, 50.0, 15.0 ],
+					"patching_rect" : [ 622.5, 412.0, 50.0, 15.0 ],
 					"style" : "",
 					"text" : "TEE-E509"
 				}
@@ -5522,9 +6030,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 673.0, 376.0, 14.0, 14.0 ],
+					"patching_rect" : [ 666.5, 410.5, 66.0, 14.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 667.0, 359.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 666.5, 396.0, 69.5, 14.0 ],
 					"varname" : "pi10422188",
 					"viewvisibility" : 1
 				}
@@ -5546,9 +6054,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 911.0, 391.0, 14.0, 14.0 ],
+					"patching_rect" : [ 982.0, 405.5, 73.0, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 911.0, 391.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 987.0, 421.0, 73.0, 15.0 ],
 					"varname" : "pi10421780",
 					"viewvisibility" : 1
 				}
@@ -5562,9 +6070,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 920.0, 391.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 920.0, 391.0, 56.0, 15.0 ],
+					"patching_rect" : [ 919.0, 405.5, 56.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-B0200"
 				}
@@ -5578,9 +6084,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 779.0, 391.0, 50.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 779.0, 391.0, 50.0, 15.0 ],
+					"patching_rect" : [ 705.5, 371.0, 50.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-A0105"
 				}
@@ -5602,9 +6106,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 763.0, 391.0, 14.0, 14.0 ],
+					"patching_rect" : [ 753.0, 369.5, 121.0, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 763.0, 391.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 753.0, 369.5, 121.0, 15.0 ],
 					"varname" : "pi10421742",
 					"viewvisibility" : 1
 				}
@@ -5618,9 +6122,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 779.0, 376.0, 50.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 779.0, 376.0, 50.0, 15.0 ],
+					"patching_rect" : [ 705.5, 356.0, 50.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-A0104"
 				}
@@ -5642,9 +6144,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 763.0, 376.0, 14.0, 14.0 ],
+					"patching_rect" : [ 753.0, 354.5, 121.0, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 763.0, 376.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 753.0, 354.5, 121.0, 15.0 ],
 					"varname" : "pi10421741",
 					"viewvisibility" : 1
 				}
@@ -5658,9 +6160,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 817.0, 575.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 816.0, 574.0, 57.0, 15.0 ],
+					"patching_rect" : [ 753.0, 582.0, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-A0107"
 				}
@@ -5682,9 +6182,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 807.0, 578.0, 14.0, 14.0 ],
+					"patching_rect" : [ 807.0, 582.0, 311.0, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 806.0, 577.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 807.0, 578.0, 311.0, 15.0 ],
 					"varname" : "pi10421744",
 					"viewvisibility" : 1
 				}
@@ -5706,9 +6206,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 622.0, 815.0, 12.0, 12.0 ],
+					"patching_rect" : [ 640.5, 823.0, 74.0, 10.5 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 622.0, 799.0, 12.0, 12.0 ],
+					"presentation_rect" : [ 654.0, 813.0, 78.5, 12.0 ],
 					"varname" : "pi10422089",
 					"viewvisibility" : 1
 				}
@@ -5730,9 +6230,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 622.0, 780.0, 12.0, 12.0 ],
+					"patching_rect" : [ 640.5, 786.5, 94.0, 12.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 622.0, 780.0, 12.0, 12.0 ],
+					"presentation_rect" : [ 654.0, 778.0, 94.0, 12.0 ],
 					"varname" : "pi10422020",
 					"viewvisibility" : 1
 				}
@@ -5754,9 +6254,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 622.0, 758.0, 12.0, 12.0 ],
+					"patching_rect" : [ 789.0, 813.5, 223.0, 11.5 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 622.0, 758.0, 12.0, 12.0 ],
+					"presentation_rect" : [ 789.0, 824.0, 227.0, 12.0 ],
 					"varname" : "pi10422040",
 					"viewvisibility" : 1
 				}
@@ -5770,9 +6270,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 632.0, 815.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 632.0, 799.0, 57.0, 15.0 ],
+					"patching_rect" : [ 581.0, 823.0, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-D0418"
 				}
@@ -5786,9 +6284,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 632.0, 780.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 632.0, 780.0, 57.0, 15.0 ],
+					"patching_rect" : [ 581.0, 788.0, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "MS-D0400",
 					"textcolor" : [ 0.572549, 0.27451, 0.027451, 1.0 ]
@@ -5803,9 +6299,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 632.0, 758.0, 67.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 632.0, 758.0, 67.0, 15.0 ],
+					"patching_rect" : [ 729.0, 813.5, 67.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-C0308 (G)",
 					"textcolor" : [ 0.086275, 0.309804, 0.52549, 1.0 ]
@@ -5828,9 +6322,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 646.0, 587.0, 14.0, 14.0 ],
+					"patching_rect" : [ 669.0, 587.0, 69.0, 14.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 628.5, 570.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 669.0, 587.0, 69.0, 14.0 ],
 					"varname" : "pi10422182",
 					"viewvisibility" : 1
 				}
@@ -5844,9 +6338,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 655.0, 587.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 637.5, 570.0, 56.0, 15.0 ],
+					"patching_rect" : [ 622.5, 588.5, 56.0, 15.0 ],
 					"style" : "",
 					"text" : "TEE-E0514"
 				}
@@ -5868,9 +6360,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 646.0, 567.0, 14.0, 14.0 ],
+					"patching_rect" : [ 669.0, 567.0, 69.0, 14.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 628.5, 550.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 669.0, 567.0, 69.0, 14.0 ],
 					"varname" : "pi10422180",
 					"viewvisibility" : 1
 				}
@@ -5884,9 +6376,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 655.0, 567.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 637.5, 550.0, 56.0, 15.0 ],
+					"patching_rect" : [ 622.5, 568.5, 56.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-E0510"
 				}
@@ -5908,9 +6398,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 797.0, 518.0, 14.0, 14.0 ],
+					"patching_rect" : [ 797.0, 518.0, 77.0, 14.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 797.0, 514.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 797.0, 518.0, 77.0, 14.0 ],
 					"varname" : "pi10421786",
 					"viewvisibility" : 1
 				}
@@ -5924,9 +6414,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 806.0, 518.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 806.0, 514.0, 56.0, 15.0 ],
+					"patching_rect" : [ 734.0, 518.0, 56.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-B0206"
 				}
@@ -5948,9 +6436,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 797.0, 498.0, 14.0, 14.0 ],
+					"patching_rect" : [ 797.0, 498.0, 77.0, 14.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 797.0, 498.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 797.0, 498.0, 77.0, 14.0 ],
 					"varname" : "pi10421787",
 					"viewvisibility" : 1
 				}
@@ -5964,9 +6452,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 806.0, 498.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 806.0, 498.0, 56.0, 15.0 ],
+					"patching_rect" : [ 734.0, 498.0, 56.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-B0207"
 				}
@@ -5988,9 +6474,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 1045.0, 475.0, 14.0, 14.0 ],
+					"patching_rect" : [ 1045.0, 475.0, 73.0, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 1045.0, 475.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 1045.0, 475.0, 73.0, 15.0 ],
 					"varname" : "pi10421785",
 					"viewvisibility" : 1
 				}
@@ -6004,9 +6490,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 1054.0, 475.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 1054.0, 475.0, 56.0, 15.0 ],
+					"patching_rect" : [ 993.0, 475.0, 56.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-B0205"
 				}
@@ -6020,9 +6504,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 936.0, 518.0, 50.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 936.0, 518.0, 50.0, 15.0 ],
+					"patching_rect" : [ 885.0, 518.0, 50.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-A0103"
 				}
@@ -6044,9 +6526,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 920.0, 518.0, 14.0, 14.0 ],
+					"patching_rect" : [ 927.0, 518.0, 282.0, 14.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 920.0, 518.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 929.0, 527.0, 282.0, 14.0 ],
 					"varname" : "pi10421840",
 					"viewvisibility" : 1
 				}
@@ -6060,9 +6542,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 1101.0, 504.0, 50.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 1060.0, 492.0, 50.0, 15.0 ],
+					"patching_rect" : [ 1035.0, 498.0, 50.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-A0106"
 				}
@@ -6084,9 +6564,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 1085.0, 504.0, 14.0, 14.0 ],
+					"patching_rect" : [ 1079.75, 498.0, 120.0, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 1044.0, 492.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 1079.75, 498.0, 120.0, 15.0 ],
 					"varname" : "pi10421743",
 					"viewvisibility" : 1
 				}
@@ -6108,9 +6588,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 711.0, 828.0, 14.0, 14.0 ],
+					"patching_rect" : [ 640.5, 838.0, 74.0, 13.5 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 711.0, 828.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 652.5, 849.0, 78.5, 15.0 ],
 					"varname" : "pi10422081",
 					"viewvisibility" : 1
 				}
@@ -6124,9 +6604,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 720.0, 828.0, 58.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 720.0, 828.0, 58.0, 15.0 ],
+					"patching_rect" : [ 581.0, 838.0, 58.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-D0410"
 				}
@@ -6148,9 +6626,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 896.0, 689.0, 14.0, 14.0 ],
+					"patching_rect" : [ 876.0, 646.0, 64.0, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 896.0, 689.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 876.0, 646.0, 84.5, 15.0 ],
 					"varname" : "N/A[3]",
 					"viewvisibility" : 1
 				}
@@ -6164,9 +6642,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 905.0, 689.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 905.0, 689.0, 57.0, 15.0 ],
+					"patching_rect" : [ 825.0, 646.0, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "TAB-C0326"
 				}
@@ -6188,9 +6664,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 984.0, 761.0, 14.0, 14.0 ],
+					"patching_rect" : [ 1089.0, 836.0, 76.0, 13.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 1007.5, 751.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 1104.0, 834.0, 76.0, 13.0 ],
 					"varname" : "pi10421888",
 					"viewvisibility" : 1
 				}
@@ -6204,9 +6680,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 993.0, 761.0, 58.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 1016.5, 751.0, 58.0, 15.0 ],
+					"patching_rect" : [ 1029.0, 836.0, 58.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-C0323"
 				}
@@ -6228,9 +6702,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 876.0, 568.0, 14.0, 14.0 ],
+					"patching_rect" : [ 876.0, 555.5, 70.0, 14.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 866.0, 557.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 876.0, 554.0, 70.0, 14.0 ],
 					"varname" : "pi10421783",
 					"viewvisibility" : 1
 				}
@@ -6244,9 +6718,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 885.0, 568.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 875.0, 557.0, 56.0, 15.0 ],
+					"patching_rect" : [ 817.5, 555.5, 56.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-B0203"
 				}
@@ -6268,9 +6740,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 1082.0, 640.0, 14.0, 14.0 ],
+					"patching_rect" : [ 1147.0, 662.0, 82.0, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 1006.0, 591.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 1147.0, 662.0, 82.0, 15.0 ],
 					"varname" : "pi10421885",
 					"viewvisibility" : 1
 				}
@@ -6284,9 +6756,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 1091.0, 640.0, 56.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 1015.0, 591.0, 56.0, 15.0 ],
+					"patching_rect" : [ 1089.0, 662.0, 56.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-C0320"
 				}
@@ -6308,9 +6778,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 993.0, 614.0, 14.0, 14.0 ],
+					"patching_rect" : [ 1007.0, 638.0, 155.0, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 993.0, 614.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 1007.0, 638.0, 155.0, 15.0 ],
 					"varname" : "pi10421884",
 					"viewvisibility" : 1
 				}
@@ -6324,9 +6794,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 1002.0, 614.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 1002.0, 614.0, 57.0, 15.0 ],
+					"patching_rect" : [ 956.0, 638.0, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-C0319"
 				}
@@ -6348,9 +6816,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 1015.0, 668.0, 14.0, 14.0 ],
+					"patching_rect" : [ 1147.0, 682.0, 82.0, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 1015.0, 668.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 1140.0, 682.0, 82.0, 15.0 ],
 					"varname" : "pi10421893",
 					"viewvisibility" : 1
 				}
@@ -6364,9 +6832,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 1024.0, 668.0, 53.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 1024.0, 668.0, 53.0, 15.0 ],
+					"patching_rect" : [ 1089.0, 682.0, 53.0, 15.0 ],
 					"style" : "",
 					"text" : "TEE-C0314"
 				}
@@ -6388,9 +6854,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 1015.0, 703.0, 14.0, 14.0 ],
+					"patching_rect" : [ 1035.0, 715.0, 150.0, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 1015.0, 703.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 1035.0, 715.0, 150.0, 15.0 ],
 					"varname" : "pi10421886",
 					"viewvisibility" : 1
 				}
@@ -6404,9 +6870,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 1024.0, 703.0, 53.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 1024.0, 703.0, 53.0, 15.0 ],
+					"patching_rect" : [ 982.0, 715.0, 53.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-C0321"
 				}
@@ -6428,9 +6892,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 927.0, 750.0, 14.0, 14.0 ],
+					"patching_rect" : [ 1087.0, 817.0, 80.0, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 896.0, 739.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 1102.0, 815.0, 80.0, 15.0 ],
 					"varname" : "pi10421892",
 					"viewvisibility" : 1
 				}
@@ -6444,9 +6908,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 936.0, 750.0, 55.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 905.0, 739.0, 55.0, 15.0 ],
+					"patching_rect" : [ 1035.0, 817.0, 55.0, 15.0 ],
 					"style" : "",
 					"text" : "TEE-C0313"
 				}
@@ -6468,9 +6930,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 948.0, 732.0, 14.0, 14.0 ],
+					"patching_rect" : [ 1087.0, 799.0, 73.0, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 896.0, 723.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 1102.0, 797.0, 73.0, 15.0 ],
 					"varname" : "pi10421887",
 					"viewvisibility" : 1
 				}
@@ -6484,9 +6946,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 957.0, 732.0, 61.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 905.0, 723.0, 61.0, 15.0 ],
+					"patching_rect" : [ 1035.0, 799.0, 61.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-C0322"
 				}
@@ -6508,9 +6968,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 788.0, 648.0, 14.0, 14.0 ],
+					"patching_rect" : [ 807.0, 614.0, 174.0, 14.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 795.5, 640.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 807.0, 614.0, 174.0, 14.0 ],
 					"varname" : "pi10421882",
 					"viewvisibility" : 1
 				}
@@ -6524,9 +6984,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 734.0, 672.0, 62.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 700.0, 654.0, 62.0, 15.0 ],
+					"patching_rect" : [ 613.5, 647.5, 62.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-C0316"
 				}
@@ -6548,9 +7006,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 724.0, 675.0, 14.0, 14.0 ],
+					"patching_rect" : [ 679.0, 646.0, 73.0, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 690.0, 657.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 676.0, 638.0, 73.0, 15.0 ],
 					"varname" : "pi10421881",
 					"viewvisibility" : 1
 				}
@@ -6564,9 +7022,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 697.0, 723.0, 62.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 681.0, 671.0, 62.0, 15.0 ],
+					"patching_rect" : [ 622.0, 662.5, 62.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-C0315"
 				}
@@ -6588,9 +7044,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 691.0, 723.0, 14.0, 14.0 ],
+					"patching_rect" : [ 674.5, 661.0, 111.0, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 675.0, 671.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 674.5, 661.0, 113.0, 15.0 ],
 					"varname" : "pi10421880",
 					"viewvisibility" : 1
 				}
@@ -6604,9 +7060,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 816.0, 758.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 788.0, 697.0, 57.0, 15.0 ],
+					"patching_rect" : [ 740.5, 707.5, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-C0318"
 				}
@@ -6628,9 +7082,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 806.0, 761.0, 14.0, 14.0 ],
+					"patching_rect" : [ 789.0, 706.0, 169.0, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 778.0, 697.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 789.0, 706.0, 169.0, 15.0 ],
 					"varname" : "pi10421883",
 					"viewvisibility" : 1
 				}
@@ -6644,9 +7098,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 734.0, 796.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 742.625, 780.0, 57.0, 15.0 ],
+					"patching_rect" : [ 725.5, 829.5, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "TEE-C0312"
 				}
@@ -6668,9 +7120,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 724.0, 799.0, 14.0, 14.0 ],
+					"patching_rect" : [ 777.0, 828.0, 79.0, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 732.625, 783.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 775.5, 849.0, 79.0, 15.0 ],
 					"varname" : "pi10421891",
 					"viewvisibility" : 1
 				}
@@ -6684,9 +7136,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 745.0, 751.0, 55.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 742.625, 751.0, 55.0, 15.0 ],
+					"patching_rect" : [ 776.5, 795.0, 55.0, 15.0 ],
 					"style" : "",
 					"text" : "MS-C0301",
 					"textcolor" : [ 0.572549, 0.27451, 0.027451, 1.0 ]
@@ -6709,9 +7159,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 735.0, 754.0, 14.0, 14.0 ],
+					"patching_rect" : [ 825.0, 793.5, 211.0, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 732.625, 754.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 825.0, 799.0, 191.0, 15.0 ],
 					"varname" : "pi10421821",
 					"viewvisibility" : 1
 				}
@@ -6725,9 +7175,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 816.0, 777.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 816.0, 777.0, 57.0, 15.0 ],
+					"patching_rect" : [ 776.5, 773.0, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-C0305"
 				}
@@ -6749,9 +7197,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 806.0, 778.0, 14.0, 14.0 ],
+					"patching_rect" : [ 825.0, 769.5, 211.0, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 806.0, 778.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 825.0, 777.0, 211.0, 15.0 ],
 					"varname" : "pi10421844",
 					"viewvisibility" : 1
 				}
@@ -6765,9 +7213,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 816.0, 694.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 742.625, 767.0, 57.0, 15.0 ],
+					"patching_rect" : [ 704.5, 685.5, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-C0304"
 				}
@@ -6789,9 +7235,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 806.0, 697.0, 14.0, 14.0 ],
+					"patching_rect" : [ 753.0, 682.0, 236.0, 17.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 732.625, 770.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 753.0, 682.0, 236.0, 17.0 ],
 					"varname" : "pi10421843",
 					"viewvisibility" : 1
 				}
@@ -6805,9 +7251,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 816.0, 672.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 816.0, 758.0, 57.0, 15.0 ],
+					"patching_rect" : [ 776.5, 751.0, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-C0303"
 				}
@@ -6829,9 +7273,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 806.0, 675.0, 14.0, 14.0 ],
+					"patching_rect" : [ 825.0, 749.5, 191.0, 15.5 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 806.0, 761.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 825.0, 754.0, 191.0, 13.0 ],
 					"varname" : "pi10421842",
 					"viewvisibility" : 1
 				}
@@ -6845,9 +7289,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 816.0, 736.0, 57.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 816.0, 736.0, 57.0, 15.0 ],
+					"patching_rect" : [ 776.5, 732.0, 57.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-C0302"
 				}
@@ -6869,9 +7311,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 806.0, 739.0, 14.0, 14.0 ],
+					"patching_rect" : [ 825.0, 730.5, 191.0, 16.5 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 806.0, 739.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 825.0, 730.5, 191.0, 15.0 ],
 					"varname" : "pi10421841",
 					"viewvisibility" : 1
 				}
@@ -6885,9 +7327,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 818.5, 716.0, 54.5, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 745.0, 736.0, 50.25, 15.0 ],
+					"patching_rect" : [ 1040.5, 780.0, 54.5, 15.0 ],
 					"style" : "",
 					"text" : "RPi-C0310"
 				}
@@ -6909,9 +7349,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 806.0, 720.0, 14.0, 14.0 ],
+					"patching_rect" : [ 1087.0, 780.0, 138.0, 15.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 732.5, 740.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 1093.0, 775.0, 138.0, 15.0 ],
 					"varname" : "pi10421845",
 					"viewvisibility" : 1
 				}
@@ -6925,9 +7365,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 1024.0, 795.0, 65.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 1016.5, 778.0, 65.0, 15.0 ],
+					"patching_rect" : [ 952.0, 869.0, 65.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-C0307 (G)",
 					"textcolor" : [ 0.086275, 0.309804, 0.52549, 1.0 ]
@@ -6942,9 +7380,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 993.0, 777.0, 60.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 1016.5, 765.0, 60.0, 15.0 ],
+					"patching_rect" : [ 952.0, 851.0, 60.0, 15.0 ],
 					"style" : "",
 					"text" : "RPi-C0311"
 				}
@@ -6966,9 +7402,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 1014.0, 796.0, 14.0, 14.0 ],
+					"patching_rect" : [ 1011.0, 869.0, 216.0, 14.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 1006.5, 779.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 1011.0, 869.0, 216.0, 14.0 ],
 					"varname" : "pi10421846",
 					"viewvisibility" : 1
 				}
@@ -6990,9 +7426,9 @@
 					"numinlets" : 0,
 					"numoutlets" : 0,
 					"offset" : [ 0.0, 0.0 ],
-					"patching_rect" : [ 983.0, 780.0, 14.0, 14.0 ],
+					"patching_rect" : [ 1011.0, 853.0, 216.0, 14.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 1006.5, 768.0, 14.0, 14.0 ],
+					"presentation_rect" : [ 1011.0, 853.0, 216.0, 14.0 ],
 					"varname" : "pi10421847",
 					"viewvisibility" : 1
 				}
@@ -7550,7 +7986,7 @@
 													"outlettype" : [ "" ],
 													"patching_rect" : [ 73.0, 98.5, 289.0, 62.0 ],
 													"style" : "",
-													"text" : "sprintf \\\"/usr/bin/python /Users/Aesir/Documents/watchdog/Show_Automation/show_start_stop.py --disable --reboot_nonresponsive\\\""
+													"text" : "sprintf \\\"/usr/bin/python /Users/Aesir/Documents/watchdog/Show_Automation/show_start_stop.py --disable --with_dump --reboot_nonresponsive\\\""
 												}
 
 											}
@@ -8534,7 +8970,7 @@
 													"outlettype" : [ "" ],
 													"patching_rect" : [ 280.0, 174.5, 405.0, 49.0 ],
 													"style" : "",
-													"text" : "sprintf \\\"/usr/bin/python /Users/Aesir/Documents/watchdog/Show_Automation/show_start_stop.py --start_show --disable\\\""
+													"text" : "sprintf \\\"/usr/bin/python /Users/Aesir/Documents/watchdog/Show_Automation/show_start_stop.py --start_show --with_dump --disable\\\""
 												}
 
 											}
@@ -8548,7 +8984,7 @@
 													"outlettype" : [ "" ],
 													"patching_rect" : [ 280.0, 112.5, 405.0, 49.0 ],
 													"style" : "",
-													"text" : "sprintf \\\"/usr/bin/python /Users/Aesir/Documents/watchdog/Show_Automation/show_start_stop.py --stop_show --disable\\\""
+													"text" : "sprintf \\\"/usr/bin/python /Users/Aesir/Documents/watchdog/Show_Automation/show_start_stop.py --stop_show --with_dump --disable\\\""
 												}
 
 											}
@@ -9339,7 +9775,7 @@
 									"outlettype" : [ "" ],
 									"patching_rect" : [ 96.0, 127.0, 185.0, 22.0 ],
 									"style" : "",
-									"text" : "10.42.21.18"
+									"text" : "10.42.21.41"
 								}
 
 							}
@@ -9572,7 +10008,7 @@
 									"outlettype" : [ "" ],
 									"patching_rect" : [ 96.0, 127.0, 185.0, 22.0 ],
 									"style" : "",
-									"text" : "10.42.21.18"
+									"text" : "10.42.21.41"
 								}
 
 							}
@@ -9719,7 +10155,7 @@
 							"modernui" : 1
 						}
 ,
-						"rect" : [ 88.0, 201.0, 749.0, 662.0 ],
+						"rect" : [ 158.0, 218.0, 749.0, 662.0 ],
 						"bglocked" : 0,
 						"openinpresentation" : 0,
 						"default_fontsize" : 12.0,
@@ -9754,7 +10190,7 @@
 									"numoutlets" : 0,
 									"patching_rect" : [ 25.0, 359.0, 152.0, 22.0 ],
 									"style" : "",
-									"text" : "udpsend 10.42.112.5 7778"
+									"text" : "udpsend 10.42.112.6 7778"
 								}
 
 							}
@@ -9775,7 +10211,7 @@
 											"modernui" : 1
 										}
 ,
-										"rect" : [ 83.0, 326.0, 1078.0, 557.0 ],
+										"rect" : [ 224.0, 215.0, 1078.0, 557.0 ],
 										"bglocked" : 0,
 										"openinpresentation" : 0,
 										"default_fontsize" : 12.0,
@@ -9930,7 +10366,7 @@
 													"outlettype" : [ "" ],
 													"patching_rect" : [ 273.0, 282.0, 80.0, 22.0 ],
 													"style" : "",
-													"text" : "/2LD-11 1"
+													"text" : "/2LD-38 1"
 												}
 
 											}
@@ -10041,7 +10477,7 @@
 													"outlettype" : [ "" ],
 													"patching_rect" : [ 51.0, 67.0, 132.0, 22.0 ],
 													"style" : "",
-													"text" : "/2LD-11 1"
+													"text" : "/2LD-38 1."
 												}
 
 											}
@@ -10066,7 +10502,7 @@
 													"outlettype" : [ "" ],
 													"patching_rect" : [ 395.75, 282.0, 143.0, 22.0 ],
 													"style" : "",
-													"text" : "/Panel-2LD/2LD-11 1"
+													"text" : "/Panel-2LD/2LD-38 1"
 												}
 
 											}
@@ -10122,7 +10558,7 @@
 													"outlettype" : [ "" ],
 													"patching_rect" : [ 81.666672, 277.0, 91.0, 22.0 ],
 													"style" : "",
-													"text" : "/relay 15 1"
+													"text" : "/relay 0 1"
 												}
 
 											}
@@ -10191,7 +10627,7 @@
 													"outlettype" : [ "" ],
 													"patching_rect" : [ 208.0, 128.0, 50.0, 22.0 ],
 													"style" : "",
-													"text" : "15 1"
+													"text" : "0 1"
 												}
 
 											}
@@ -10542,7 +10978,7 @@
 													"outlettype" : [ "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "" ],
 													"patching_rect" : [ 273.0, 374.0, 768.4375, 35.0 ],
 													"style" : "",
-													"text" : "route /2LD-2 /2LD-4 /2LD-6 /2LD-7 /2LD-8 /2LD-9 /2LD-10 /2LD-11 /2LD-12 /2LD-13 /2LD-14 /2LD-15 /2LD16 /2LD-17 /2LD-18 /2LD-19 /2LD-20 /2LD-21 /2LD-29 /2LD-36 /2LD-38"
+													"text" : "route /2LD-2 /2LD-4 /2LD-6 /2LD-7 /2LD-8 /2LD-9 /2LD-10 /2LD-11 /2LD-12 /2LD-13 /2LD-14 /2LD-15 /2LD-16 /2LD-17 /2LD-18 /2LD-19 /2LD-20 /2LD-21 /2LD-29 /2LD-36 /2LD-38"
 												}
 
 											}
@@ -11031,7 +11467,7 @@
  ]
 									}
 ,
-									"patching_rect" : [ 157.666672, 272.0, 114.0, 22.0 ],
+									"patching_rect" : [ 184.0, 272.0, 114.0, 22.0 ],
 									"saved_object_attributes" : 									{
 										"description" : "",
 										"digest" : "",
@@ -11062,7 +11498,7 @@
 											"modernui" : 1
 										}
 ,
-										"rect" : [ 50.0, 341.0, 908.0, 557.0 ],
+										"rect" : [ 319.0, 189.0, 958.0, 559.0 ],
 										"bglocked" : 0,
 										"openinpresentation" : 0,
 										"default_fontsize" : 12.0,
@@ -11090,6 +11526,32 @@
 										"style" : "",
 										"subpatcher_template" : "",
 										"boxes" : [ 											{
+												"box" : 												{
+													"id" : "obj-27",
+													"maxclass" : "message",
+													"numinlets" : 2,
+													"numoutlets" : 1,
+													"outlettype" : [ "" ],
+													"patching_rect" : [ 359.0, 114.0, 50.0, 22.0 ],
+													"style" : "",
+													"text" : "0"
+												}
+
+											}
+, 											{
+												"box" : 												{
+													"id" : "obj-25",
+													"maxclass" : "message",
+													"numinlets" : 2,
+													"numoutlets" : 1,
+													"outlettype" : [ "" ],
+													"patching_rect" : [ 651.3125, 294.0, 94.0, 22.0 ],
+													"style" : "",
+													"text" : "/2LC/status 11"
+												}
+
+											}
+, 											{
 												"box" : 												{
 													"id" : "obj-1",
 													"maxclass" : "newobj",
@@ -11134,7 +11596,7 @@
 													"numinlets" : 1,
 													"numoutlets" : 1,
 													"outlettype" : [ "" ],
-													"patching_rect" : [ 765.3125, 241.0, 109.0, 22.0 ],
+													"patching_rect" : [ 765.3125, 241.0, 136.0, 22.0 ],
 													"style" : "",
 													"text" : "sprintf /status %i"
 												}
@@ -11217,7 +11679,7 @@
 													"outlettype" : [ "" ],
 													"patching_rect" : [ 273.0, 295.0, 82.0, 22.0 ],
 													"style" : "",
-													"text" : "/2LC-17 1"
+													"text" : "/2LC-22 1"
 												}
 
 											}
@@ -11230,7 +11692,7 @@
 													"outlettype" : [ "" ],
 													"patching_rect" : [ 45.0, 67.0, 118.0, 22.0 ],
 													"style" : "",
-													"text" : "/2LC-17 1."
+													"text" : "/2LC-22 1."
 												}
 
 											}
@@ -11255,7 +11717,7 @@
 													"outlettype" : [ "" ],
 													"patching_rect" : [ 380.0625, 295.0, 148.0, 22.0 ],
 													"style" : "",
-													"text" : "/Panel-2LC/2LC-17 1"
+													"text" : "/Panel-2LC/2LC-22 1"
 												}
 
 											}
@@ -11311,7 +11773,7 @@
 													"outlettype" : [ "" ],
 													"patching_rect" : [ 63.666668, 280.0, 91.0, 22.0 ],
 													"style" : "",
-													"text" : "/relay 20 1"
+													"text" : "/relay 11 1"
 												}
 
 											}
@@ -11380,7 +11842,7 @@
 													"outlettype" : [ "" ],
 													"patching_rect" : [ 202.0, 128.0, 50.0, 22.0 ],
 													"style" : "",
-													"text" : "20 1"
+													"text" : "11 1"
 												}
 
 											}
@@ -11415,11 +11877,11 @@
 													"id" : "obj-57",
 													"maxclass" : "newobj",
 													"numinlets" : 1,
-													"numoutlets" : 4,
-													"outlettype" : [ "", "", "", "" ],
-													"patching_rect" : [ 273.0, 67.0, 286.0, 22.0 ],
+													"numoutlets" : 5,
+													"outlettype" : [ "", "", "", "", "" ],
+													"patching_rect" : [ 273.0, 67.0, 354.0, 22.0 ],
 													"style" : "",
-													"text" : "OSC-route /reply /temperatureSensor /powerFailure"
+													"text" : "OSC-route /reply /status /temperatureSensor /powerFailure"
 												}
 
 											}
@@ -11929,6 +12391,15 @@
 											}
 , 											{
 												"patchline" : 												{
+													"destination" : [ "obj-25", 1 ],
+													"disabled" : 0,
+													"hidden" : 0,
+													"source" : [ "obj-45", 0 ]
+												}
+
+											}
+, 											{
+												"patchline" : 												{
 													"destination" : [ "obj-42", 0 ],
 													"disabled" : 0,
 													"hidden" : 0,
@@ -11965,7 +12436,7 @@
 											}
 , 											{
 												"patchline" : 												{
-													"destination" : [ "obj-59", 1 ],
+													"destination" : [ "obj-27", 1 ],
 													"disabled" : 0,
 													"hidden" : 0,
 													"source" : [ "obj-57", 1 ]
@@ -11974,10 +12445,19 @@
 											}
 , 											{
 												"patchline" : 												{
-													"destination" : [ "obj-61", 1 ],
+													"destination" : [ "obj-59", 1 ],
 													"disabled" : 0,
 													"hidden" : 0,
 													"source" : [ "obj-57", 2 ]
+												}
+
+											}
+, 											{
+												"patchline" : 												{
+													"destination" : [ "obj-61", 1 ],
+													"disabled" : 0,
+													"hidden" : 0,
+													"source" : [ "obj-57", 3 ]
 												}
 
 											}
@@ -12133,7 +12613,7 @@
 									"outlettype" : [ "" ],
 									"patching_rect" : [ 320.0, 91.0, 300.0, 22.0 ],
 									"style" : "",
-									"text" : "/2LD/powerFailure \"power supply YELLOW\""
+									"text" : "/2LC/powerFailure \"power supply YELLOW\""
 								}
 
 							}
@@ -12180,7 +12660,7 @@
 											"modernui" : 1
 										}
 ,
-										"rect" : [ 68.0, 345.0, 897.0, 536.0 ],
+										"rect" : [ 682.0, 260.0, 897.0, 536.0 ],
 										"bglocked" : 0,
 										"openinpresentation" : 0,
 										"default_fontsize" : 12.0,
@@ -12227,7 +12707,8 @@
 													"numoutlets" : 1,
 													"outlettype" : [ "" ],
 													"patching_rect" : [ 273.0, 293.0, 80.0, 22.0 ],
-													"style" : ""
+													"style" : "",
+													"text" : "/2LB-8 1"
 												}
 
 											}
@@ -12253,7 +12734,7 @@
 													"outlettype" : [ "" ],
 													"patching_rect" : [ 44.166668, 67.0, 148.0, 22.0 ],
 													"style" : "",
-													"text" : "/2LB-13 1."
+													"text" : "/2LB-8 1."
 												}
 
 											}
@@ -12277,7 +12758,8 @@
 													"numoutlets" : 1,
 													"outlettype" : [ "" ],
 													"patching_rect" : [ 380.0625, 293.0, 139.0, 22.0 ],
-													"style" : ""
+													"style" : "",
+													"text" : "/Panel-2LB/2LB-8 1"
 												}
 
 											}
@@ -12333,7 +12815,7 @@
 													"outlettype" : [ "" ],
 													"patching_rect" : [ 63.666668, 280.0, 91.0, 22.0 ],
 													"style" : "",
-													"text" : "/relay 18 1"
+													"text" : "/relay 9 1"
 												}
 
 											}
@@ -12401,7 +12883,8 @@
 													"numoutlets" : 1,
 													"outlettype" : [ "" ],
 													"patching_rect" : [ 353.0, 114.0, 50.0, 22.0 ],
-													"style" : ""
+													"style" : "",
+													"text" : "9 1"
 												}
 
 											}
@@ -12412,8 +12895,9 @@
 													"numinlets" : 2,
 													"numoutlets" : 1,
 													"outlettype" : [ "" ],
-													"patching_rect" : [ 485.0, 114.0, 50.0, 22.0 ],
-													"style" : ""
+													"patching_rect" : [ 485.0, 114.0, 142.0, 22.0 ],
+													"style" : "",
+													"text" : "\"power supply BLUE\""
 												}
 
 											}
@@ -12425,7 +12909,8 @@
 													"numoutlets" : 1,
 													"outlettype" : [ "" ],
 													"patching_rect" : [ 421.0, 114.0, 50.0, 22.0 ],
-													"style" : ""
+													"style" : "",
+													"text" : "0"
 												}
 
 											}
@@ -13089,7 +13574,7 @@
 									"outlettype" : [ "" ],
 									"patching_rect" : [ 200.0, 126.0, 82.0, 22.0 ],
 									"style" : "",
-									"text" : "/2LD-2 1."
+									"text" : "/2LD-38 1."
 								}
 
 							}
@@ -13102,7 +13587,7 @@
 									"outlettype" : [ "" ],
 									"patching_rect" : [ 111.0, 126.0, 82.0, 22.0 ],
 									"style" : "",
-									"text" : "/2LC-15 1."
+									"text" : "/2LC-22 1."
 								}
 
 							}
@@ -13115,7 +13600,7 @@
 									"outlettype" : [ "" ],
 									"patching_rect" : [ 25.0, 126.0, 79.0, 22.0 ],
 									"style" : "",
-									"text" : "/2LB-13 1."
+									"text" : "/2LB-8 1."
 								}
 
 							}
@@ -13126,7 +13611,7 @@
 									"numinlets" : 1,
 									"numoutlets" : 4,
 									"outlettype" : [ "", "", "", "" ],
-									"patching_rect" : [ 25.0, 91.0, 257.0, 22.0 ],
+									"patching_rect" : [ 25.000002, 91.0, 257.0, 22.0 ],
 									"style" : "",
 									"text" : "OSC-route /Panel-2LB /Panel-2LC /Panel-2LD"
 								}
@@ -13141,7 +13626,7 @@
 									"outlettype" : [ "" ],
 									"patching_rect" : [ 38.5, 55.0, 159.0, 22.0 ],
 									"style" : "",
-									"text" : "/Panel-2LD/2LD-15 1."
+									"text" : "/Panel-2LD/2LD-38 1."
 								}
 
 							}
@@ -18375,7 +18860,7 @@
 									"outlettype" : [ "" ],
 									"patching_rect" : [ 115.0, 157.0, 185.0, 22.0 ],
 									"style" : "",
-									"text" : "10.42.21.18"
+									"text" : "10.42.21.41"
 								}
 
 							}
@@ -18862,7 +19347,7 @@
 					"presentation" : 1,
 					"presentation_rect" : [ 25.0, 1795.0, 1086.0, 22.0 ],
 					"style" : "",
-					"text" : "selected device: 10.42.21.18"
+					"text" : "selected device: 10.42.21.41"
 				}
 
 			}
@@ -20317,7 +20802,7 @@
 					"presentation" : 1,
 					"presentation_rect" : [ 333.0, 1029.0, 401.0, 29.0 ],
 					"style" : "",
-					"text" : "SYSTEM INFO: 286 total devices, 190 OK (66%)",
+					"text" : "SYSTEM INFO: 266 total devices, 215 OK (80%)",
 					"textcolor" : [ 0.0, 0.0, 0.0, 1.0 ]
 				}
 
@@ -20341,8 +20826,8 @@
 				"box" : 				{
 					"border" : 0,
 					"bordercolor" : [ 0.0, 0.0, 0.0, 1.0 ],
-					"celldef" : [ [ 0, 0, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 1, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 2, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 3, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 4, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 5, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 6, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 7, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.498039, 0.498039, 0.498039, 1.0, 0, -1, -1 ], [ 0, 8, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 9, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 10, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 11, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 12, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 13, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 14, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 15, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 16, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 17, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 18, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 19, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 20, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 21, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 22, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 23, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 24, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 25, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 26, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 27, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 28, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 29, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 30, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 31, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 32, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 33, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 34, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.498039, 0.498039, 0.498039, 1.0, 0, -1, -1 ], [ 0, 35, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 36, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 37, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 38, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 39, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 40, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 41, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 42, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 43, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 44, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 45, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 46, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 47, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 48, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 49, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 50, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 51, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 52, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 53, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 54, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 55, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 56, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 57, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 58, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 59, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 60, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 61, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 62, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 63, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 64, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 65, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 66, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 67, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 68, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 69, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 70, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 71, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 72, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 73, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 74, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.498039, 0.498039, 0.498039, 1.0, 0, -1, -1 ], [ 0, 75, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 76, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.498039, 0.498039, 0.498039, 1.0, 0, -1, -1 ], [ 0, 77, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 78, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 79, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 80, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 81, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 82, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 83, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 84, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 85, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 86, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 87, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 88, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 89, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 90, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 91, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 92, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 93, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 94, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 95, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 96, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 97, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 98, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 99, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 2, 0, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.301961, 0.301961, 0.301961, 1.0, -1, -1, -1 ], [ 2, 1, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 2, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 3, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 4, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 5, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 6, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 7, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 8, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 9, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 10, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 11, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 12, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 13, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 14, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 15, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 16, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 17, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 18, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 19, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 4, 0, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 1, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 2, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 3, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 4, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 5, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 6, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 7, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 8, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 9, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 10, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 11, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 12, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 13, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 14, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 15, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 16, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 17, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 18, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 19, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 20, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 21, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 22, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 23, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 24, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 25, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 26, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 27, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 28, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 29, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 30, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 31, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 32, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 33, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 34, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 35, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 36, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 37, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 38, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 39, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 40, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 41, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 42, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 43, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 44, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 45, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 46, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 47, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 48, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 49, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 50, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 51, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 52, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 53, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 54, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 55, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 56, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 57, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 58, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 59, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 60, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 61, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 62, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 63, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 64, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 65, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 66, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 67, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 68, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 69, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 70, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 71, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 72, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 73, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 74, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 75, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 76, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 77, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 78, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 79, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 80, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 81, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 82, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 83, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 84, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 85, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 86, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 87, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 88, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 89, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 90, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 91, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 92, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 93, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 94, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 95, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 96, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 97, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 98, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 99, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ] ],
-					"cellmap" : [ [ 5, 1, "Arduino", "Mega2650" ], [ 5, 2, "Arduino", "Uno" ], [ 5, 3, "Arduino", "Uno" ], [ 5, 4, "Arduino", "Uno" ], [ 5, 5, "Arduino", "Uno" ], [ 5, 6, "Arduino", "Uno" ], [ 5, 7, "Windows", "PC", "-", "ian's", "build" ], [ 5, 8, "Software" ], [ 5, 9, "Raspberry", "Pi" ], [ 5, 10, "Software" ], [ 5, 11, "Software" ], [ 5, 12, "Raspberry", "Pi" ], [ 5, 13, "Software" ], [ 5, 14, "Software" ], [ 5, 15, "Software" ], [ 5, 16, "Software" ], [ 5, 17, "Raspberry", "Pi" ], [ 5, 18, 0 ], [ 5, 19, "Software" ], [ 5, 20, "Software" ], [ 5, 21, 0 ], [ 5, 22, "Raspberry", "Pi" ], [ 5, 23, "Software" ], [ 5, 24, "Raspberry", "Pi" ], [ 5, 25, "Software" ], [ 5, 26, "Software" ], [ 5, 27, "Raspberry", "Pi" ], [ 5, 28, "Software" ], [ 5, 29, "Software" ], [ 5, 30, "Raspberry", "Pi" ], [ 5, 31, "Software" ], [ 5, 32, "Raspberry", "Pi" ], [ 5, 33, "Software" ], [ 5, 34, "Windows", "PC", "-", "Media", "Server" ], [ 5, 35, "Software" ], [ 5, 36, "Raspberry", "Pi" ], [ 5, 37, "Software" ], [ 5, 38, "Software" ], [ 5, 39, "Software" ], [ 5, 40, "Software" ], [ 5, 41, "Raspberry", "Pi" ], [ 5, 42, "Software" ], [ 5, 43, "Software" ], [ 5, 44, "Software" ], [ 5, 45, "Software" ], [ 5, 46, "Raspberry", "Pi" ], [ 5, 47, "Software" ], [ 5, 48, "Software" ], [ 5, 49, "Software" ], [ 5, 50, "Software" ], [ 5, 51, "Raspberry", "Pi" ], [ 5, 52, "Software" ], [ 5, 53, "Software" ], [ 5, 54, "Software" ], [ 5, 55, "Software" ], [ 5, 56, "Raspberry", "Pi" ], [ 5, 57, "Software" ], [ 5, 58, "Software" ], [ 5, 59, "Raspberry", "Pi" ], [ 5, 60, "Software" ], [ 5, 61, "Raspberry", "Pi" ], [ 5, 62, "Software" ], [ 5, 63, "Software" ], [ 5, 64, "Raspberry", "Pi" ], [ 5, 65, "Software" ], [ 5, 66, "Software" ], [ 5, 67, "Software" ], [ 5, 68, "Software" ], [ 5, 69, "Arduino", "Uno" ], [ 5, 70, "Arduino", "Uno" ], [ 5, 71, "Arduino", "Uno" ], [ 5, 72, "Arduino", "Uno" ], [ 5, 73, "Arduino", "Uno" ], [ 5, 74, "Windows", "PC", "-", "Media", "Server" ], [ 5, 75, "Software" ], [ 5, 76, "Windows", "PC", "-", "Media", "Server" ], [ 5, 77, "Software" ], [ 5, 78, "Raspberry", "Pi" ], [ 5, 79, "Software" ], [ 5, 80, "Software" ], [ 5, 0, "type" ], [ 5, 81, "Raspberry", "Pi" ], [ 5, 82, "Software" ], [ 5, 83, "Software" ], [ 5, 84, "Placeholder" ], [ 5, 85, "Software" ], [ 5, 86, "Raspberry", "Pi" ], [ 5, 87, "Software" ], [ 5, 88, "Raspberry", "Pi" ], [ 5, 89, "Software" ], [ 5, 90, "Software" ], [ 5, 91, "Software" ], [ 5, 92, "Arduino", "Uno" ], [ 5, 93, "Arduino", "Uno" ], [ 5, 94, "Arduino", "Uno" ], [ 5, 95, "Arduino", "Uno" ], [ 5, 96, "Arduino", "Uno" ], [ 5, 97, "Arduino", "Uno" ], [ 5, 98, "Arduino", "Uno" ], [ 5, 99, "Mac", "Pro" ], [ 6, 1, "Feb", 14, ",", 2016, "20:01:54" ], [ 6, 2, "Feb", 28, ",", 2016, "04:08:45" ], [ 6, 3, "Mar", 11, ",", 2016, "12:19:28" ], [ 6, 4, "Mar", 1, ",", 2016, "04:21:10" ], [ 6, 5, "Feb", 28, ",", 2016, "03:53:25" ], [ 6, 6, 0 ], [ 6, 7, "Jan", 20, ",", 2016, "16:22:19" ], [ 6, 8, "Jan", 20, ",", 2016, "16:22:19" ], [ 6, 9, "Mar", 11, ",", 2016, "18:21:00" ], [ 6, 10, "Mar", 11, ",", 2016, "18:21:00" ], [ 6, 11, "Mar", 11, ",", 2016, "18:21:00" ], [ 6, 12, "Mar", 14, ",", 2016, "01:08:25" ], [ 6, 13, "Mar", 14, ",", 2016, "01:08:25" ], [ 6, 14, "Mar", 14, ",", 2016, "01:08:25" ], [ 6, 15, "Mar", 14, ",", 2016, "01:08:25" ], [ 6, 16, "Mar", 14, ",", 2016, "01:08:25" ], [ 6, 17, "Feb", 17, ",", 2016, "12:05:16" ], [ 6, 18, "Mar", 11, ",", 2016, "18:21:03" ], [ 6, 19, "Mar", 11, ",", 2016, "18:21:03" ], [ 6, 20, "Mar", 11, ",", 2016, "18:21:03" ], [ 6, 21, "Feb", 17, ",", 2016, "12:05:16" ], [ 6, 22, "Mar", 11, ",", 2016, "18:21:02" ], [ 6, 23, "Mar", 11, ",", 2016, "18:21:02" ], [ 6, 24, "Mar", 13, ",", 2016, "21:55:38" ], [ 6, 25, "Mar", 13, ",", 2016, "21:55:38" ], [ 6, 26, "Mar", 13, ",", 2016, "21:55:38" ], [ 6, 27, "Mar", 14, ",", 2016, "00:27:02" ], [ 6, 28, "Mar", 14, ",", 2016, "00:27:03" ], [ 6, 29, "Mar", 14, ",", 2016, "00:27:03" ], [ 6, 30, "Mar", 14, ",", 2016, "20:09:34" ], [ 6, 31, "Mar", 14, ",", 2016, "20:09:34" ], [ 6, 32, "Mar", 13, ",", 2016, "17:52:23" ], [ 6, 33, "Mar", 14, ",", 2016, "20:10:31" ], [ 6, 34, "Mar", 11, ",", 2016, "18:45:26" ], [ 6, 35, "Feb", 25, ",", 2016, "15:17:10" ], [ 6, 36, "Mar", 14, ",", 2016, "20:36:07" ], [ 6, 37, "Mar", 14, ",", 2016, "20:36:07" ], [ 6, 38, "Mar", 14, ",", 2016, "20:36:07" ], [ 6, 39, "Mar", 14, ",", 2016, "20:36:07" ], [ 6, 40, "Mar", 14, ",", 2016, "20:36:07" ], [ 6, 41, "Mar", 11, ",", 2016, "18:21:03" ], [ 6, 42, "Mar", 11, ",", 2016, "18:21:03" ], [ 6, 43, "Mar", 11, ",", 2016, "18:21:03" ], [ 6, 44, "Mar", 11, ",", 2016, "18:21:03" ], [ 6, 45, "Mar", 11, ",", 2016, "18:21:03" ], [ 6, 46, "Mar", 11, ",", 2016, "18:21:03" ], [ 6, 47, "Mar", 11, ",", 2016, "18:21:03" ], [ 6, 48, "Mar", 11, ",", 2016, "18:21:03" ], [ 6, 49, "Mar", 11, ",", 2016, "18:21:04" ], [ 6, 50, "Mar", 11, ",", 2016, "18:21:04" ], [ 6, 51, "Mar", 12, ",", 2016, "12:59:17" ], [ 6, 52, "Mar", 12, ",", 2016, "12:59:17" ], [ 6, 53, "Mar", 12, ",", 2016, "12:59:17" ], [ 6, 54, "Mar", 12, ",", 2016, "12:59:17" ], [ 6, 55, "Mar", 12, ",", 2016, "12:59:17" ], [ 6, 56, "Mar", 11, ",", 2016, "18:21:05" ], [ 6, 57, "Mar", 11, ",", 2016, "18:21:05" ], [ 6, 58, "Mar", 11, ",", 2016, "18:21:05" ], [ 6, 59, "Mar", 11, ",", 2016, "18:21:06" ], [ 6, 60, "Mar", 11, ",", 2016, "18:21:06" ], [ 6, 61, "Mar", 14, ",", 2016, "12:48:20" ], [ 6, 62, "Mar", 14, ",", 2016, "12:48:20" ], [ 6, 63, "Mar", 14, ",", 2016, "12:48:20" ], [ 6, 64, "Mar", 14, ",", 2016, "01:12:46" ], [ 6, 65, "Mar", 14, ",", 2016, "01:12:46" ], [ 6, 66, "Mar", 14, ",", 2016, "01:12:46" ], [ 6, 67, "Mar", 14, ",", 2016, "01:12:46" ], [ 6, 68, "Mar", 14, ",", 2016, "01:12:46" ], [ 6, 69, "Mar", 11, ",", 2016, "17:49:58" ], [ 6, 70, "Feb", 17, ",", 2016, "17:32:25" ], [ 6, 71, "Feb", 13, ",", 2016, "21:12:12" ], [ 6, 72, "Feb", 17, ",", 2016, "20:03:23" ], [ 6, 73, "Feb", 15, ",", 2016, "14:18:56" ], [ 6, 74, "Mar", 11, ",", 2016, "22:07:21" ], [ 6, 75, "Mar", 11, ",", 2016, "22:07:21" ], [ 6, 76, "Feb", 9, ",", 2016, "17:40:51" ], [ 6, 77, "Feb", 9, ",", 2016, "17:40:51" ], [ 6, 78, "Mar", 14, ",", 2016, "06:01:12" ], [ 6, 79, "Mar", 14, ",", 2016, "06:01:12" ], [ 6, 80, "Mar", 14, ",", 2016, "06:01:12" ], [ 6, 0, "last", "reset" ], [ 6, 81, "Mar", 14, ",", 2016, "16:47:45" ], [ 6, 82, "Mar", 14, ",", 2016, "16:47:45" ], [ 6, 83, "Mar", 14, ",", 2016, "16:47:45" ], [ 6, 84, "Mar", 4, ",", 2016, "16:02:38" ], [ 6, 85, "Mar", 4, ",", 2016, "16:02:38" ], [ 6, 86, "Mar", 14, ",", 2016, "06:01:13" ], [ 6, 87, "Mar", 14, ",", 2016, "06:01:13" ], [ 6, 88, "Mar", 14, ",", 2016, "17:30:33" ], [ 6, 89, "Mar", 14, ",", 2016, "17:30:33" ], [ 6, 90, "Mar", 14, ",", 2016, "17:30:33" ], [ 6, 91, "Mar", 14, ",", 2016, "17:30:33" ], [ 6, 92, "Feb", 14, ",", 2016, "12:24:27" ], [ 6, 93, "Feb", 16, ",", 2016, "16:55:02" ], [ 6, 94, "Feb", 22, ",", 2016, "11:49:34" ], [ 6, 95, "Mar", 11, ",", 2016, "17:50:07" ], [ 6, 96, "Feb", 17, ",", 2016, "12:16:51" ], [ 6, 97, "Mar", 14, ",", 2016, "00:46:16" ], [ 6, 98, "Feb", 17, ",", 2016, "12:16:35" ], [ 6, 99, "Mar", 14, ",", 2016, "08:50:08" ], [ 4, 1, "NONRESPONSIVE" ], [ 4, 2, "NONRESPONSIVE" ], [ 4, 3, "NONRESPONSIVE" ], [ 4, 4, "NONRESPONSIVE" ], [ 4, 5, "OKAY" ], [ 4, 6, "NONRESPONSIVE" ], [ 4, 7, "NONRESPONSIVE" ], [ 4, 8, "NONRESPONSIVE" ], [ 4, 9, "OKAY" ], [ 4, 10, "OKAY" ], [ 4, 11, "OKAY" ], [ 4, 12, "OKAY" ], [ 4, 13, "OKAY" ], [ 4, 14, "OKAY" ], [ 4, 15, "OKAY" ], [ 4, 16, "NONRESPONSIVE" ], [ 4, 17, "OKAY" ], [ 4, 18, "OKAY" ], [ 4, 19, "OKAY" ], [ 4, 20, "NONRESPONSIVE" ], [ 4, 21, "NONRESPONSIVE" ], [ 4, 22, "OKAY" ], [ 4, 23, "OKAY" ], [ 4, 24, "OKAY" ], [ 4, 25, "NONRESPONSIVE" ], [ 4, 26, "NONRESPONSIVE" ], [ 4, 27, "OKAY" ], [ 4, 28, "OKAY" ], [ 4, 29, "OKAY" ], [ 4, 30, "OKAY" ], [ 4, 31, "OKAY" ], [ 4, 32, "OKAY" ], [ 4, 33, "OKAY" ], [ 4, 34, "OKAY" ], [ 4, 35, "NONRESPONSIVE" ], [ 4, 36, "OKAY" ], [ 4, 37, "OKAY" ], [ 4, 38, "OKAY" ], [ 4, 39, "OKAY" ], [ 4, 40, "OKAY" ], [ 4, 41, "OKAY" ], [ 4, 42, "OKAY" ], [ 4, 43, "OKAY" ], [ 4, 44, "NONRESPONSIVE" ], [ 4, 45, "NONRESPONSIVE" ], [ 4, 46, "OKAY" ], [ 4, 47, "OKAY" ], [ 4, 48, "OKAY" ], [ 4, 49, "OKAY" ], [ 4, 50, "OKAY" ], [ 4, 51, "OKAY" ], [ 4, 52, "OKAY" ], [ 4, 53, "OKAY" ], [ 4, 54, "NONRESPONSIVE" ], [ 4, 55, "NONRESPONSIVE" ], [ 4, 56, "OKAY" ], [ 4, 57, "OKAY" ], [ 4, 58, "OKAY" ], [ 4, 59, "OKAY" ], [ 4, 60, "OKAY" ], [ 4, 61, "OKAY" ], [ 4, 62, "OKAY" ], [ 4, 63, "OKAY" ], [ 4, 64, "OKAY" ], [ 4, 65, "OKAY" ], [ 4, 66, "NONRESPONSIVE" ], [ 4, 67, "NONRESPONSIVE" ], [ 4, 68, "NONRESPONSIVE" ], [ 4, 69, "OKAY" ], [ 4, 70, "NONRESPONSIVE" ], [ 4, 71, "NONRESPONSIVE" ], [ 4, 72, "NONRESPONSIVE" ], [ 4, 73, "NONRESPONSIVE" ], [ 4, 74, "OKAY" ], [ 4, 75, "OKAY" ], [ 4, 76, "NONRESPONSIVE" ], [ 4, 77, "NONRESPONSIVE" ], [ 4, 78, "OKAY" ], [ 4, 79, "OKAY" ], [ 4, 80, "OKAY" ], [ 4, 0, "status" ], [ 4, 81, "OKAY" ], [ 4, 82, "OKAY" ], [ 4, 83, "OKAY" ], [ 4, 84, "NONRESPONSIVE" ], [ 4, 85, "NONRESPONSIVE" ], [ 4, 86, "OKAY" ], [ 4, 87, "OKAY" ], [ 4, 88, "OKAY" ], [ 4, 89, "OKAY" ], [ 4, 90, "NONRESPONSIVE" ], [ 4, 91, "NONRESPONSIVE" ], [ 4, 92, "NONRESPONSIVE" ], [ 4, 93, "NONRESPONSIVE" ], [ 4, 94, "NONRESPONSIVE" ], [ 4, 95, "OKAY" ], [ 4, 96, "NONRESPONSIVE" ], [ 4, 97, "OKAY" ], [ 4, 98, "NONRESPONSIVE" ], [ 4, 99, "OKAY" ], [ 3, 1, 676260 ], [ 3, 2, 122592 ], [ 3, 3, 87240 ], [ 3, 4, 107232 ], [ 3, 5, 1353192 ], [ 3, 6, 60 ], [ 3, 7, 1648591 ], [ 3, 8, 1648574 ], [ 3, 9, 264647 ], [ 3, 10, 264622 ], [ 3, 11, 264622 ], [ 3, 12, 71053 ], [ 3, 13, 70970 ], [ 3, 14, 70970 ], [ 3, 15, 70970 ], [ 3, 16, 70970 ], [ 3, 17, 264691 ], [ 3, 18, 264683 ], [ 3, 19, 264682 ], [ 3, 20, 264682 ], [ 3, 21, 108829 ], [ 3, 22, 264644 ], [ 3, 23, 264685 ], [ 3, 24, 82517 ], [ 3, 25, 82621 ], [ 3, 26, 82621 ], [ 3, 27, 73515 ], [ 3, 28, 73519 ], [ 3, 29, 73519 ], [ 3, 30, 2581 ], [ 3, 31, 2569 ], [ 3, 32, 2520 ], [ 3, 33, 2524 ], [ 3, 34, 266780 ], [ 3, 35, 957169 ], [ 3, 36, 901 ], [ 3, 37, 906 ], [ 3, 38, 906 ], [ 3, 39, 906 ], [ 3, 40, 906 ], [ 3, 41, 264694 ], [ 3, 42, 264680 ], [ 3, 43, 264680 ], [ 3, 44, 264680 ], [ 3, 45, 264680 ], [ 3, 46, 264643 ], [ 3, 47, 264619 ], [ 3, 48, 264619 ], [ 3, 49, 264619 ], [ 3, 50, 264619 ], [ 3, 51, 197500 ], [ 3, 52, 197521 ], [ 3, 53, 197521 ], [ 3, 54, 197521 ], [ 3, 55, 197521 ], [ 3, 56, 264601 ], [ 3, 57, 264672 ], [ 3, 58, 264672 ], [ 3, 59, 264681 ], [ 3, 60, 264692 ], [ 3, 61, 29007 ], [ 3, 62, 29032 ], [ 3, 63, 29033 ], [ 3, 64, 70694 ], [ 3, 65, 70767 ], [ 3, 66, 70767 ], [ 3, 67, 70767 ], [ 3, 68, 70767 ], [ 3, 69, 266580 ], [ 3, 70, 180 ], [ 3, 71, 360 ], [ 3, 72, 2220 ], [ 3, 73, 112920 ], [ 3, 74, 251070 ], [ 3, 75, 251037 ], [ 3, 76, 136402 ], [ 3, 77, 7942 ], [ 3, 78, 53473 ], [ 3, 79, 53482 ], [ 3, 80, 53482 ], [ 3, 0, "uptime" ], [ 3, 81, 14643 ], [ 3, 82, 14618 ], [ 3, 83, 14618 ], [ 3, 84, 6783 ], [ 3, 85, 6808 ], [ 3, 86, 53467 ], [ 3, 87, 53405 ], [ 3, 88, 12124 ], [ 3, 89, 12109 ], [ 3, 90, 12109 ], [ 3, 91, 12109 ], [ 3, 92, 60 ], [ 3, 93, 498900 ], [ 3, 94, 60 ], [ 3, 95, 266280 ], [ 3, 96, 29400 ], [ 3, 97, 46140 ], [ 3, 98, 29460 ], [ 3, 99, 8284 ], [ 2, 1, "Mar", 14, ",", 2016, "20:50:34" ], [ 2, 2, "Mar", 14, ",", 2016, "20:50:34" ], [ 2, 3, "Mar", 14, ",", 2016, "20:50:34" ], [ 2, 4, "Mar", 14, ",", 2016, "20:50:35" ], [ 2, 5, "Mar", 14, ",", 2016, "20:51:04" ], [ 2, 6, "Mar", 14, ",", 2016, "20:50:35" ], [ 2, 7, "Mar", 14, ",", 2016, "20:50:35" ], [ 2, 8, "Mar", 14, ",", 2016, "20:50:34" ], [ 2, 9, "Mar", 14, ",", 2016, "20:51:47" ], [ 2, 10, "Mar", 14, ",", 2016, "20:51:22" ], [ 2, 11, "Mar", 14, ",", 2016, "20:51:22" ], [ 2, 12, "Mar", 14, ",", 2016, "20:52:39" ], [ 2, 13, "Mar", 14, ",", 2016, "20:51:15" ], [ 2, 14, "Mar", 14, ",", 2016, "20:51:15" ], [ 2, 15, "Mar", 14, ",", 2016, "20:51:15" ], [ 2, 16, "Mar", 14, ",", 2016, "20:51:15" ], [ 2, 17, "Mar", 14, ",", 2016, "20:52:34" ], [ 2, 18, "Mar", 14, ",", 2016, "20:52:26" ], [ 2, 19, "Mar", 14, ",", 2016, "20:52:25" ], [ 2, 20, "Mar", 14, ",", 2016, "20:52:25" ], [ 2, 21, "Mar", 14, ",", 2016, "20:50:34" ], [ 2, 22, "Mar", 14, ",", 2016, "20:51:45" ], [ 2, 23, "Mar", 14, ",", 2016, "20:52:26" ], [ 2, 24, "Mar", 14, ",", 2016, "20:50:55" ], [ 2, 25, "Mar", 14, ",", 2016, "20:52:39" ], [ 2, 26, "Mar", 14, ",", 2016, "20:52:39" ], [ 2, 27, "Mar", 14, ",", 2016, "20:52:18" ], [ 2, 28, "Mar", 14, ",", 2016, "20:52:22" ], [ 2, 29, "Mar", 14, ",", 2016, "20:52:22" ], [ 2, 30, "Mar", 14, ",", 2016, "20:52:34" ], [ 2, 31, "Mar", 14, ",", 2016, "20:52:22" ], [ 2, 32, "Mar", 14, ",", 2016, "20:52:31" ], [ 2, 33, "Mar", 14, ",", 2016, "20:52:34" ], [ 2, 34, "Mar", 14, ",", 2016, "20:51:46" ], [ 2, 35, "Mar", 14, ",", 2016, "20:50:35" ], [ 2, 36, "Mar", 14, ",", 2016, "20:51:08" ], [ 2, 37, "Mar", 14, ",", 2016, "20:51:13" ], [ 2, 38, "Mar", 14, ",", 2016, "20:51:13" ], [ 2, 39, "Mar", 14, ",", 2016, "20:51:13" ], [ 2, 40, "Mar", 14, ",", 2016, "20:51:13" ], [ 2, 41, "Mar", 14, ",", 2016, "20:52:37" ], [ 2, 42, "Mar", 14, ",", 2016, "20:52:24" ], [ 2, 43, "Mar", 14, ",", 2016, "20:52:24" ], [ 2, 44, "Mar", 14, ",", 2016, "20:52:24" ], [ 2, 45, "Mar", 14, ",", 2016, "20:52:24" ], [ 2, 46, "Mar", 14, ",", 2016, "20:51:47" ], [ 2, 47, "Mar", 14, ",", 2016, "20:51:23" ], [ 2, 48, "Mar", 14, ",", 2016, "20:51:23" ], [ 2, 49, "Mar", 14, ",", 2016, "20:51:23" ], [ 2, 50, "Mar", 14, ",", 2016, "20:51:23" ], [ 2, 51, "Mar", 14, ",", 2016, "20:50:58" ], [ 2, 52, "Mar", 14, ",", 2016, "20:51:18" ], [ 2, 53, "Mar", 14, ",", 2016, "20:51:18" ], [ 2, 54, "Mar", 14, ",", 2016, "20:51:18" ], [ 2, 55, "Mar", 14, ",", 2016, "20:51:18" ], [ 2, 56, "Mar", 14, ",", 2016, "20:51:06" ], [ 2, 57, "Mar", 14, ",", 2016, "20:52:17" ], [ 2, 58, "Mar", 14, ",", 2016, "20:52:17" ], [ 2, 59, "Mar", 14, ",", 2016, "20:52:27" ], [ 2, 60, "Mar", 14, ",", 2016, "20:52:38" ], [ 2, 61, "Mar", 14, ",", 2016, "20:51:47" ], [ 2, 62, "Mar", 14, ",", 2016, "20:52:13" ], [ 2, 63, "Mar", 14, ",", 2016, "20:52:13" ], [ 2, 64, "Mar", 14, ",", 2016, "20:50:59" ], [ 2, 65, "Mar", 14, ",", 2016, "20:52:13" ], [ 2, 66, "Mar", 14, ",", 2016, "20:52:13" ], [ 2, 67, "Mar", 14, ",", 2016, "20:52:13" ], [ 2, 68, "Mar", 14, ",", 2016, "20:52:13" ], [ 2, 69, "Mar", 14, ",", 2016, "20:51:46" ], [ 2, 70, "Mar", 14, ",", 2016, "20:50:34" ], [ 2, 71, "Mar", 14, ",", 2016, "20:50:34" ], [ 2, 72, "Mar", 14, ",", 2016, "20:50:34" ], [ 2, 73, "Mar", 14, ",", 2016, "20:50:34" ], [ 2, 74, "Mar", 14, ",", 2016, "20:51:48" ], [ 2, 75, "Mar", 14, ",", 2016, "20:51:14" ], [ 2, 76, "Mar", 14, ",", 2016, "20:50:35" ], [ 2, 77, "Mar", 14, ",", 2016, "20:50:35" ], [ 2, 78, "Mar", 14, ",", 2016, "20:52:25" ], [ 2, 79, "Mar", 14, ",", 2016, "20:52:35" ], [ 2, 80, "Mar", 14, ",", 2016, "20:52:35" ], [ 2, 0, "timestamp" ], [ 2, 81, "Mar", 14, ",", 2016, "20:51:48" ], [ 2, 82, "Mar", 14, ",", 2016, "20:51:23" ], [ 2, 83, "Mar", 14, ",", 2016, "20:51:23" ], [ 2, 84, "Mar", 14, ",", 2016, "20:50:34" ], [ 2, 85, "Mar", 14, ",", 2016, "20:50:35" ], [ 2, 86, "Mar", 14, ",", 2016, "20:52:21" ], [ 2, 87, "Mar", 14, ",", 2016, "20:51:18" ], [ 2, 88, "Mar", 14, ",", 2016, "20:52:38" ], [ 2, 89, "Mar", 14, ",", 2016, "20:52:23" ], [ 2, 90, "Mar", 14, ",", 2016, "20:52:23" ], [ 2, 91, "Mar", 14, ",", 2016, "20:52:23" ], [ 2, 92, "Mar", 14, ",", 2016, "20:50:34" ], [ 2, 93, "Mar", 14, ",", 2016, "20:50:34" ], [ 2, 94, "Mar", 14, ",", 2016, "20:50:34" ], [ 2, 95, "Mar", 14, ",", 2016, "20:52:10" ], [ 2, 96, "Mar", 14, ",", 2016, "20:50:34" ], [ 2, 97, "Mar", 14, ",", 2016, "20:50:30" ], [ 2, 98, "Mar", 14, ",", 2016, "20:50:34" ], [ 2, 99, "Mar", 14, ",", 2016, "20:52:22" ], [ 0, 1, "Treenado" ], [ 0, 2, "UV", "light", "switch" ], [ 0, 3, "Controls", "the", "IR/DVD/VCR", "Data", "sent", "to", "Max", "for", "the", "TV" ], [ 0, 4, "Oliver", "Velostat" ], [ 0, 5, "Stalagmite" ], [ 0, 6, "Temperature", "Sensor" ], [ 0, 7, "Demo", "Server", "(formerly", "watchdog", "server)" ], [ 0, 8, "Demo", "Server", "(formerl", "(Max", "MSP)" ], [ 0, 9, "standalone", "demos", "pi" ], [ 0, 10, "Piezo", "arduino" ], [ 0, 11, "Audio", "service", "for", "the", "demos", "pi" ], [ 0, 12, "Video:", "Toilet", "Audio:", "Justin's", "Strings", "1DAC", ",", "Front", "Yard", "1DAC" ], [ 0, 13, "Video:", "Toilet", "Audio:", "(video", "script)" ], [ 0, 14, "Video:", "Toilet", "Audio:", "(looping", "audio", "1)" ], [ 0, 15, "Video:", "Toilet", "Audio:", "(looping", "audio", "2)" ], [ 0, 16, "Video:", "Toilet", "Audio:", "(looping", "audio", "3)" ], [ 0, 17, "Video:", "Mirror" ], [ 0, 18, 0 ], [ 0, 19, "Video:", "Mirror", "(video", "script)" ], [ 0, 20, "Video:", "Mirror", "(looping", "audio", "1)" ], [ 0, 21, 0 ], [ 0, 22, "Video:", "Dryer", "Narrative" ], [ 0, 23, "Video:", "Dryer", "Narrati", "(video", "script)" ], [ 0, 24, "Emerson's", "Computer", "-", "Audio:", "Emerson", "Pipe", "Murmurs", "1DAC", ",", "Pipers", "Studio", "1DAC" ], [ 0, 25, "Emerson's", "Computer", "-", "(looping", "audio", "1)" ], [ 0, 26, "Emerson's", "Computer", "-", "(looping", "audio", "2)" ], [ 0, 27, "Audio:", "Cave", "Stairs", "1DAC", ",", "Parents", "Closet", "1DAC", ",", "Mud", "Room", "1DAC" ], [ 0, 28, "Audio:", "Cave", "Stairs", 1, "(looping", "audio", "1)" ], [ 0, 29, "Audio:", "Cave", "Stairs", 1, "(looping", "audio", "2)" ], [ 0, 30, "Video:", "Front", "Yard", "Projection" ], [ 0, 31, "Video:", "Front", "Yard", "Pr", "(video", "script)" ], [ 0, 32, "Video:", "Front", "Yard", "Projection" ], [ 0, 33, "Video:", "Front", "Yard", "Pr", "(video", "script)" ], [ 0, 34, "Portals", "Server" ], [ 0, 35, "Portals", "Server", "(Max", "MSP)" ], [ 0, 36, "Video:", "Secret", "Garden", "Narrative", "-", "Audio:", "Secret", "Garden", "1DAC", "Silver", "Yard", "1DAC" ], [ 0, 37, "Video:", "Secret", "Garden", "(video", "script)" ], [ 0, 38, "Video:", "Secret", "Garden", "(looping", "audio", "1)" ], [ 0, 39, "Video:", "Secret", "Garden", "(looping", "audio", "2)" ], [ 0, 40, "Video:", "Secret", "Garden", "(looping", "audio", "3)" ], [ 0, 41, "Video:", "Inner", "Ring", "-", "Audio:", "Outer", "ring", "1DAC", ",", "Carboniferous", "1DAC", ",", "Oliver+Desert", "Doors", "1DAC" ], [ 0, 42, "Video:", "Inner", "Ring", "-", "(audio", "script)" ], [ 0, 43, "Video:", "Inner", "Ring", "-", "(video", "script)" ], [ 0, 44, "Video:", "Inner", "Ring", "-", "(looping", "audio", "1)" ], [ 0, 45, "Video:", "Inner", "Ring", "-", "(looping", "audio", "2)" ], [ 0, 46, "Video:", "Outer", "Ring", "-", "Audio", "Outer", "ring", "2DACs", ",", "Icestation+Beach", "Doors", "1DAC" ], [ 0, 47, "Video:", "Outer", "Ring", "-", "(audio", "script)" ], [ 0, 48, "Video:", "Outer", "Ring", "-", "(video", "script)" ], [ 0, 49, "Video:", "Outer", "Ring", "-", "(looping", "audio", "1)" ], [ 0, 50, "Video:", "Outer", "Ring", "-", "(looping", "audio", "2)" ], [ 0, 51, "Video:", "Desert", "Trailer", "TV", "-", "Audio:", "Desert", "trailer", "2DACs" ], [ 0, 52, "Video:", "Desert", "Traile", "(audio", "script)" ], [ 0, 53, "Video:", "Desert", "Traile", "(video", "script)" ], [ 0, 54, "Video:", "Desert", "Traile", "(looping", "audio", "1)" ], [ 0, 55, "Video:", "Desert", "Traile", "(looping", "audio", "2)" ], [ 0, 56, "Video:", "teen", "room", "TV", "-", "Audio:", "Teen", "room", 1, "DAC" ], [ 0, 57, "Video:", "teen", "room", "TV", "(audio", "script)" ], [ 0, 58, "Video:", "teen", "room", "TV", "(video", "script)" ], [ 0, 59, "Video:", "Cudney", "5screen" ], [ 0, 60, "Video:", "Cudney", "5scree", "(video", "script)" ], [ 0, 61, "Video:", "Ice", "Station", "-", "Audio:", "Art", "Hall", "Global", "1DAC" ], [ 0, 62, "Video:", "Ice", "Station", "-", "(video", "script)" ], [ 0, 63, "Video:", "Ice", "Station", "-", "(check", "server)" ], [ 0, 64, "Video:", "Glitch", "Beach", "-", "Audio:", "Glitch", "Beach", "1DAC", ",", "Icestation", "1DAC" ], [ 0, 65, "Video:", "Glitch", "Beach", "(video", "script)" ], [ 0, 66, "Video:", "Glitch", "Beach", "(looping", "audio", "1)" ], [ 0, 67, "Video:", "Glitch", "Beach", "(looping", "audio", "2)" ], [ 0, 68, "Video:", "Glitch", "Beach", "(looping", "audio", "3)" ], [ 0, 69, "Desert", "trailer", "lighting", "controller" ], [ 0, 70, "Pneumatic", "door" ], [ 0, 71, "Pneumatic", "door" ], [ 0, 72, "Pneumatic", "door" ], [ 0, 73, "Ice", "station", "lighting", "controller" ], [ 0, 74, "Arcade", "Server" ], [ 0, 75, "Arcade", "Server", "(Max", "MSP)" ], [ 0, 76, "Beam", "Server" ], [ 0, 77, "Beam", "Server", "(Max", "MSP)" ], [ 0, 78, "Video:", "Art", "Hall", "Kiosk", "-", "Audio:", "Art", "Hall", "global", "1DAC" ], [ 0, 79, "Video:", "Art", "Hall", "Kios", "(video", "script)" ], [ 0, 80, "Video:", "Art", "Hall", "Kios", "(check", "server)" ], [ 0, 0, "location" ], [ 0, 81, "Video:", "Alley", "Ads", "-", "Audio:", "Alley", "Global", "1DAC" ], [ 0, 82, "Video:", "Alley", "Ads", "-", "A", "(video", "script)" ], [ 0, 83, "Video:", "Alley", "Ads", "-", "A", "(check", "server)" ], [ 0, 84, "(video", "script)" ], [ 0, 85, "(video", "script)" ], [ 0, 86, "Audio:", "Aspen", "Global" ], [ 0, 87, "Audio:", "Aspen", "Global", "(check", "server)" ], [ 0, 88, "Video:", "Alley", "Ads", "NE", "-", "Audio:", "Cactus", 2, "DACs" ], [ 0, 89, "Video:", "Alley", "Ads", "NE", "(video", "script)" ], [ 0, 90, "Video:", "Alley", "Ads", "NE", "(looping", "audio", "1)" ], [ 0, 91, "Video:", "Alley", "Ads", "NE", "(looping", "audio", "2)" ], [ 0, 92, "Wayne", "Geary" ], [ 0, 93, "Pinball", "lighting" ], [ 0, 94, "Arcade", "lighting" ], [ 0, 95, "Arcade", "lighting" ], [ 0, 96, "Dave's", "alley", "lighting" ], [ 0, 97, "Chapel" ], [ 0, 98, "ATM" ], [ 0, 99, "global", "media", "server" ], [ 7, 1, "**", "PROBLEM", "Host", "Alert:", "10_42_16_166", "is", "DOWN", "**" ], [ 7, 2, "**", "PROBLEM", "Host", "Alert:", "10_42_16_169", "is", "DOWN", "**" ], [ 7, 3, "**", "PROBLEM", "Host", "Alert:", "ARD-L1213", "is", "DOWN", "**" ], [ 7, 4, "**", "PROBLEM", "Host", "Alert:", "10_42_16_178", "is", "DOWN", "**" ], [ 7, 5, "--" ], [ 7, 6, "**", "PROBLEM", "Host", "Alert:", "10_42_16_190", "is", "DOWN", "**" ], [ 7, 7, "**", "PROBLEM", "Host", "Alert:", "AUDIO-SERVER", "is", "DOWN", "**" ], [ 7, 8, "--" ], [ 7, 9, "--" ], [ 7, 10, "--" ], [ 7, 11, "--" ], [ 7, 12, "--" ], [ 7, 13, "--" ], [ 7, 14, "--" ], [ 7, 15, "--" ], [ 7, 16, "--" ], [ 7, 17, "--" ], [ 7, 18, "--" ], [ 7, 19, "--" ], [ 7, 20, "--" ], [ 7, 21, "--" ], [ 7, 22, "--" ], [ 7, 23, "--" ], [ 7, 24, "**", "PROBLEM", "Host", "Alert:", "RPi-A0106", "is", "DOWN", "**" ], [ 7, 25, "--" ], [ 7, 26, "--" ], [ 7, 27, "--" ], [ 7, 28, "--" ], [ 7, 29, "--" ], [ 7, 30, "--" ], [ 7, 31, "--" ], [ 7, 32, "--" ], [ 7, 33, "--" ], [ 7, 34, "--" ], [ 7, 35, "--" ], [ 7, 36, "**", "PROBLEM", "Host", "Alert:", "RPi-A0103", "is", "DOWN", "**" ], [ 7, 37, "--" ], [ 7, 38, "--" ], [ 7, 39, "--" ], [ 7, 40, "--" ], [ 7, 41, "--" ], [ 7, 42, "--" ], [ 7, 43, "--" ], [ 7, 44, "--" ], [ 7, 45, "--" ], [ 7, 46, "--" ], [ 7, 47, "--" ], [ 7, 48, "--" ], [ 7, 49, "--" ], [ 7, 50, "--" ], [ 7, 51, "--" ], [ 7, 52, "--" ], [ 7, 53, "--" ], [ 7, 54, "--" ], [ 7, 55, "--" ], [ 7, 56, "**", "PROBLEM", "Host", "Alert:", "RPi-C0305", "is", "DOWN", "**" ], [ 7, 57, "--" ], [ 7, 58, "--" ], [ 7, 59, "--" ], [ 7, 60, "--" ], [ 7, 61, "--" ], [ 7, 62, "--" ], [ 7, 63, "--" ], [ 7, 64, "--" ], [ 7, 65, "--" ], [ 7, 66, "--" ], [ 7, 67, "--" ], [ 7, 68, "--" ], [ 7, 69, "--" ], [ 7, 70, "**", "PROBLEM", "Host", "Alert:", "ARD-C0318", "is", "DOWN", "**" ], [ 7, 71, "--" ], [ 7, 72, "**", "PROBLEM", "Host", "Alert:", "ARD-C0321", "is", "DOWN", "**" ], [ 7, 73, "**", "PROBLEM", "Host", "Alert:", "ARD-C0323", "is", "DOWN", "**" ], [ 7, 74, "--" ], [ 7, 75, "--" ], [ 7, 76, "--" ], [ 7, 77, "--" ], [ 7, 78, "--" ], [ 7, 79, "--" ], [ 7, 80, "--" ], [ 7, 0, "alarm" ], [ 7, 81, "--" ], [ 7, 82, "--" ], [ 7, 83, "--" ], [ 7, 84, "**", "PROBLEM", "Host", "Alert:", "RPi-D0407", "is", "DOWN", "**" ], [ 7, 85, "--" ], [ 7, 86, "--" ], [ 7, 87, "--" ], [ 7, 88, "**", "PROBLEM", "Host", "Alert:", "RPi-F0607", "is", "DOWN", "**" ], [ 7, 89, "--" ], [ 7, 90, "--" ], [ 7, 91, "--" ], [ 7, 92, "**", "PROBLEM", "Host", "Alert:", "ARD-D0410", "is", "DOWN", "**" ], [ 7, 93, "**", "PROBLEM", "Host", "Alert:", "ARD-D0411", "is", "DOWN", "**" ], [ 7, 94, "**", "PROBLEM", "Host", "Alert:", "ARD-D0412", "is", "DOWN", "**" ], [ 7, 95, "--" ], [ 7, 96, "**", "PROBLEM", "Host", "Alert:", "ARD-D0414", "is", "DOWN", "**" ], [ 7, 97, "**", "PROBLEM", "Host", "Alert:", "ARD-D0415", "is", "DOWN", "**" ], [ 7, 98, "**", "PROBLEM", "Host", "Alert:", "ARD-D0416", "is", "DOWN", "**" ], [ 7, 99, "--" ], [ 1, 1, "10.42.16.166" ], [ 1, 2, "10.42.16.169" ], [ 1, 3, "10.42.16.171" ], [ 1, 4, "10.42.16.178" ], [ 1, 5, "10.42.16.187" ], [ 1, 6, "10.42.16.190" ], [ 1, 7, "10.42.16.23" ], [ 1, 8, "10.42.16.23/Max.exe" ], [ 1, 9, "10.42.16.53" ], [ 1, 10, "10.42.16.53/home/pi/RUNNING/builds/piezo" ], [ 1, 11, "10.42.16.53/home/pi/RUNNING/scripts/do-audio.py" ], [ 1, 12, "10.42.17.40" ], [ 1, 13, "10.42.17.40/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 14, "10.42.17.40/home/pi/RUNNING/scripts/looping-audio.sh" ], [ 1, 15, "10.42.17.40/home/pi/RUNNING/scripts/looping-audio1.sh" ], [ 1, 16, "10.42.17.40/home/pi/RUNNING/scripts/looping-audio2.sh" ], [ 1, 17, "10.42.17.41" ], [ 1, 18, "10.42.17.41/home/pi/RUNNING/builds/start-piduino" ], [ 1, 19, "10.42.17.41/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 20, "10.42.17.41/home/pi/RUNNING/scripts/looping-audio.sh" ], [ 1, 21, "10.42.17.41/home/pi/RUNNING/scripts/looping-video.py" ], [ 1, 22, "10.42.17.42" ], [ 1, 23, "10.42.17.42/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 24, "10.42.17.43" ], [ 1, 25, "10.42.17.43/home/pi/RUNNING/scripts/looping-audio.sh" ], [ 1, 26, "10.42.17.43/home/pi/RUNNING/scripts/looping-audio1.sh" ], [ 1, 27, "10.42.17.44" ], [ 1, 28, "10.42.17.44/home/pi/RUNNING/scripts/looping-audio.sh" ], [ 1, 29, "10.42.17.44/home/pi/RUNNING/scripts/looping-audio1.sh" ], [ 1, 30, "10.42.17.45" ], [ 1, 31, "10.42.17.45/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 32, "10.42.17.46" ], [ 1, 33, "10.42.17.46/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 34, "10.42.18.21" ], [ 1, 35, "10.42.18.21/Max.exe" ], [ 1, 36, "10.42.18.40" ], [ 1, 37, "10.42.18.40/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 38, "10.42.18.40/home/pi/RUNNING/scripts/looping-audio.sh" ], [ 1, 39, "10.42.18.40/home/pi/RUNNING/scripts/looping-audio1.sh" ], [ 1, 40, "10.42.18.40/home/pi/RUNNING/scripts/looping-audio2.sh" ], [ 1, 41, "10.42.18.41" ], [ 1, 42, "10.42.18.41/home/pi/RUNNING/scripts/do-audio.py" ], [ 1, 43, "10.42.18.41/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 44, "10.42.18.41/home/pi/RUNNING/scripts/looping-audio.sh" ], [ 1, 45, "10.42.18.41/home/pi/RUNNING/scripts/looping-audio1.sh" ], [ 1, 46, "10.42.18.42" ], [ 1, 47, "10.42.18.42/home/pi/RUNNING/scripts/do-audio.py" ], [ 1, 48, "10.42.18.42/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 49, "10.42.18.42/home/pi/RUNNING/scripts/looping-audio.sh" ], [ 1, 50, "10.42.18.42/home/pi/RUNNING/scripts/looping-audio1.sh" ], [ 1, 51, "10.42.18.43" ], [ 1, 52, "10.42.18.43/home/pi/RUNNING/scripts/do-audio.py" ], [ 1, 53, "10.42.18.43/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 54, "10.42.18.43/home/pi/RUNNING/scripts/looping-audio.sh" ], [ 1, 55, "10.42.18.43/home/pi/RUNNING/scripts/looping-audio1.sh" ], [ 1, 56, "10.42.18.44" ], [ 1, 57, "10.42.18.44/home/pi/RUNNING/scripts/do-audio.py" ], [ 1, 58, "10.42.18.44/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 59, "10.42.18.45" ], [ 1, 60, "10.42.18.45/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 61, "10.42.18.46" ], [ 1, 62, "10.42.18.46/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 63, "10.42.18.46/home/pi/builds/checkServer.sh" ], [ 1, 64, "10.42.18.47" ], [ 1, 65, "10.42.18.47/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 66, "10.42.18.47/home/pi/RUNNING/scripts/looping-audio.sh" ], [ 1, 67, "10.42.18.47/home/pi/RUNNING/scripts/looping-audio1.sh" ], [ 1, 68, "10.42.18.47/home/pi/RUNNING/scripts/looping-audio2.sh" ], [ 1, 69, "10.42.18.80" ], [ 1, 70, "10.42.18.83" ], [ 1, 71, "10.42.18.84" ], [ 1, 72, "10.42.18.86" ], [ 1, 73, "10.42.18.88" ], [ 1, 74, "10.42.20.20" ], [ 1, 75, "10.42.20.20/Max.exe" ], [ 1, 76, "10.42.20.21" ], [ 1, 77, "10.42.20.21/Max.exe" ], [ 1, 78, "10.42.20.40" ], [ 1, 79, "10.42.20.40/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 80, "10.42.20.40/home/pi/builds/checkServer.sh" ], [ 1, 0, "id" ], [ 1, 81, "10.42.20.41" ], [ 1, 82, "10.42.20.41/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 83, "10.42.20.41/home/pi/builds/checkServer.sh" ], [ 1, 84, "10.42.20.43" ], [ 1, 85, "10.42.20.43/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 86, "10.42.20.44" ], [ 1, 87, "10.42.20.44/home/pi/builds/checkServer.sh" ], [ 1, 88, "10.42.20.45" ], [ 1, 89, "10.42.20.45/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 90, "10.42.20.45/home/pi/RUNNING/scripts/looping-audio.sh" ], [ 1, 91, "10.42.20.45/home/pi/RUNNING/scripts/looping-audio1.sh" ], [ 1, 92, "10.42.20.81" ], [ 1, 93, "10.42.20.82" ], [ 1, 94, "10.42.20.83" ], [ 1, 95, "10.42.20.84" ], [ 1, 96, "10.42.20.85" ], [ 1, 97, "10.42.20.86" ], [ 1, 98, "10.42.20.87" ], [ 1, 99, "10.42.21.18" ] ],
+					"celldef" : [ [ 0, 0, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 1, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 2, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 3, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 4, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 5, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 6, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 7, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.498039, 0.498039, 0.498039, 1.0, 0, -1, -1 ], [ 0, 8, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 9, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 10, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 11, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 12, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 13, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 14, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 15, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 16, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 17, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 18, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 19, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 20, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 21, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 22, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 23, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 24, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 25, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 26, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 27, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 28, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 29, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 30, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 31, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 32, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 33, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 34, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 35, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 36, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 37, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.498039, 0.498039, 0.498039, 1.0, 0, -1, -1 ], [ 0, 38, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 39, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 40, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 41, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 42, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 43, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 44, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 45, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 46, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 47, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 48, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 49, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 50, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 51, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 52, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 53, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 54, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 55, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 56, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 57, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 58, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 59, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 60, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 61, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 62, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 63, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 64, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 65, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 66, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 67, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 68, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 69, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 70, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 71, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 72, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 73, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 74, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 75, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 76, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.498039, 0.498039, 0.498039, 1.0, 0, -1, -1 ], [ 0, 77, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.498039, 0.498039, 0.498039, 1.0, 0, -1, -1 ], [ 0, 78, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 79, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.498039, 0.498039, 0.498039, 1.0, 0, -1, -1 ], [ 0, 80, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 81, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 82, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 83, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 84, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 85, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 86, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 87, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 88, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 89, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 90, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 91, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 92, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 93, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 94, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.164706, 0.721569, 0.690196, 1.0, 0, -1, -1 ], [ 0, 95, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 96, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 0, 97, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 98, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.454902, 0.909804, 1.0, 2, -1, -1 ], [ 0, 99, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.721569, 1.0, 0, -1, -1 ], [ 2, 0, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.301961, 0.301961, 0.301961, 1.0, -1, -1, -1 ], [ 2, 1, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 2, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 3, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 4, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 5, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 6, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 7, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 8, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 9, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 10, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 11, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 12, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 13, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 14, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 15, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 16, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 17, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 18, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 2, 19, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 1.0, 1.0, 1.0, -1, -1, -1 ], [ 4, 0, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 1, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 2, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 3, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 4, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 5, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 6, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 7, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 8, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 9, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 10, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 11, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 12, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 13, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 14, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 15, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 16, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 17, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 18, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 19, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 20, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 21, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 22, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 23, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 24, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 25, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 26, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 27, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 28, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 29, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 30, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 31, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 32, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 33, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 34, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 35, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 36, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 37, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 38, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 39, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 40, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 41, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 42, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 43, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 44, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 45, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 46, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 47, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 48, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 49, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 50, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 51, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 52, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 53, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 54, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 55, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 56, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 57, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 58, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 59, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 60, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 61, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 62, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 63, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 64, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 65, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 66, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 67, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 68, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 69, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 70, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 71, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 72, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 73, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 74, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 75, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 76, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 77, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 78, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 79, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 80, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 81, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 82, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 83, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 84, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 85, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 86, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 87, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 88, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 89, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 90, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 91, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 92, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 93, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 94, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 1.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 95, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 96, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 97, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 98, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 99, 0, 1, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 1.0, 0.0, 1.0, -1, -1, -1 ] ],
+					"cellmap" : [ [ 5, 1, "Arduino", "Mega2650" ], [ 5, 2, "Arduino", "Uno" ], [ 5, 3, "Arduino", "Uno" ], [ 5, 4, "Arduino", "Uno" ], [ 5, 5, "Arduino", "Uno" ], [ 5, 6, "Arduino", "Uno" ], [ 5, 7, "Windows", "PC", "-", "ian's", "build" ], [ 5, 8, "Software" ], [ 5, 9, "Raspberry", "Pi" ], [ 5, 10, "Software" ], [ 5, 11, "Software" ], [ 5, 12, 0 ], [ 5, 13, "Raspberry", "Pi" ], [ 5, 14, "Software" ], [ 5, 15, "Software" ], [ 5, 16, "Software" ], [ 5, 17, "Software" ], [ 5, 18, 0 ], [ 5, 19, "Raspberry", "Pi" ], [ 5, 20, 0 ], [ 5, 21, "Software" ], [ 5, 22, "Software" ], [ 5, 23, "Raspberry", "Pi" ], [ 5, 24, "Software" ], [ 5, 25, "Raspberry", "Pi" ], [ 5, 26, "Software" ], [ 5, 27, "Software" ], [ 5, 28, "Raspberry", "Pi" ], [ 5, 29, "Software" ], [ 5, 30, "Software" ], [ 5, 31, "Raspberry", "Pi" ], [ 5, 32, "Software" ], [ 5, 33, "Raspberry", "Pi" ], [ 5, 34, "Software" ], [ 5, 35, "Raspberry", "Pi" ], [ 5, 36, "Software" ], [ 5, 37, "Windows", "PC", "-", "Media", "Server" ], [ 5, 38, "Raspberry", "Pi" ], [ 5, 39, "Software" ], [ 5, 40, "Software" ], [ 5, 41, "Software" ], [ 5, 42, "Software" ], [ 5, 43, "Raspberry", "Pi" ], [ 5, 44, "Software" ], [ 5, 45, "Software" ], [ 5, 46, "Software" ], [ 5, 47, "Software" ], [ 5, 48, "Raspberry", "Pi" ], [ 5, 49, "Software" ], [ 5, 50, "Software" ], [ 5, 51, "Software" ], [ 5, 52, "Software" ], [ 5, 53, "Raspberry", "Pi" ], [ 5, 54, "Software" ], [ 5, 55, "Software" ], [ 5, 56, "Software" ], [ 5, 57, "Software" ], [ 5, 58, "Raspberry", "Pi" ], [ 5, 59, "Software" ], [ 5, 60, "Software" ], [ 5, 61, "Raspberry", "Pi" ], [ 5, 62, "Software" ], [ 5, 63, "Raspberry", "Pi" ], [ 5, 64, "Software" ], [ 5, 65, "Software" ], [ 5, 66, "Raspberry", "Pi" ], [ 5, 67, "Software" ], [ 5, 68, "Software" ], [ 5, 69, "Software" ], [ 5, 70, "Software" ], [ 5, 71, "Arduino", "Uno" ], [ 5, 72, "Arduino", "Uno" ], [ 5, 73, "Arduino", "Uno" ], [ 5, 74, "Arduino", "Uno" ], [ 5, 75, "Arduino", "Uno" ], [ 5, 76, "Windows", "PC", "-", "Media", "Server" ], [ 5, 77, 0 ], [ 5, 78, "Software" ], [ 5, 79, "Windows", "PC", "-", "Media", "Server" ], [ 5, 80, "Raspberry", "Pi" ], [ 5, 0, "type" ], [ 5, 81, "Software" ], [ 5, 82, "Software" ], [ 5, 83, "Raspberry", "Pi" ], [ 5, 84, "Software" ], [ 5, 85, "Software" ], [ 5, 86, "Raspberry", "Pi" ], [ 5, 87, "Software" ], [ 5, 88, "Raspberry", "Pi" ], [ 5, 89, "Software" ], [ 5, 90, "Software" ], [ 5, 91, "Software" ], [ 5, 92, "Arduino", "Uno" ], [ 5, 93, "Arduino", "Uno" ], [ 5, 94, "Arduino", "Uno" ], [ 5, 95, "Mac", "Pro" ], [ 5, 96, "Raspberry", "Pi" ], [ 5, 97, "Software" ], [ 5, 98, "Software" ], [ 5, 99, "Raspberry", "Pi" ], [ 6, 1, "Jan", 26, ",", 2016, "11:12:25" ], [ 6, 2, "Jan", 9, ",", 2016, "10:50:24" ], [ 6, 3, "Mar", 24, ",", 2016, "14:55:48" ], [ 6, 4, "Jan", 11, ",", 2016, "11:30:14" ], [ 6, 5, "Jan", 11, ",", 2016, "11:33:10" ], [ 6, 6, "Feb", 28, ",", 2016, "04:59:08" ], [ 6, 7, "Jan", 20, ",", 2016, "16:22:38" ], [ 6, 8, "Jan", 20, ",", 2016, "16:22:38" ], [ 6, 9, "Mar", 20, ",", 2016, "14:05:43" ], [ 6, 10, "Mar", 20, ",", 2016, "14:05:43" ], [ 6, 11, "Mar", 20, ",", 2016, "14:05:43" ], [ 6, 12, "Feb", 2, ",", 2016, "12:07:46" ], [ 6, 13, "Mar", 25, ",", 2016, "18:21:31" ], [ 6, 14, "Mar", 16, ",", 2016, "15:23:28" ], [ 6, 15, "Mar", 25, ",", 2016, "18:21:31" ], [ 6, 16, "Mar", 25, ",", 2016, "18:21:32" ], [ 6, 17, "Mar", 25, ",", 2016, "18:21:31" ], [ 6, 18, "Mar", 25, ",", 2016, "18:22:17" ], [ 6, 19, "Mar", 30, ",", 2016, "10:25:36" ], [ 6, 20, "Mar", 30, ",", 2016, "10:25:36" ], [ 6, 21, "Mar", 30, ",", 2016, "10:25:36" ], [ 6, 22, "Mar", 30, ",", 2016, "10:25:36" ], [ 6, 23, "Mar", 15, ",", 2016, "13:17:05" ], [ 6, 24, "Mar", 15, ",", 2016, "13:17:05" ], [ 6, 25, "Apr", 1, ",", 2016, "09:55:47" ], [ 6, 26, "Apr", 1, ",", 2016, "09:55:47" ], [ 6, 27, "Apr", 1, ",", 2016, "09:55:47" ], [ 6, 28, "Mar", 15, ",", 2016, "13:17:45" ], [ 6, 29, "Mar", 15, ",", 2016, "13:17:45" ], [ 6, 30, "Mar", 15, ",", 2016, "13:17:45" ], [ 6, 31, "Mar", 29, ",", 2016, "18:12:34" ], [ 6, 32, "Mar", 29, ",", 2016, "18:12:34" ], [ 6, 33, "Mar", 23, ",", 2016, "14:37:17" ], [ 6, 34, "Mar", 29, ",", 2016, "18:12:43" ], [ 6, 35, "Mar", 25, ",", 2016, "16:33:32" ], [ 6, 36, "Mar", 25, ",", 2016, "16:34:02" ], [ 6, 37, "Mar", 31, ",", 2016, "23:24:19" ], [ 6, 38, "Mar", 15, ",", 2016, "13:17:44" ], [ 6, 39, "Mar", 15, ",", 2016, "13:17:44" ], [ 6, 40, "Mar", 15, ",", 2016, "13:17:44" ], [ 6, 41, "Mar", 15, ",", 2016, "13:17:44" ], [ 6, 42, "Mar", 15, ",", 2016, "13:17:44" ], [ 6, 43, "Mar", 30, ",", 2016, "10:26:07" ], [ 6, 44, "Mar", 30, ",", 2016, "10:26:07" ], [ 6, 45, "Mar", 30, ",", 2016, "10:26:07" ], [ 6, 46, "Mar", 30, ",", 2016, "10:26:07" ], [ 6, 47, "Mar", 30, ",", 2016, "10:26:07" ], [ 6, 48, "Mar", 15, ",", 2016, "23:02:45" ], [ 6, 49, "Mar", 15, ",", 2016, "23:02:44" ], [ 6, 50, "Mar", 15, ",", 2016, "23:02:45" ], [ 6, 51, "Mar", 15, ",", 2016, "23:02:44" ], [ 6, 52, "Mar", 15, ",", 2016, "23:02:44" ], [ 6, 53, "Mar", 17, ",", 2016, "17:06:59" ], [ 6, 54, "Mar", 17, ",", 2016, "17:06:59" ], [ 6, 55, "Mar", 17, ",", 2016, "17:06:59" ], [ 6, 56, "Mar", 17, ",", 2016, "17:06:59" ], [ 6, 57, "Mar", 17, ",", 2016, "17:06:59" ], [ 6, 58, "Mar", 25, ",", 2016, "18:28:19" ], [ 6, 59, "Mar", 25, ",", 2016, "18:28:19" ], [ 6, 60, "Mar", 25, ",", 2016, "18:28:19" ], [ 6, 61, "Mar", 16, ",", 2016, "17:29:34" ], [ 6, 62, "Mar", 16, ",", 2016, "17:29:33" ], [ 6, 63, "Mar", 18, ",", 2016, "13:24:16" ], [ 6, 64, "Mar", 18, ",", 2016, "13:24:16" ], [ 6, 65, "Mar", 18, ",", 2016, "13:24:16" ], [ 6, 66, "Mar", 25, ",", 2016, "18:27:53" ], [ 6, 67, "Mar", 25, ",", 2016, "18:27:53" ], [ 6, 68, "Mar", 25, ",", 2016, "18:27:53" ], [ 6, 69, "Mar", 25, ",", 2016, "18:27:53" ], [ 6, 70, "Mar", 25, ",", 2016, "18:27:53" ], [ 6, 71, "Mar", 16, ",", 2016, "16:38:56" ], [ 6, 72, "Apr", 1, ",", 2016, "09:34:25" ], [ 6, 73, "Mar", 31, ",", 2016, "15:08:16" ], [ 6, 74, "Mar", 29, ",", 2016, "18:16:46" ], [ 6, 75, "Mar", 30, ",", 2016, "11:39:06" ], [ 6, 76, "Mar", 29, ",", 2016, "23:03:32" ], [ 6, 77, "Mar", 16, ",", 2016, "13:28:40" ], [ 6, 78, "Mar", 29, ",", 2016, "23:03:32" ], [ 6, 79, "Mar", 29, ",", 2016, "19:23:16" ], [ 6, 80, "Mar", 29, ",", 2016, "16:13:12" ], [ 6, 0, "last", "reset" ], [ 6, 81, "Mar", 29, ",", 2016, "16:13:12" ], [ 6, 82, "Mar", 29, ",", 2016, "16:13:12" ], [ 6, 83, "Mar", 18, ",", 2016, "06:01:14" ], [ 6, 84, "Mar", 18, ",", 2016, "06:01:14" ], [ 6, 85, "Mar", 18, ",", 2016, "06:01:14" ], [ 6, 86, "Mar", 18, ",", 2016, "06:03:13" ], [ 6, 87, "Mar", 18, ",", 2016, "06:03:13" ], [ 6, 88, "Mar", 25, ",", 2016, "09:40:25" ], [ 6, 89, "Mar", 25, ",", 2016, "09:40:25" ], [ 6, 90, "Mar", 25, ",", 2016, "09:40:25" ], [ 6, 91, "Mar", 25, ",", 2016, "09:40:25" ], [ 6, 92, "Mar", 11, ",", 2016, "18:58:58" ], [ 6, 93, "Mar", 18, ",", 2016, "11:39:47" ], [ 6, 94, "Feb", 4, ",", 2016, "14:25:40" ], [ 6, 95, "Mar", 22, ",", 2016, "17:00:08" ], [ 6, 96, "Mar", 17, ",", 2016, "11:50:40" ], [ 6, 97, "Mar", 17, ",", 2016, "11:50:40" ], [ 6, 98, "Mar", 17, ",", 2016, "11:50:40" ], [ 6, 99, "Mar", 30, ",", 2016, "20:12:08" ], [ 4, 1, "NONRESPONSIVE" ], [ 4, 2, "NONRESPONSIVE" ], [ 4, 3, "OKAY" ], [ 4, 4, "NONRESPONSIVE" ], [ 4, 5, "NONRESPONSIVE" ], [ 4, 6, "OKAY" ], [ 4, 7, "NONRESPONSIVE" ], [ 4, 8, "NONRESPONSIVE" ], [ 4, 9, "OKAY" ], [ 4, 10, "NONRESPONSIVE" ], [ 4, 11, "OKAY" ], [ 4, 12, "NONRESPONSIVE" ], [ 4, 13, "OKAY" ], [ 4, 14, "NONRESPONSIVE" ], [ 4, 15, "OKAY" ], [ 4, 16, "OKAY" ], [ 4, 17, "NONRESPONSIVE" ], [ 4, 18, "OKAY" ], [ 4, 19, "OKAY" ], [ 4, 20, "OKAY" ], [ 4, 21, "OKAY" ], [ 4, 22, "NONRESPONSIVE" ], [ 4, 23, "OKAY" ], [ 4, 24, "OKAY" ], [ 4, 25, "OKAY" ], [ 4, 26, "OKAY" ], [ 4, 27, "NONRESPONSIVE" ], [ 4, 28, "OKAY" ], [ 4, 29, "OKAY" ], [ 4, 30, "OKAY" ], [ 4, 31, "OKAY" ], [ 4, 32, "OKAY" ], [ 4, 33, "OKAY" ], [ 4, 34, "OKAY" ], [ 4, 35, "OKAY" ], [ 4, 36, "OKAY" ], [ 4, 37, "OKAY" ], [ 4, 38, "OKAY" ], [ 4, 39, "OKAY" ], [ 4, 40, "OKAY" ], [ 4, 41, "OKAY" ], [ 4, 42, "OKAY" ], [ 4, 43, "OKAY" ], [ 4, 44, "OKAY" ], [ 4, 45, "OKAY" ], [ 4, 46, "NONRESPONSIVE" ], [ 4, 47, "NONRESPONSIVE" ], [ 4, 48, "OKAY" ], [ 4, 49, "OKAY" ], [ 4, 50, "OKAY" ], [ 4, 51, "OKAY" ], [ 4, 52, "OKAY" ], [ 4, 53, "OKAY" ], [ 4, 54, "OKAY" ], [ 4, 55, "OKAY" ], [ 4, 56, "OKAY" ], [ 4, 57, "NONRESPONSIVE" ], [ 4, 58, "OKAY" ], [ 4, 59, "OKAY" ], [ 4, 60, "OKAY" ], [ 4, 61, "OKAY" ], [ 4, 62, "OKAY" ], [ 4, 63, "OKAY" ], [ 4, 64, "OKAY" ], [ 4, 65, "OKAY" ], [ 4, 66, "OKAY" ], [ 4, 67, "OKAY" ], [ 4, 68, "OKAY" ], [ 4, 69, "OKAY" ], [ 4, 70, "OKAY" ], [ 4, 71, "OKAY" ], [ 4, 72, "OKAY" ], [ 4, 73, "OKAY" ], [ 4, 74, "OKAY" ], [ 4, 75, "NONRESPONSIVE" ], [ 4, 76, "OKAY" ], [ 4, 77, "OKAY" ], [ 4, 78, "OKAY" ], [ 4, 79, "OKAY" ], [ 4, 80, "OKAY" ], [ 4, 0, "status" ], [ 4, 81, "OKAY" ], [ 4, 82, "OKAY" ], [ 4, 83, "OKAY" ], [ 4, 84, "OKAY" ], [ 4, 85, "OKAY" ], [ 4, 86, "OKAY" ], [ 4, 87, "OKAY" ], [ 4, 88, "OKAY" ], [ 4, 89, "OKAY" ], [ 4, 90, "NONRESPONSIVE" ], [ 4, 91, "NONRESPONSIVE" ], [ 4, 92, "OKAY" ], [ 4, 93, "NONRESPONSIVE" ], [ 4, 94, "NONRESPONSIVE" ], [ 4, 95, "OKAY" ], [ 4, 96, "OKAY" ], [ 4, 97, "OKAY" ], [ 4, 98, "OKAY" ], [ 4, 99, "OKAY" ], [ 3, 1, 645780 ], [ 3, 2, 2365980 ], [ 3, 3, 698340 ], [ 3, 4, 2020080 ], [ 3, 5, 2191080 ], [ 3, 6, 2901252 ], [ 3, 7, 1395896 ], [ 3, 8, 1395872 ], [ 3, 9, 1054407 ], [ 3, 10, 1054422 ], [ 3, 11, 1054422 ], [ 3, 12, 1800 ], [ 3, 13, 607053 ], [ 3, 14, 788315 ], [ 3, 15, 607069 ], [ 3, 16, 607069 ], [ 3, 17, 607069 ], [ 3, 18, 607068 ], [ 3, 19, 203636 ], [ 3, 20, 203646 ], [ 3, 21, 203645 ], [ 3, 22, 203645 ], [ 3, 23, 1489373 ], [ 3, 24, 1489333 ], [ 3, 25, 32640 ], [ 3, 26, 32628 ], [ 3, 27, 32628 ], [ 3, 28, 1489345 ], [ 3, 29, 1489347 ], [ 3, 30, 1489347 ], [ 3, 31, 262015 ], [ 3, 32, 262005 ], [ 3, 33, 262021 ], [ 3, 34, 262011 ], [ 3, 35, 613599 ], [ 3, 36, 613571 ], [ 3, 37, 70484 ], [ 3, 38, 1489326 ], [ 3, 39, 1489373 ], [ 3, 40, 1489373 ], [ 3, 41, 1489373 ], [ 3, 42, 1489373 ], [ 3, 43, 203615 ], [ 3, 44, 203614 ], [ 3, 45, 203614 ], [ 3, 46, 203613 ], [ 3, 47, 203613 ], [ 3, 48, 1454199 ], [ 3, 49, 1454194 ], [ 3, 50, 1454194 ], [ 3, 51, 1454194 ], [ 3, 52, 1454194 ], [ 3, 53, 1302745 ], [ 3, 54, 1302771 ], [ 3, 55, 1302771 ], [ 3, 56, 1302771 ], [ 3, 57, 1302771 ], [ 3, 58, 606692 ], [ 3, 59, 606698 ], [ 3, 60, 606698 ], [ 3, 61, 1387825 ], [ 3, 62, 1387803 ], [ 3, 63, 1229732 ], [ 3, 64, 1229710 ], [ 3, 65, 1229711 ], [ 3, 66, 606697 ], [ 3, 67, 606723 ], [ 3, 68, 606723 ], [ 3, 69, 606723 ], [ 3, 70, 606723 ], [ 3, 71, 1391220 ], [ 3, 72, 33900 ], [ 3, 73, 100260 ], [ 3, 74, 261600 ], [ 3, 75, 1200 ], [ 3, 76, 244542 ], [ 3, 77, 244542 ], [ 3, 78, 244591 ], [ 3, 79, 257777 ], [ 3, 80, 269199 ], [ 3, 0, "uptime" ], [ 3, 81, 269187 ], [ 3, 82, 269188 ], [ 3, 83, 1256308 ], [ 3, 84, 1256291 ], [ 3, 85, 1256291 ], [ 3, 86, 1256149 ], [ 3, 87, 1256178 ], [ 3, 88, 638317 ], [ 3, 89, 638352 ], [ 3, 90, 638352 ], [ 3, 91, 638352 ], [ 3, 92, 1813320 ], [ 3, 93, 245820 ], [ 3, 94, 180 ], [ 3, 95, 83641 ], [ 3, 96, 1321729 ], [ 3, 97, 1321733 ], [ 3, 98, 1321733 ], [ 3, 99, 168447 ], [ 2, 1, "Feb", 5, ",", 2016, "20:05:03" ], [ 2, 2, "Feb", 5, ",", 2016, "20:05:59" ], [ 2, 3, "Apr", 1, ",", 2016, "18:59:19" ], [ 2, 4, "Feb", 5, ",", 2016, "20:04:43" ], [ 2, 5, "Feb", 5, ",", 2016, "20:06:03" ], [ 2, 6, "Apr", 1, ",", 2016, "18:59:48" ], [ 2, 7, "Feb", 5, ",", 2016, "20:06:04" ], [ 2, 8, "Feb", 5, ",", 2016, "20:06:04" ], [ 2, 9, "Apr", 1, ",", 2016, "18:59:11" ], [ 2, 10, "Apr", 1, ",", 2016, "18:59:26" ], [ 2, 11, "Apr", 1, ",", 2016, "18:59:26" ], [ 2, 12, "Feb", 5, ",", 2016, "20:04:43" ], [ 2, 13, "Apr", 1, ",", 2016, "18:59:04" ], [ 2, 14, "Mar", 25, ",", 2016, "18:21:17" ], [ 2, 15, "Apr", 1, ",", 2016, "18:59:20" ], [ 2, 16, "Apr", 1, ",", 2016, "18:59:20" ], [ 2, 17, "Apr", 1, ",", 2016, "18:59:20" ], [ 2, 18, "Apr", 1, ",", 2016, "18:59:20" ], [ 2, 19, "Apr", 1, ",", 2016, "18:59:32" ], [ 2, 20, "Apr", 1, ",", 2016, "18:59:42" ], [ 2, 21, "Apr", 1, ",", 2016, "18:59:42" ], [ 2, 22, "Apr", 1, ",", 2016, "18:59:41" ], [ 2, 23, "Apr", 1, ",", 2016, "18:59:58" ], [ 2, 24, "Apr", 1, ",", 2016, "18:59:17" ], [ 2, 25, "Apr", 1, ",", 2016, "18:59:47" ], [ 2, 26, "Apr", 1, ",", 2016, "18:59:35" ], [ 2, 27, "Apr", 1, ",", 2016, "18:59:35" ], [ 2, 28, "Apr", 1, ",", 2016, "18:59:25" ], [ 2, 29, "Apr", 1, ",", 2016, "18:59:27" ], [ 2, 30, "Apr", 1, ",", 2016, "18:59:27" ], [ 2, 31, "Apr", 1, ",", 2016, "18:59:29" ], [ 2, 32, "Apr", 1, ",", 2016, "18:59:20" ], [ 2, 33, "Apr", 1, ",", 2016, "18:59:45" ], [ 2, 34, "Apr", 1, ",", 2016, "18:59:35" ], [ 2, 35, "Apr", 1, ",", 2016, "18:59:55" ], [ 2, 36, "Apr", 1, ",", 2016, "18:59:28" ], [ 2, 37, "Apr", 1, ",", 2016, "18:59:05" ], [ 2, 38, "Apr", 1, ",", 2016, "18:59:05" ], [ 2, 39, "Apr", 1, ",", 2016, "18:59:52" ], [ 2, 40, "Apr", 1, ",", 2016, "18:59:52" ], [ 2, 41, "Apr", 1, ",", 2016, "18:59:52" ], [ 2, 42, "Apr", 1, ",", 2016, "18:59:52" ], [ 2, 43, "Apr", 1, ",", 2016, "18:59:43" ], [ 2, 44, "Apr", 1, ",", 2016, "18:59:41" ], [ 2, 45, "Apr", 1, ",", 2016, "18:59:41" ], [ 2, 46, "Apr", 1, ",", 2016, "18:59:41" ], [ 2, 47, "Apr", 1, ",", 2016, "18:59:41" ], [ 2, 48, "Apr", 1, ",", 2016, "18:59:23" ], [ 2, 49, "Apr", 1, ",", 2016, "18:59:18" ], [ 2, 50, "Apr", 1, ",", 2016, "18:59:18" ], [ 2, 51, "Apr", 1, ",", 2016, "18:59:18" ], [ 2, 52, "Apr", 1, ",", 2016, "18:59:18" ], [ 2, 53, "Apr", 1, ",", 2016, "18:59:23" ], [ 2, 54, "Apr", 1, ",", 2016, "18:59:50" ], [ 2, 55, "Apr", 1, ",", 2016, "18:59:50" ], [ 2, 56, "Apr", 1, ",", 2016, "18:59:50" ], [ 2, 57, "Apr", 1, ",", 2016, "18:59:50" ], [ 2, 58, "Apr", 1, ",", 2016, "18:59:51" ], [ 2, 59, "Apr", 1, ",", 2016, "18:59:57" ], [ 2, 60, "Apr", 1, ",", 2016, "18:59:57" ], [ 2, 61, "Apr", 1, ",", 2016, "18:59:58" ], [ 2, 62, "Apr", 1, ",", 2016, "18:59:36" ], [ 2, 63, "Apr", 1, ",", 2016, "18:59:48" ], [ 2, 64, "Apr", 1, ",", 2016, "18:59:26" ], [ 2, 65, "Apr", 1, ",", 2016, "18:59:26" ], [ 2, 66, "Apr", 1, ",", 2016, "18:59:30" ], [ 2, 67, "Apr", 1, ",", 2016, "18:59:56" ], [ 2, 68, "Apr", 1, ",", 2016, "18:59:56" ], [ 2, 69, "Apr", 1, ",", 2016, "18:59:56" ], [ 2, 70, "Apr", 1, ",", 2016, "18:59:56" ], [ 2, 71, "Apr", 1, ",", 2016, "18:59:14" ], [ 2, 72, "Apr", 1, ",", 2016, "18:59:51" ], [ 2, 73, "Apr", 1, ",", 2016, "18:59:49" ], [ 2, 74, "Apr", 1, ",", 2016, "18:59:16" ], [ 2, 75, "Mar", 30, ",", 2016, "11:59:06" ], [ 2, 76, "Apr", 1, ",", 2016, "18:59:10" ], [ 2, 77, "Apr", 1, ",", 2016, "18:59:10" ], [ 2, 78, "Apr", 1, ",", 2016, "18:59:59" ], [ 2, 79, "Apr", 1, ",", 2016, "18:59:29" ], [ 2, 80, "Apr", 1, ",", 2016, "18:59:51" ], [ 2, 0, "timestamp" ], [ 2, 81, "Apr", 1, ",", 2016, "18:59:39" ], [ 2, 82, "Apr", 1, ",", 2016, "18:59:39" ], [ 2, 83, "Apr", 1, ",", 2016, "18:59:43" ], [ 2, 84, "Apr", 1, ",", 2016, "18:59:26" ], [ 2, 85, "Apr", 1, ",", 2016, "18:59:26" ], [ 2, 86, "Apr", 1, ",", 2016, "18:59:02" ], [ 2, 87, "Apr", 1, ",", 2016, "18:59:32" ], [ 2, 88, "Apr", 1, ",", 2016, "18:59:02" ], [ 2, 89, "Apr", 1, ",", 2016, "18:59:37" ], [ 2, 90, "Apr", 1, ",", 2016, "18:59:37" ], [ 2, 91, "Apr", 1, ",", 2016, "18:59:37" ], [ 2, 92, "Apr", 1, ",", 2016, "18:59:04" ], [ 2, 93, "Mar", 25, ",", 2016, "12:20:02" ], [ 2, 94, "Feb", 5, ",", 2016, "20:04:43" ], [ 2, 95, "Apr", 1, ",", 2016, "18:59:40" ], [ 2, 96, "Apr", 1, ",", 2016, "18:59:29" ], [ 2, 97, "Apr", 1, ",", 2016, "18:59:33" ], [ 2, 98, "Apr", 1, ",", 2016, "18:59:33" ], [ 2, 99, "Apr", 1, ",", 2016, "18:59:35" ], [ 0, 1, "Treenado" ], [ 0, 2, "UV", "light", "switch" ], [ 0, 3, "Controls", "the", "IR/DVD/VCR", "Data", "sent", "to", "Max", "for", "the", "TV" ], [ 0, 4, "Squirell", "Velostat" ], [ 0, 5, "Oliver", "Velostat" ], [ 0, 6, "Stalagmite" ], [ 0, 7, "Demo", "Server", "(formerly", "watchdog", "server)" ], [ 0, 8, "Demo", "Server", "(formerl", "(Max", "MSP)" ], [ 0, 9, "standalone", "demos", "pi" ], [ 0, 10, "Piezo", "arduino" ], [ 0, 11, "Audio", "service", "for", "the", "demos", "pi" ], [ 0, 12, 0 ], [ 0, 13, "Video:", "Toilet", "Audio:", "Justin's", "Strings", "1DAC", ",", "Front", "Yard", "1DAC" ], [ 0, 14, "Video:", "Toilet", "Audio:", "(video", "script)" ], [ 0, 15, "Video:", "Toilet", "Audio:", "(looping", "audio", "1)" ], [ 0, 16, "Video:", "Toilet", "Audio:", "(looping", "audio", "2)" ], [ 0, 17, "Video:", "Toilet", "Audio:", "(looping", "audio", "3)" ], [ 0, 18, 0 ], [ 0, 19, "Video:", "Mirror" ], [ 0, 20, 0 ], [ 0, 21, "Video:", "Mirror", "(video", "script)" ], [ 0, 22, "Video:", "Mirror", "(looping", "audio", "1)" ], [ 0, 23, "Video:", "Dryer", "Narrative" ], [ 0, 24, "Video:", "Dryer", "Narrati", "(video", "script)" ], [ 0, 25, "Emerson's", "Computer", "-", "Audio:", "Emerson", "Pipe", "Murmurs", "1DAC", ",", "Pipers", "Studio", "1DAC" ], [ 0, 26, "Emerson's", "Computer", "-", "(looping", "audio", "1)" ], [ 0, 27, "Emerson's", "Computer", "-", "(looping", "audio", "2)" ], [ 0, 28, "Audio:", "Cave", "Stairs", "1DAC", ",", "Parents", "Closet", "1DAC", ",", "Mud", "Room", "1DAC" ], [ 0, 29, "Audio:", "Cave", "Stairs", 1, "(looping", "audio", "1)" ], [ 0, 30, "Audio:", "Cave", "Stairs", 1, "(looping", "audio", "2)" ], [ 0, 31, "Video:", "Front", "Yard", "Projection" ], [ 0, 32, "Video:", "Front", "Yard", "Pr", "(video", "script)" ], [ 0, 33, "Video:", "Front", "Yard", "Projection" ], [ 0, 34, "Video:", "Front", "Yard", "Pr", "(video", "script)" ], [ 0, 35, "Temp", "Entertainment", "System" ], [ 0, 36, "Temp", "Entertainment", "S", "(video", "script)" ], [ 0, 37, "Portals", "Server:", "kiosk", "video", "&", "audio" ], [ 0, 38, "Video:", "Secret", "Garden", "Narrative", "-", "Audio:", "Secret", "Garden", "1DAC", "Silver", "Yard", "1DAC" ], [ 0, 39, "Video:", "Secret", "Garden", "(video", "script)" ], [ 0, 40, "Video:", "Secret", "Garden", "(looping", "audio", "1)" ], [ 0, 41, "Video:", "Secret", "Garden", "(looping", "audio", "2)" ], [ 0, 42, "Video:", "Secret", "Garden", "(looping", "audio", "3)" ], [ 0, 43, "Video:", "Inner", "Ring", "-", "Audio:", "Outer", "ring", "1DAC", ",", "Carboniferous", "1DAC", ",", "Oliver+Desert", "Doors", "1DAC" ], [ 0, 44, "Video:", "Inner", "Ring", "-", "(audio", "script)" ], [ 0, 45, "Video:", "Inner", "Ring", "-", "(video", "script)" ], [ 0, 46, "Video:", "Inner", "Ring", "-", "(looping", "audio", "1)" ], [ 0, 47, "Video:", "Inner", "Ring", "-", "(looping", "audio", "2)" ], [ 0, 48, "Video:", "Outer", "Ring", "-", "Audio", "Outer", "ring", "2DACs", ",", "Icestation+Beach", "Doors", "1DAC" ], [ 0, 49, "Video:", "Outer", "Ring", "-", "(audio", "script)" ], [ 0, 50, "Video:", "Outer", "Ring", "-", "(video", "script)" ], [ 0, 51, "Video:", "Outer", "Ring", "-", "(looping", "audio", "1)" ], [ 0, 52, "Video:", "Outer", "Ring", "-", "(looping", "audio", "2)" ], [ 0, 53, "Video:", "Desert", "Trailer", "TV", "-", "Audio:", "Desert", "trailer", "2DACs" ], [ 0, 54, "Video:", "Desert", "Traile", "(audio", "script)" ], [ 0, 55, "Video:", "Desert", "Traile", "(video", "script)" ], [ 0, 56, "Video:", "Desert", "Traile", "(looping", "audio", "1)" ], [ 0, 57, "Video:", "Desert", "Traile", "(looping", "audio", "2)" ], [ 0, 58, "Video:", "teen", "room", "TV", "-", "Audio:", "Teen", "room", 1, "DAC" ], [ 0, 59, "Video:", "teen", "room", "TV", "(audio", "script)" ], [ 0, 60, "Video:", "teen", "room", "TV", "(video", "script)" ], [ 0, 61, "Video:", "Cudney", "5screen" ], [ 0, 62, "Video:", "Cudney", "5scree", "(video", "script)" ], [ 0, 63, "Video:", "Ice", "Station", "-", "Audio:", "Art", "Hall", "Global", "1DAC" ], [ 0, 64, "Video:", "Ice", "Station", "-", "(video", "script)" ], [ 0, 65, "Video:", "Ice", "Station", "-", "(check", "server)" ], [ 0, 66, "Video:", "Glitch", "Beach", "-", "Audio:", "Glitch", "Beach", "1DAC", ",", "Icestation", "1DAC" ], [ 0, 67, "Video:", "Glitch", "Beach", "(video", "script)" ], [ 0, 68, "Video:", "Glitch", "Beach", "(looping", "audio", "1)" ], [ 0, 69, "Video:", "Glitch", "Beach", "(looping", "audio", "2)" ], [ 0, 70, "Video:", "Glitch", "Beach", "(looping", "audio", "3)" ], [ 0, 71, "Desert", "trailer", "lighting", "controller" ], [ 0, 72, "Pneumatic", "door", ",", "Oliver's", "Forest" ], [ 0, 73, "Pneumatic", "door", ",", "Desert", "Trailer" ], [ 0, 74, "Pneumatic", "door", ",", "Glitch", "Beach" ], [ 0, 75, "Pneumatic", "door", ",", "Ice", "Station" ], [ 0, 76, "Arcade", "Server" ], [ 0, 77, 0 ], [ 0, 78, "Arcade", "Server", "(Max", "MSP)" ], [ 0, 79, "Beam", "Server" ], [ 0, 80, "Video:", "Art", "Hall", "Kiosk", "-", "Audio:", "Art", "Hall", "global", "1DAC" ], [ 0, 0, "location" ], [ 0, 81, "Video:", "Art", "Hall", "Kios", "(video", "script)" ], [ 0, 82, "Video:", "Art", "Hall", "Kios", "(check", "server)" ], [ 0, 83, "Video:", "Alley", "Ads", "-", "Audio:", "Alley", "Global", "1DAC" ], [ 0, 84, "Video:", "Alley", "Ads", "-", "A", "(video", "script)" ], [ 0, 85, "Video:", "Alley", "Ads", "-", "A", "(check", "server)" ], [ 0, 86, "Audio:", "Aspen", "Global" ], [ 0, 87, "Audio:", "Aspen", "Global", "(check", "server)" ], [ 0, 88, "Video:", "Alley", "Ads", "NE", "-", "Audio:", "Cactus", 2, "DACs" ], [ 0, 89, "Video:", "Alley", "Ads", "NE", "(video", "script)" ], [ 0, 90, "Video:", "Alley", "Ads", "NE", "(looping", "audio", "1)" ], [ 0, 91, "Video:", "Alley", "Ads", "NE", "(looping", "audio", "2)" ], [ 0, 92, "Arcade", "lighting" ], [ 0, 93, "Chapel" ], [ 0, 94, "Forest", "Creatures" ], [ 0, 95, "global", "media", "server" ], [ 0, 96, "Video:", "Forest", "Narrative", "E", "-", "Audio:", "Kitchen", "Pipe", "Murmurs" ], [ 0, 97, "Video:", "Forest", "Narrat", "(video", "script)" ], [ 0, 98, "Video:", "Forest", "Narrat", "(looping", "audio", "1)" ], [ 0, 99, "Video:", "Glow", "Kiosk" ], [ 7, 1, "**", "PROBLEM", "Host", "Alert:", "10_42_16_166", "is", "DOWN", "**" ], [ 7, 2, "**", "PROBLEM", "Host", "Alert:", "10_42_16_169", "is", "DOWN", "**" ], [ 7, 3, "--" ], [ 7, 4, "**", "PROBLEM", "Host", "Alert:", "10_42_16_177", "is", "DOWN", "**" ], [ 7, 5, "**", "PROBLEM", "Host", "Alert:", "10_42_16_178", "is", "DOWN", "**" ], [ 7, 6, "--" ], [ 7, 7, "**", "PROBLEM", "Host", "Alert:", "AUDIO-SERVER", "is", "DOWN", "**" ], [ 7, 8, "--" ], [ 7, 9, "--" ], [ 7, 10, "--" ], [ 7, 11, "--" ], [ 7, 12, "--" ], [ 7, 13, "--" ], [ 7, 14, "--" ], [ 7, 15, "--" ], [ 7, 16, "--" ], [ 7, 17, "--" ], [ 7, 18, "--" ], [ 7, 19, "--" ], [ 7, 20, "--" ], [ 7, 21, "--" ], [ 7, 22, "--" ], [ 7, 23, "--" ], [ 7, 24, "--" ], [ 7, 25, "**", "PROBLEM", "Host", "Alert:", "RPi-A0106", "is", "DOWN", "**" ], [ 7, 26, "--" ], [ 7, 27, "--" ], [ 7, 28, "--" ], [ 7, 29, "--" ], [ 7, 30, "--" ], [ 7, 31, "--" ], [ 7, 32, "--" ], [ 7, 33, "--" ], [ 7, 34, "--" ], [ 7, 35, "--" ], [ 7, 36, "--" ], [ 7, 37, "--" ], [ 7, 38, "**", "PROBLEM", "Host", "Alert:", "RPi-A0103", "is", "DOWN", "**" ], [ 7, 39, "--" ], [ 7, 40, "--" ], [ 7, 41, "--" ], [ 7, 42, "--" ], [ 7, 43, "--" ], [ 7, 44, "--" ], [ 7, 45, "--" ], [ 7, 46, "--" ], [ 7, 47, "--" ], [ 7, 48, "--" ], [ 7, 49, "--" ], [ 7, 50, "--" ], [ 7, 51, "--" ], [ 7, 52, "--" ], [ 7, 53, "**", "PROBLEM", "Host", "Alert:", "RPi-C0304", "is", "DOWN", "**" ], [ 7, 54, "--" ], [ 7, 55, "--" ], [ 7, 56, "--" ], [ 7, 57, "--" ], [ 7, 58, "**", "PROBLEM", "Host", "Alert:", "RPi-C0305", "is", "DOWN", "**" ], [ 7, 59, "--" ], [ 7, 60, "--" ], [ 7, 61, "--" ], [ 7, 62, "--" ], [ 7, 63, "--" ], [ 7, 64, "--" ], [ 7, 65, "--" ], [ 7, 66, "--" ], [ 7, 67, "--" ], [ 7, 68, "--" ], [ 7, 69, "--" ], [ 7, 70, "--" ], [ 7, 71, "--" ], [ 7, 72, "--" ], [ 7, 73, "--" ], [ 7, 74, "--" ], [ 7, 75, "**", "PROBLEM", "Host", "Alert:", "ARD-C0321", "is", "DOWN", "**" ], [ 7, 76, "--" ], [ 7, 77, "--" ], [ 7, 78, "--" ], [ 7, 79, "--" ], [ 7, 80, "--" ], [ 7, 0, "alarm" ], [ 7, 81, "--" ], [ 7, 82, "--" ], [ 7, 83, "--" ], [ 7, 84, "--" ], [ 7, 85, "--" ], [ 7, 86, "--" ], [ 7, 87, "--" ], [ 7, 88, "**", "PROBLEM", "Host", "Alert:", "RPi-F0607", "is", "DOWN", "**" ], [ 7, 89, "--" ], [ 7, 90, "--" ], [ 7, 91, "--" ], [ 7, 92, "--" ], [ 7, 93, "**", "PROBLEM", "Host", "Alert:", "ARD-D0415", "is", "DOWN", "**" ], [ 7, 94, "**", "PROBLEM", "Host", "Alert:", "ARD-D0423", "is", "DOWN", "**" ], [ 7, 95, "--" ], [ 7, 96, "**", "PROBLEM", "Host", "Alert:", "RPi-C0309", "is", "DOWN", "**" ], [ 7, 97, "--" ], [ 7, 98, "--" ], [ 7, 99, "**", "PROBLEM", "Host", "Alert:", "RPi-E0504", "is", "DOWN", "**" ], [ 1, 1, "10.42.16.166" ], [ 1, 2, "10.42.16.169" ], [ 1, 3, "10.42.16.171" ], [ 1, 4, "10.42.16.177" ], [ 1, 5, "10.42.16.178" ], [ 1, 6, "10.42.16.187" ], [ 1, 7, "10.42.16.23" ], [ 1, 8, "10.42.16.23/Max.exe" ], [ 1, 9, "10.42.16.53" ], [ 1, 10, "10.42.16.53/home/pi/RUNNING/builds/piezo" ], [ 1, 11, "10.42.16.53/home/pi/RUNNING/scripts/do-audio.py" ], [ 1, 12, "10.42.16.84" ], [ 1, 13, "10.42.17.40" ], [ 1, 14, "10.42.17.40/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 15, "10.42.17.40/home/pi/RUNNING/scripts/looping-audio.sh" ], [ 1, 16, "10.42.17.40/home/pi/RUNNING/scripts/looping-audio1.sh" ], [ 1, 17, "10.42.17.40/home/pi/RUNNING/scripts/looping-audio2.sh" ], [ 1, 18, "10.42.17.40/home/pi/RUNNING/scripts/looping-video.sh" ], [ 1, 19, "10.42.17.41" ], [ 1, 20, "10.42.17.41/home/pi/RUNNING/builds/start-piduino" ], [ 1, 21, "10.42.17.41/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 22, "10.42.17.41/home/pi/RUNNING/scripts/looping-audio.sh" ], [ 1, 23, "10.42.17.42" ], [ 1, 24, "10.42.17.42/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 25, "10.42.17.43" ], [ 1, 26, "10.42.17.43/home/pi/RUNNING/scripts/looping-audio.sh" ], [ 1, 27, "10.42.17.43/home/pi/RUNNING/scripts/looping-audio1.sh" ], [ 1, 28, "10.42.17.44" ], [ 1, 29, "10.42.17.44/home/pi/RUNNING/scripts/looping-audio.sh" ], [ 1, 30, "10.42.17.44/home/pi/RUNNING/scripts/looping-audio1.sh" ], [ 1, 31, "10.42.17.45" ], [ 1, 32, "10.42.17.45/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 33, "10.42.17.46" ], [ 1, 34, "10.42.17.46/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 35, "10.42.17.47" ], [ 1, 36, "10.42.17.47/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 37, "10.42.18.21" ], [ 1, 38, "10.42.18.40" ], [ 1, 39, "10.42.18.40/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 40, "10.42.18.40/home/pi/RUNNING/scripts/looping-audio.sh" ], [ 1, 41, "10.42.18.40/home/pi/RUNNING/scripts/looping-audio1.sh" ], [ 1, 42, "10.42.18.40/home/pi/RUNNING/scripts/looping-audio2.sh" ], [ 1, 43, "10.42.18.41" ], [ 1, 44, "10.42.18.41/home/pi/RUNNING/scripts/do-audio.py" ], [ 1, 45, "10.42.18.41/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 46, "10.42.18.41/home/pi/RUNNING/scripts/looping-audio.sh" ], [ 1, 47, "10.42.18.41/home/pi/RUNNING/scripts/looping-audio1.sh" ], [ 1, 48, "10.42.18.42" ], [ 1, 49, "10.42.18.42/home/pi/RUNNING/scripts/do-audio.py" ], [ 1, 50, "10.42.18.42/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 51, "10.42.18.42/home/pi/RUNNING/scripts/looping-audio.sh" ], [ 1, 52, "10.42.18.42/home/pi/RUNNING/scripts/looping-audio1.sh" ], [ 1, 53, "10.42.18.43" ], [ 1, 54, "10.42.18.43/home/pi/RUNNING/scripts/do-audio.py" ], [ 1, 55, "10.42.18.43/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 56, "10.42.18.43/home/pi/RUNNING/scripts/looping-audio.sh" ], [ 1, 57, "10.42.18.43/home/pi/RUNNING/scripts/looping-audio1.sh" ], [ 1, 58, "10.42.18.44" ], [ 1, 59, "10.42.18.44/home/pi/RUNNING/scripts/do-audio.py" ], [ 1, 60, "10.42.18.44/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 61, "10.42.18.45" ], [ 1, 62, "10.42.18.45/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 63, "10.42.18.46" ], [ 1, 64, "10.42.18.46/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 65, "10.42.18.46/home/pi/builds/checkServer.sh" ], [ 1, 66, "10.42.18.47" ], [ 1, 67, "10.42.18.47/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 68, "10.42.18.47/home/pi/RUNNING/scripts/looping-audio.sh" ], [ 1, 69, "10.42.18.47/home/pi/RUNNING/scripts/looping-audio1.sh" ], [ 1, 70, "10.42.18.47/home/pi/RUNNING/scripts/looping-audio2.sh" ], [ 1, 71, "10.42.18.80" ], [ 1, 72, "10.42.18.82" ], [ 1, 73, "10.42.18.83" ], [ 1, 74, "10.42.18.84" ], [ 1, 75, "10.42.18.86" ], [ 1, 76, "10.42.20.20" ], [ 1, 77, "10.42.20.20/Ableton" ], [ 1, 78, "10.42.20.20/Max.exe" ], [ 1, 79, "10.42.20.21" ], [ 1, 80, "10.42.20.40" ], [ 1, 0, "id" ], [ 1, 81, "10.42.20.40/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 82, "10.42.20.40/home/pi/builds/checkServer.sh" ], [ 1, 83, "10.42.20.41" ], [ 1, 84, "10.42.20.41/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 85, "10.42.20.41/home/pi/builds/checkServer.sh" ], [ 1, 86, "10.42.20.44" ], [ 1, 87, "10.42.20.44/home/pi/builds/checkServer.sh" ], [ 1, 88, "10.42.20.45" ], [ 1, 89, "10.42.20.45/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 90, "10.42.20.45/home/pi/RUNNING/scripts/looping-audio.sh" ], [ 1, 91, "10.42.20.45/home/pi/RUNNING/scripts/looping-audio1.sh" ], [ 1, 92, "10.42.20.84" ], [ 1, 93, "10.42.20.86" ], [ 1, 94, "10.42.20.94" ], [ 1, 95, "10.42.21.18" ], [ 1, 96, "10.42.21.40" ], [ 1, 97, "10.42.21.40/home/pi/RUNNING/scripts/do-video.py" ], [ 1, 98, "10.42.21.40/home/pi/RUNNING/scripts/looping-audio.sh" ], [ 1, 99, "10.42.21.41" ] ],
 					"coldef" : [ [ 3, 70, 1, 0.0, 0.0, 0.0, 1.0, 1, 0.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 0, 300, 1, 0.0, 0.0, 0.0, 1.0, 1, 0.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 2, 139, 1, 0.0, 0.0, 0.0, 1.0, 1, 0.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 1, 349, 1, 0.0, 0.0, 0.0, 1.0, 1, 0.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 5, 117, 1, 0.0, 0.0, 0.0, 1.0, 1, 0.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 4, 130, 1, 0.0, 0.0, 0.0, 1.0, 1, 0.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 6, 108, 1, 0.0, 0.0, 0.0, 1.0, 1, 0.0, 0.0, 0.0, 1.0, -1, -1, -1 ], [ 7, 241, 1, 0.0, 0.0, 0.0, 1.0, 1, 0.0, 0.0, 0.0, 1.0, -1, -1, -1 ] ],
 					"colhead" : 1,
 					"cols" : 8,
@@ -24748,7 +25233,7 @@
 									"outlettype" : [ "" ],
 									"patching_rect" : [ 347.0, 535.0, 50.0, 22.0 ],
 									"style" : "",
-									"text" : "286"
+									"text" : "266"
 								}
 
 							}
@@ -26339,9 +26824,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 797.0, 648.0, 59.0, 15.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 804.5, 640.0, 59.0, 15.0 ],
+					"patching_rect" : [ 753.0, 614.0, 59.0, 15.0 ],
 					"style" : "",
 					"text" : "ARD-C0317"
 				}
@@ -26603,7 +27086,7 @@
 			}
 , 			{
 				"patchline" : 				{
-					"destination" : [ "obj-312", 0 ],
+					"destination" : [ "obj-309", 0 ],
 					"disabled" : 0,
 					"hidden" : 0,
 					"source" : [ "obj-297", 0 ]
@@ -26650,6 +27133,15 @@
 			}
 , 			{
 				"patchline" : 				{
+					"destination" : [ "obj-366", 0 ],
+					"disabled" : 0,
+					"hidden" : 0,
+					"source" : [ "obj-309", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
 					"destination" : [ "obj-3", 0 ],
 					"disabled" : 0,
 					"hidden" : 0,
@@ -26682,6 +27174,24 @@
 					"disabled" : 0,
 					"hidden" : 0,
 					"source" : [ "obj-32", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-312", 0 ],
+					"disabled" : 0,
+					"hidden" : 0,
+					"source" : [ "obj-364", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-364", 0 ],
+					"disabled" : 0,
+					"hidden" : 0,
+					"source" : [ "obj-366", 0 ]
 				}
 
 			}
@@ -26987,6 +27497,15 @@
 			}
 , 			{
 				"patchline" : 				{
+					"destination" : [ "obj-88", 0 ],
+					"disabled" : 0,
+					"hidden" : 0,
+					"source" : [ "obj-89", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
 					"destination" : [ "obj-54", 1 ],
 					"disabled" : 0,
 					"hidden" : 0,
@@ -27112,6 +27631,12 @@
 			}
 , 			{
 				"name" : "onOffByDeviceType.maxpat",
+				"bootpath" : "~/Documents/Max 7/Library/Show Automation",
+				"type" : "JSON",
+				"implicit" : 1
+			}
+, 			{
+				"name" : "portalsDoorSendHelp.maxpat",
 				"bootpath" : "~/Documents/Max 7/Library/Show Automation",
 				"type" : "JSON",
 				"implicit" : 1
