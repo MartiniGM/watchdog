@@ -1,0 +1,42 @@
+#!/usr/bin/expect -f
+# usage: ./install_pi_volumeconfig 10.42.24.42
+
+set ip [lindex $argv 0]
+#DO NOT upload these files to github, they have our passwords in them!
+set pass1 [read [open "pi_passphrase1.secret" r]]
+
+set timeout -1
+eval spawn ssh -oConnectTimeout=20 -oStrictHostKeyChecking=no -oCheckHostIP=no pi@$ip
+match_max 100000
+set prompt ":|#|\\\$"
+interact -o -nobuffer "password:" return
+send -- "$pass1\r"
+interact -o -nobuffer -re $prompt return
+send -- "if cd /home/pi/Demos; then git pull; else git clone https://github.com/MeowWolf/Demos /home/pi/Demos; fi\r"
+interact -o -nobuffer -re $prompt return
+send -- "if cd /home/pi/watchdog; then git pull; else git clone https://github.com/MeowWolf/watchdog /home/pi/watchdog; fi\r"
+interact -o -nobuffer -re $prompt return
+send -- "cp /home/pi/watchdog/watchdog.py /home/pi/RUNNING/scripts\r"
+interact -o -nobuffer -re $prompt return
+send -- "cp /home/pi/Demos/config/set_volume.py /home/pi/RUNNING/scripts\r"
+interact -o -nobuffer -re $prompt return
+send -- "cp /home/pi/Demos/config/getVolumes.sh /home/pi/RUNNING/scripts\r"
+interact -o -nobuffer -re $prompt return
+send -- "cp /home/pi/Demos/config/setupDACs.sh /home/pi/RUNNING/scripts\r"
+interact -o -nobuffer -re $prompt return
+send -- "chmod 755 /home/pi/RUNNING/scripts/getVolumes.sh\r"
+interact -o -nobuffer -re $prompt return
+send -- "chmod 755 /home/pi/RUNNING/scripts/setupDACs.sh\r"
+interact -o -nobuffer -re $prompt return
+send -- "chmod 755 /home/pi/RUNNING/scripts/set_volume.py\r"
+interact -o -nobuffer -re $prompt return
+send -- "/home/pi/RUNNING/scripts/getVolumes.sh\r"
+interact -o -nobuffer -re $prompt return
+send -- "/home/pi/RUNNING/scripts/setupDACs.sh\r"
+interact -o -nobuffer -re $prompt return
+send -- "chmod 755 /home/pi/watchdog/add_volumeconfig_to_crontab.sh\r"
+interact -o -nobuffer -re $prompt return
+send -- "/home/pi/watchdog/add_volumeconfig_to_crontab.sh\r"
+interact -o -nobuffer -re $prompt return
+send -- "exit\r"
+expect eof
