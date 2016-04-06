@@ -56,7 +56,9 @@ googleSheetDictSwitches = {} #dict of items on the switch map tab
 list_of_lists_switches = [] #list of items on the switch map tab
 switch_prefix_index = 0 #index for the switch prefix on the switch map tab
 switch_ip_index = 0 #index for the switch IP address on the switch map tab
+MAX_SWITCH_NUM = 16
 googlesheet_failures = 0 # counts successive sheet failures to suppress messages
+ip_address_column = 1
 
 # load google sheet every hour. it's a bit slow to get the data back so it doesn't reload often, but if you want to trigger it immediately just restart the program
 LOADSHEET_SLOW = 3600 #seconds, once the initial load gets at least 1 row
@@ -70,7 +72,7 @@ LOG_FILENAME = '/Users/Aesir/Documents/watchdog/tcp_watchdog_server/tcp_watchdog
 PORT = 6666 # port number to watch
 
 # give the size for each rolling log segment, in bytes
-LOG_SIZE = 20000000 #20 MB, in bytes
+LOG_SIZE = 40000000 #20 MB, in bytes
 # give the number of rolling log segments to record before the log rolls over
 LOG_NUM_BACKUPS = 5 # five .out files before they roll over
 
@@ -117,6 +119,7 @@ def open_googlesheet():
         global switch_prefix_index
         global loadGoogleSheetEvery
         global googlesheet_failures
+        global ip_address_column
         googleSheetLenSwitches = 0
         googleSheetLen = 0
         googlesheet_failures = 0
@@ -310,6 +313,7 @@ def is_known_software(id_name):
     try:
         sep = '/'
         parent = id_name.split(sep, 1)[0]
+        desc = ""
         desc = get_item_googlesheet(parent, "Description")
     
         if "do-audio.py" in id_name:
@@ -341,7 +345,7 @@ def is_known_software(id_name):
 #current values from the sqlite DB.
 def get_items_from_googlesheet(id_name):
     loc = ""
-    
+    desc = ""
     location = get_item_googlesheet(id_name, "Location Details")
     if location == "" or location is None:
         location = get_item_from_googlesheet_backup(id_name, "LOCATION")
@@ -439,6 +443,42 @@ def find_item(mylist, item_name):
             i = i + 1
 
 ############################################################
+#init_items
+############################################################
+#writes info from master doc plus "Unknown" status into all nonexistent entries
+def init_items():
+    global list_of_lists
+    global ip_address_column
+#    print list_of_lists
+    for item in list_of_lists:
+        id_name = item[ip_address_column]
+        status = "UNKNOWN"
+        last_reset_timestamp = ""
+        timestamp = ""
+        uptime_sec = 0
+        uptime = ""
+        (location, device_type, zone, space, device_name, description, switch_interface, mac_address, boot_order) = get_all_from_googlesheet(id_name)
+        if device_type is not None and device_type != "" and id_name is not None and id_name != "" and id_name != "n/a":
+            if "berry" in device_type.lower() or "duino" in device_type.lower() or "indow" in device_type.lower() or "mac" in device_type.lower() or "eensy" in device_type.lower() and id_name is not None and id_name != "": 
+#                print "this item %s" % id_name
+                try:
+                    cur = con.cursor()
+                    cur.execute("SELECT rowid FROM devices WHERE id_name = ?", (id_name,))
+                    data = cur.fetchone()
+                    if data is None:
+                        cur.execute("INSERT OR IGNORE INTO DEVICES(ID_NAME, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME, LAST_UPTIME_SEC, LOCATION, DEVICE_TYPE, LAST_RESET_TIMESTAMP, ZONE, SPACE, DEVICE_NAME, DESCRIPTION, SWITCH_INTERFACE, MAC_ADDRESS, BOOT_ORDER) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",  (id_name,timestamp,status, uptime_sec,uptime,uptime_sec, location, device_type, last_reset_timestamp, zone, space, device_name, description, switch_interface, mac_address, boot_order))
+                        con.commit()
+                except lite.Error, e:
+                    for frame in traceback.extract_tb(sys.exc_info()[2]):
+                        fname,lineno,fn,text = frame
+                        logger.error( "     in %s on line %d" % (fname, lineno))
+                        logger.error("sqlite error: %s" % e)
+                        try:
+                            con.rollback()
+                        except Exception, e:
+                            logger.error(" Can't rollback! %s" % e)
+
+############################################################
 #find_switch()
 ############################################################
 # returns switch in list of switches
@@ -455,7 +495,7 @@ def find_switch(c):
 ############################################################
 # creates searchable per-switch dict of device names & switch interfaces
 def pivot_switches():
-    top = 13; #max number of switches, ignore everything below these in sheet
+    top = MAX_SWITCH_NUM; #max number of switches, ignore everything below these in sheet
     global googleSheetDictSwitches
     googleSheetDictSwitches = defaultdict(list)
     for i, switch in enumerate(list_of_lists_switches):
@@ -713,21 +753,31 @@ def sql_data_sqlite(data, ip):
 def parse_data_sqlite(data):
     num_okay = 0
     num_total = 0
+
+
     for row in data:
-        num_total += 1
-        id_name = row[0]
-        timestamp = row[1]
-        status = row[2]
-        new_status = return_status(status)
-        last_reset_timestamp = get_item_sqlite(id_name, "LAST_RESET_TIMESTAMP")
-        uptime_sec = row[3]
-        uptime = row[4]
-        time_cur = datetime.datetime.now()
-        if timestamp is not None:
-            time_ts = datetime.datetime.strptime(timestamp, "%b %d, %Y %H:%M:%S")
-        else:
-            time_ts = datetime.datetime.time()
-        total_seconds = ((time_cur-time_ts).seconds)
+        try:
+            num_total += 1
+            id_name = row[0]
+            timestamp = row[1]
+            status = row[2]
+            new_status = return_status(status)
+            last_reset_timestamp = get_item_sqlite(id_name, "LAST_RESET_TIMESTAMP")
+            uptime_sec = row[3]
+            uptime = row[4]
+
+            time_cur = datetime.datetime.now()        
+            if timestamp is not None and timestamp != '' and timestamp != ' ':
+                time_ts = datetime.datetime.strptime(timestamp, "%b %d, %Y %H:%M:%S")
+                total_seconds = ((time_cur-time_ts).seconds)
+            else:
+                time_ts = ""
+                total_seconds = 0
+        except Exception, e:
+            logger.error("error: %s" % e)
+            for frame in traceback.extract_tb(sys.exc_info()[2]):
+                fname,lineno,fn,text = frame
+                logger.error( "     in %s on line %d" % (fname, lineno))
         if (total_seconds > periodic_period):
             # more than X seconds since last message. update this entry with NOREPLY
             timestamp = get_item_sqlite(id_name, "TIMESTAMP")
@@ -756,6 +806,9 @@ def parse_data_sqlite(data):
             #this item was OK if its status says OKAY
             if (new_status == "OKAY"):
                 num_okay += 1
+
+
+
     # report / save system stats            
     if (num_total == 0):
         return
@@ -845,6 +898,8 @@ if __name__ == "__main__":
         except Exception, e:
             logger.error("Can't connect to googlesheet! %s" % e)
         
+    init_items()
+
     ##################
     # SOCKET SETUP
     ##################
@@ -876,13 +931,13 @@ if __name__ == "__main__":
         # PERIODIC DATA CHECK
         #######################
         # periodic data check. Checks SQLite every X seconds for lack of replies
-
-        if (time.time() - periodic_timer > periodic_period):
-            data = get_pis_sqlite("DEVICES")
-            parse_data_sqlite(data)
-            periodic_timer = time.time()
-        
         try:
+
+            if (time.time() - periodic_timer > periodic_period):
+                data = get_pis_sqlite("DEVICES")
+                parse_data_sqlite(data)
+                periodic_timer = time.time()
+        
             data, address = server_socket.recvfrom(1024)
             if (data):
                 print "-----Client (%s) connected, sent %s" % (address, data)

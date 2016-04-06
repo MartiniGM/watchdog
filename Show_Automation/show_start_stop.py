@@ -53,22 +53,30 @@ PAUSE_COMMAND = "/pause" #pause command sent to do-audio on the Pis
 UNPAUSE_COMMAND = "/unpause" #unpause command sent to do-audio on the Pis
 PAUSE_VIDEO_COMMAND = "/stopall" #pause command sent to do-audio on the Pis
 UNPAUSE_VIDEO_COMMAND = "/playnormal" #unpause command sent to do-audio on the Pis
-VOLUME_DOWN_COMMAND0 = "amixer -c 0 -- sset Headphone playback 0%"
-VOLUME_DOWN_COMMAND1 = "amixer -c 1 -- sset Headphone playback 0%"
-VOLUME_DOWN_COMMAND2 = "amixer -c 2 -- sset Headphone playback 0%"
-VOLUME_UP_COMMAND0 = "amixer -c 0 -- sset Headphone playback 30%" 
-VOLUME_UP_COMMAND1 = "amixer -c 1 -- sset Headphone playback 30%" 
-VOLUME_UP_COMMAND2 = "amixer -c 2 -- sset Headphone playback 30%"
+
+VOLUME_DOWN_COMMAND = "/home/pi/RUNNING/scripts/set_volume.py 0%"
+VOLUME_UP_COMMAND = "/home/pi/RUNNING/scripts/set_volume.py"
 
 #list of entry videos to be rebooted simultaneously
 entry_video_list = ["10.42.27.41", "10.42.27.42"]
+
+#IP address for the POD
+POD_ip = "10.42.24.21"
+POD_port = 5678 #port it listens for the "calm down" bang
+#command to start the POD max patch
+POD_command = "c:/Users/bauerrus/Desktop/MasterControlPatch.maxpat"
+
+#command & list to start Ableton on media servers
+ableton_play_command = "/live/play"
+ableton_port = 9000
+ableton_list = ["10.42.18.21", "10.42.20.20", "10.42.20.21", "10.42.21.18", "10.42.22.20", "10.42.24.20", "10.42.24.21", "10.42.25.20", "10.42.25.21"]
 
 #list of Pis with videos to kill/start for concert mode
 concert_mode_video_list = ["10.42.22.42", "10.42.23.45", "10.42.22.54", "10.42.23.44"] #benji's dance videos, lighthouse, lucius narrative
 #list of Pis with audio to kill/start for concert mode
 concert_mode_looping_audio_list = ["10.42.23.40"] #lighthouse
 concert_mode_triggered_audio_list = ["10.42.22.52"] #charter clock
-concert_mode_volume_list = ["10.42.22.53", "10.42.22.54", "10.42.23.43", "10.42.22.50"] #bug room, dylan's cartoon room, and 2x shanty global audio
+concert_mode_volume_list = ["10.42.22.53", "10.42.22.54", "10.42.22.50"] #bug room, dylan's cartoon room, and 2x shanty global audio] #, "10.42.23.43", 
 
 #Beamspace controller IP / port for DMX control
 DMX_IP = "10.42.20.21"
@@ -1248,6 +1256,13 @@ def start_proc_device(remote_ip, procname):
         logger.info( " -----sending %s to %s" % (cmd, remote_ip))
         udpsend(cmd, remote_ip, WATCHDOG_PORT)
 
+#restarts the max patch on the POD (sends "calm down" message and then stops/starts the max patch)
+def restart_pod():
+    send_to_osc(POD_ip, POD_port, "restart pod")
+    time.sleep(4.0)
+    reboot_windows(POD_ip)
+#    start_proc_device(POD_ip, POD_command)
+
 #kills looping audio for a given Pi
 def kill_looping_audio(remote_ip):
     if not args.disable:
@@ -1280,28 +1295,28 @@ def pause(remote_ip, cmd):
 def volume_off_pi(remote_ip):
     if not args.disable:
 
-        cmd = "start_proc " + VOLUME_DOWN_COMMAND0
+        cmd = "start_proc " + VOLUME_DOWN_COMMAND
         send_to_osc(remote_ip, WATCHDOG_PORT, cmd)
         time.sleep(0.5)
-        cmd = "start_proc " + VOLUME_DOWN_COMMAND1
-        send_to_osc(remote_ip, WATCHDOG_PORT, cmd)
-        time.sleep(0.5)
-        cmd = "start_proc " + VOLUME_DOWN_COMMAND2
-        send_to_osc(remote_ip, WATCHDOG_PORT, cmd)
+#        cmd = "start_proc " + VOLUME_DOWN_COMMAND1
+#        send_to_osc(remote_ip, WATCHDOG_PORT, cmd)
+#        time.sleep(0.5)
+#        cmd = "start_proc " + VOLUME_DOWN_COMMAND2
+#        send_to_osc(remote_ip, WATCHDOG_PORT, cmd)
     else:
         logger.info("would send volume down to %s" % remote_ip)
 
 #sends volume on (80%) to the given Pi
 def volume_on_pi(remote_ip):
     if not args.disable:
-        cmd = "start_proc " + VOLUME_UP_COMMAND0
+        cmd = "start_proc " + VOLUME_UP_COMMAND
         send_to_osc(remote_ip, WATCHDOG_PORT, cmd)
         time.sleep(0.5)
-        cmd = "start_proc " + VOLUME_UP_COMMAND1
-        send_to_osc(remote_ip, WATCHDOG_PORT, cmd)
-        time.sleep(0.5)
-        cmd = "start_proc " + VOLUME_UP_COMMAND2
-        send_to_osc(remote_ip, WATCHDOG_PORT, cmd)
+#        cmd = "start_proc " + VOLUME_UP_COMMAND1
+#        send_to_osc(remote_ip, WATCHDOG_PORT, cmd)
+#        time.sleep(0.5)
+#        cmd = "start_proc " + VOLUME_UP_COMMAND2
+#        send_to_osc(remote_ip, WATCHDOG_PORT, cmd)
     else:
         logger.info("would send volume up to %s" % remote_ip)
 
@@ -1408,6 +1423,18 @@ def concert_off_dmx():
 #        send_to_osc(DMX_IP, DMX_PORT, msg)
     else:
         logger.info( "would set dmx preset 1 on %s: to enter exhibition mode" % DMX_IP)
+
+
+
+# hits play on Ableton for a given list of media servers
+def play_ableton():
+    logger.info( " -----play ableton")
+        
+    try:
+        for item in ableton_list:
+            send_to_osc(item, ableton_port, ableton_play_command)
+    except Exception, e:
+        logger.error(" ERROR: %s" % e) 
 
 # turns concert mode (for live shows) on or off. Kills/starts audio on all Pis in Shanty Town, plus sends 
 # DMX light control to/from the light console
@@ -1613,6 +1640,9 @@ if __name__ == "__main__":
                         action='store_true',
                         help='simul(ish)-reboots the entry video (Benji as Agent 35) Pis')
 
+    group.add_argument('--restart_pod',
+                        action='store_true',
+                        help='restarts the MAX patch on Russels Livestock POD')
 
     group.add_argument('--volume_up',
                         action='store_true',
@@ -1621,6 +1651,10 @@ if __name__ == "__main__":
     group.add_argument('--volume_down',
                         action='store_true',
                         help='sets volume to 0 percent on Pis')
+
+    group.add_argument('--play_ableton',
+                        action='store_true',
+                        help='sends /live/play message to media servers, to hit play on Ableton')
 
     ##### add-on arguments (can be applied to the above)
     parser.add_argument("--switch",
@@ -1723,6 +1757,8 @@ if __name__ == "__main__":
         cmd = cmd + (", leave concert mode")
     if args.reboot_entry_videos:
         cmd = cmd + (", reboot entry videos")
+    if args.play_ableton:
+        cmd = cmd + (", play ableton")
     if args.on_by_zone:
         cmd = cmd + (", on by zone:")
     if args.off_by_zone:
@@ -1968,18 +2004,32 @@ if __name__ == "__main__":
         volume_off_pi(args.ip)
 
     #################
-    # VOLUME UP
+    # RELAY ON
     #################
 
     if args.relay_on:
         on_off_single_relay("on", args.relay)
 
     #################
-    # VOLUME DOWN
+    # RELAY OFF
     #################
 
     if args.relay_off:
         on_off_single_relay("off", args.relay)
+
+    #################
+    # RELAY OFF
+    #################
+
+    if args.play_ableton:
+        play_ableton()
+
+    #################
+    # RESTART POD
+    #################
+
+    if args.restart_pod:
+        restart_pod()
 
     #################
     # ENTRY VIDEO REBOOT
