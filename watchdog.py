@@ -542,10 +542,11 @@ def print_startup_message(software_list, ups_list):
     logger.info("Now monitoring:")
     logger.info(this_ip)
     for (proc_name) in software_list:
-        if (proc_name[0] == '/'):
-            logger.info(this_ip + str(proc_name))
-        else:
-            logger.info(this_ip + "/" + str(proc_name))
+        if proc_name is not None and proc_name != "" and len(proc_name) > 0:
+            if (proc_name[0] == '/'):
+                logger.info(this_ip + str(proc_name))
+            else:
+                logger.info(this_ip + "/" + str(proc_name))
     i = 0
     for (ups_name) in ups_list:
         i = i + 1
