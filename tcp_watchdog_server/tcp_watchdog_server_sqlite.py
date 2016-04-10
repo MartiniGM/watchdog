@@ -682,15 +682,15 @@ def sql_data_sqlite(data, ip):
     if len(datalist) != 5 or datalist[0] == "x.x.x.x":
         logger.warning( "got the IP address error %s " % ip[0])
         id_name = ip[0]
-        timestamp = datalist[0]
-        status = datalist[1]
+        timestamp = datalist[1]
+        status = datalist[2]
         new_status = return_status(status)
-        uptime_sec = datalist[2]
+        uptime_sec = datalist[3]
         #replaces ',' etc to ensure numbers only
         uptime_sec = non_decimal.sub('', uptime_sec)
         #strips out dumb characters at the end of strings sent by Max
         uptime_sec = uptime_sec.replace('\x00', '')
-        uptime = datalist[3]
+        uptime = datalist[4]
     else:
         id_name = datalist[0]
         if (id_name[0] == '/'):

@@ -54,6 +54,7 @@ UNPAUSE_COMMAND = "/unpause" #unpause command sent to do-audio on the Pis
 PAUSE_VIDEO_COMMAND = "/stopall" #pause command sent to do-audio on the Pis
 UNPAUSE_VIDEO_COMMAND = "/playnormal" #unpause command sent to do-audio on the Pis
 
+VOLUME_RELATIVE_COMMAND = "/home/pi/RUNNING/scripts/set_volume.py --relative"
 VOLUME_DOWN_COMMAND = "/home/pi/RUNNING/scripts/set_volume.py 0%"
 VOLUME_UP_COMMAND = "/home/pi/RUNNING/scripts/set_volume.py"
 
@@ -1292,6 +1293,30 @@ def pause(remote_ip, cmd):
         send_to_osc(remote_ip, OSC_PORT, cmd)
 
 #sends volume off to the given Pi
+def volume_relative_pi(remote_ip, volume_amount):
+
+    if volume_amount is None: 
+        logger.info("Error: no --volume given with --volume_relative")
+        return
+
+    if volume_amount == "":
+        logger.info("Error: no --volume given with --volume_relative")
+        return
+
+    if not args.disable:
+        cmd = "start_proc " + VOLUME_RELATIVE_COMMAND + " " + volume_amount
+        send_to_osc(remote_ip, WATCHDOG_PORT, cmd)
+        time.sleep(0.5)
+#        cmd = "start_proc " + VOLUME_DOWN_COMMAND1
+#        send_to_osc(remote_ip, WATCHDOG_PORT, cmd)
+#        time.sleep(0.5)
+#        cmd = "start_proc " + VOLUME_DOWN_COMMAND2
+#        send_to_osc(remote_ip, WATCHDOG_PORT, cmd)
+    else:
+        log_info = "would send volume relative to " + remote_ip + " as " + volume_amount
+        logger.info(log_info)
+
+#sends volume off to the given Pi
 def volume_off_pi(remote_ip):
     if not args.disable:
 
@@ -1306,7 +1331,7 @@ def volume_off_pi(remote_ip):
     else:
         logger.info("would send volume down to %s" % remote_ip)
 
-#sends volume on (80%) to the given Pi
+#sends volume on (standard presets) to the given Pi
 def volume_on_pi(remote_ip):
     if not args.disable:
         cmd = "start_proc " + VOLUME_UP_COMMAND
@@ -1319,6 +1344,80 @@ def volume_on_pi(remote_ip):
 #        send_to_osc(remote_ip, WATCHDOG_PORT, cmd)
     else:
         logger.info("would send volume up to %s" % remote_ip)
+
+#sends volume on (standard presets) to all non global Pis
+def volume_on_allpis():
+    try:
+        if os.name == 'nt':
+            con = lite.connect(WINDOWS_DB_FILENAME)
+        else:
+            con = lite.connect(LINUX_OSX_DB_FILENAME)
+    except Exception, e:
+        logger.error( " ERROR: Can't connect to demosdb! %s" % e)
+
+    try:
+        with con:
+            #select all the Pis
+            cur = con.cursor()
+            sql = "SELECT ID_NAME, DEVICE_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE, BOOT_ORDER, SPACE, ZONE, DESCRIPTION FROM DEVICES WHERE DEVICE_TYPE LIKE '%BERRY%' AND DESCRIPTION NOT LIKE '%GLOBAL%'" 
+            cur.execute(sql)
+            data = cur.fetchall()
+
+        #and step through devices, turning volume on
+            for item in data:
+                (remote_ip, device_name, mac_address, switch_interface, device_type, boot_order, space, zone, description) = item
+
+                if device_name is not None and device_name.lower() != "default":
+                    if not args.disable:
+                        logger.info("sending volume up to %s: %s" % (remote_ip, device_name))
+                        cmd = "start_proc " + VOLUME_UP_COMMAND
+                        time.sleep(0.5)
+                    else:
+                        logger.info("would send volume up to %s: %s" % (remote_ip, device_name))
+    except lite.Error, e:
+        logger.error(" ERROR: SQL error! %s" % e)
+
+#sends volume on (relative volume given) to all non global Pis
+def volume_relative_allpis(volume_amount):
+    if volume_amount is None:
+        logger.info("Error: no --volume given with --volume_relative")
+        return
+
+    if volume_amount == "":
+        logger.info("Error: no --volume given with --volume_relative")
+        return
+
+    try:
+        if os.name == 'nt':
+            con = lite.connect(WINDOWS_DB_FILENAME)
+        else:
+            con = lite.connect(LINUX_OSX_DB_FILENAME)
+    except Exception, e:
+        logger.error( " ERROR: Can't connect to demosdb! %s" % e)
+
+    try:
+        with con:
+            #select all the Pis
+            cur = con.cursor()
+            sql = "SELECT ID_NAME, DEVICE_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE, BOOT_ORDER, SPACE, ZONE, DESCRIPTION FROM DEVICES WHERE DEVICE_TYPE LIKE '%BERRY%' AND DESCRIPTION NOT LIKE '%GLOBAL%'" 
+            cur.execute(sql)
+            data = cur.fetchall()
+
+        #and step through devices, turning volume on
+            for item in data:
+                (remote_ip, device_name, mac_address, switch_interface, device_type, boot_order, space, zone, description) = item
+
+                if device_name is not None and device_name.lower() != "default":
+                    if not args.disable:
+                        logger.info("sending volume %s to %s: %s" % (volume_amount, remote_ip, device_name))
+
+                        cmd = "start_proc " + VOLUME_RELATIVE_COMMAND + " " + volume_amount
+                        time.sleep(0.5)
+                    else:
+                        logger.info("would send volume %s to %s: %s" % (volume_amount, remote_ip, device_name))
+
+    except lite.Error, e:
+        logger.error(" ERROR: SQL error! %s" % e)
 
 #sends "concert mode on" commands to one Pi
 def concert_on_video(remote_ip):
@@ -1652,6 +1751,10 @@ if __name__ == "__main__":
                         action='store_true',
                         help='sets volume to 0 percent on Pis')
 
+    group.add_argument('--volume_relative',
+                        action='store_true',
+                        help='sets volume to +/- given percent on Pis')
+
     group.add_argument('--play_ableton',
                         action='store_true',
                         help='sends /live/play message to media servers, to hit play on Ableton')
@@ -1721,7 +1824,10 @@ if __name__ == "__main__":
     parser.add_argument('--relay', 
                         type=str,
                         help='Relay name to use with _relay commands')
-    
+
+    parser.add_argument('--volume', 
+                        type=str,
+                        help='Volume to use with --volume_relative (i.e. 5-, 10+') 
     args = parser.parse_args()
 
     ###############################################
@@ -1767,6 +1873,9 @@ if __name__ == "__main__":
         cmd = cmd + (", volume up")
     if args.volume_down:
         cmd = cmd + (", volume down:")
+    if args.volume_relative:
+        cmd = cmd + (", volume relative:")
+
     if args.ip:
         cmd = cmd + (" with IP %s" % args.ip)
     if args.proc:
@@ -1789,6 +1898,8 @@ if __name__ == "__main__":
         cmd = cmd + (", for device type %s" % args.type)
     if args.space:
         cmd = cmd + (", for space %s" % args.space)
+    if args.volume:
+        cmd = cmd + (" with volume %s" % args.volume)
     logger.info(cmd)
 
     if args.disable:
@@ -1796,7 +1907,7 @@ if __name__ == "__main__":
     
         #checks whether this is a standalone call or requires arguments
     single_item = False
-    if not (args.start_device or args.stop_device or args.reboot_device or args.pause_audio_device or args.unpause_audio_device or args.kill_proc_device or args.start_proc_device or args.volume_up or args.volume_down):
+    if not (args.start_device or args.stop_device or args.reboot_device or args.pause_audio_device or args.unpause_audio_device or args.kill_proc_device or args.start_proc_device or args.volume_up or args.volume_down or args.volume_relative):
         single_item = True
         
     if (single_item):
@@ -1994,7 +2105,10 @@ if __name__ == "__main__":
     #################
 
     if args.volume_up:
-        volume_on_pi(args.ip)
+        if args.ip:
+            volume_on_pi(args.ip)
+        else:
+            volume_on_allpis()           
 
     #################
     # VOLUME DOWN
@@ -2002,6 +2116,17 @@ if __name__ == "__main__":
 
     if args.volume_down:
         volume_off_pi(args.ip)
+
+    #################
+    # VOLUME DOWN
+    #################
+
+    if args.volume_relative:
+        if args.ip:
+            volume_relative_pi(args.ip, args.volume)
+        else:
+            #turn everything up
+            volume_relative_allpis(args.volume)
 
     #################
     # RELAY ON
