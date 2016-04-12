@@ -165,7 +165,18 @@ def send_to_osc(remote_ip, port, cmd):
             except Exception, e:
                 logger.error( "Error in send_to_osc: %s" % e)
         else:
-            print "not implemented"
+            try:
+                import liblo
+            except Exception, e:
+                return
+            try:
+                logger.info( " -----sending %s to %s %s" % (cmd, remote_ip, port))
+                target = liblo.Address(remote_ip, port)
+                liblo.send(target, cmd)
+            except liblo.AddressError, err:
+                logger.error( str(err))
+            except Exception, e:
+                logger.error( "Error in send_to_osc: %s" % e)
 
 ####################
 # setup_logger()
