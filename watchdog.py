@@ -13,6 +13,7 @@ import subprocess
 import traceback
 import logging
 import logging.handlers
+import liblo
 
 ##############################
 # INSTRUCTIONS 
@@ -56,6 +57,8 @@ upslist = []
 # set watchdog server's IP and port here
 host = '10.42.16.17'
 port = 6666
+STATUS_PORT = 4001
+
 # set this machine's IP in case the network goes down & it forgets :l  
 this_default_ip = "x.x.x.x"
 send_ok_period = 30 #sends OKAY every N seconds
@@ -256,9 +259,15 @@ def kill_proc(process_name):
     try:
         if sys.platform == 'linux' or sys.platform == 'linux2': 
             os.system('pkill -f ' + process_name)
+            msg2 = "Watchdog got kill process %s" % str(process_name)
+            msg = "/watchdog_status %s %s" % (this_ip, msg2)
+            send_to_osc(host, STATUS_PORT, msg)
         else:
             if os.name == 'nt':
                 os.system('taskkill /im ' + process_name)
+                msg2 = "Watchdog got kill process %s" % str(process_name)
+                msg = "/watchdog_status %s %s" % (this_ip, msg2)
+                send_to_osc(host, STATUS_PORT, msg)
     except Exception, e:
         print "error in kill-proc: can't kill %s: %s" % (process_name, e)
 
@@ -269,6 +278,9 @@ def start_proc(process_name):
         # process when the watchdog dies or is ctrl-c'd, and not letting
         # child processes hold onto the watchdog's own ports
             tmp_process = subprocess.Popen(process_name, preexec_fn=os.setsid, close_fds=True)
+            msg2 = "Watchdog got start process %s" % str(process_name)
+            msg = "/watchdog_status %s %s" % (this_ip, msg2)
+            send_to_osc(host, STATUS_PORT, msg)
         except Exception, e:
             print "error in start-proc: can't start %s: %s" % (process_name, e)
     else:
@@ -281,6 +293,9 @@ def start_proc(process_name):
                 process_name_str = str(os.path.normpath(process_name[0]))
 #                tmp_process = subprocess.Popen(process_name_str, close_fds=True)
                 os.startfile(process_name_str)
+                msg2 = "Watchdog got start process %s" % str(process_name)
+                msg = "/watchdog_status %s %s" % (this_ip, msg2)
+                send_to_osc(host, STATUS_PORT, msg)
             except Exception, e:
                 print "error in start-proc: can't start %s: %s" % (process_name_str, e)
                 for frame in traceback.extract_tb(sys.exc_info()[2]):
@@ -294,9 +309,15 @@ def rebootscript():
     global reboot_cmd
     if ("reboot" in reboot_cmd):
         logger.info( "rebooting system!" )
+        msg2 = "Watchdog got reboot"
+        msg = "/watchdog_status %s %s" % (this_ip, msg2)
+        send_to_osc(host, STATUS_PORT, msg)
     else:
         if ("halt" in reboot_cmd):
             logger.info( "halting system!" )
+            msg2 = "Watchdog got halt"
+            msg = "/watchdog_status %s %s" % (this_ip, msg2)
+            send_to_osc(host, STATUS_PORT, msg)
     try:
         if sys.platform == 'linux' or sys.platform == 'linux2':
             import subprocess
@@ -539,6 +560,9 @@ def socket_connect():
 # prints the ID name of every device to be monitored, so the user can copy it to the Master Doc
 def print_startup_message(software_list, ups_list):
     global this_ip
+    msg2 = "Watchdog started on %s" % this_ip
+    msg = "/watchdog_status %s %s" % (this_ip, msg2)
+    send_to_osc(host, STATUS_PORT, msg)
     logger.info("Now monitoring:")
     logger.info(this_ip)
     for (proc_name) in software_list:
