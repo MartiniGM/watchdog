@@ -141,9 +141,9 @@ signal.signal(signal.SIGINT, signal_handler)
 #sends OSC messages to the show controller
 def send_to_osc(remote_ip, port, cmd):
     if sys.platform == 'linux' or sys.platform == 'linux2':
-        import liblo
-        logger.info( " -----sending %s to %s %s" % (cmd, remote_ip, port))
         try:
+            import liblo
+            logger.info( " -----sending %s to %s %s" % (cmd, remote_ip, port))
             target = liblo.Address(remote_ip, port)
             liblo.send(target, cmd)
         except liblo.AddressError, err:
@@ -152,12 +152,15 @@ def send_to_osc(remote_ip, port, cmd):
             logger.error( "Error in send_to_osc: %s" % e)
     else:
         if os.name == 'nt':
-            import OSC
-            c = OSC.OSCClient()
-            c.connect((remote_ip, port))
-            oscmsg = OSC.OSCMessage()
-            oscmsg.setAddress(cmd)
-            c.send(oscmsg)
+            try:
+                import OSC
+                c = OSC.OSCClient()
+                c.connect((remote_ip, port))
+                oscmsg = OSC.OSCMessage()
+                oscmsg.setAddress(cmd)
+                c.send(oscmsg)
+            except Exception, e:
+                logger.error( "Error in send_to_osc: %s" % e)
         else:
             print "not implemented"
 
