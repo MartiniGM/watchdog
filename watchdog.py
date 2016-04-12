@@ -13,7 +13,6 @@ import subprocess
 import traceback
 import logging
 import logging.handlers
-import liblo
 
 ##############################
 # INSTRUCTIONS 
@@ -141,14 +140,26 @@ signal.signal(signal.SIGINT, signal_handler)
 ####################
 #sends OSC messages to the show controller
 def send_to_osc(remote_ip, port, cmd):
-    logger.info( " -----sending %s to %s %s" % (cmd, remote_ip, port))
-    try:
-        target = liblo.Address(remote_ip, port)
-        liblo.send(target, cmd)
-    except liblo.AddressError, err:
-        logger.error( str(err))
-    except Exception, e:
-        logger.error( "Error in send_to_osc: %s" % e)
+    if sys.platform == 'linux' or sys.platform == 'linux2':
+        import liblo
+        logger.info( " -----sending %s to %s %s" % (cmd, remote_ip, port))
+        try:
+            target = liblo.Address(remote_ip, port)
+            liblo.send(target, cmd)
+        except liblo.AddressError, err:
+            logger.error( str(err))
+        except Exception, e:
+            logger.error( "Error in send_to_osc: %s" % e)
+    else:
+        if os.name == 'nt':
+            import OSC
+            c = OSC.OSCClient()
+            c.connect((remote_ip, port))
+            oscmsg = OSC.OSCMessage()
+            oscmsg.setAddress(cmd)
+            c.send(oscmsg)
+        else:
+            print "not implemented"
 
 ####################
 # setup_logger()
