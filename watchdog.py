@@ -143,6 +143,9 @@ def send_to_osc(remote_ip, port, cmd):
     if sys.platform == 'linux' or sys.platform == 'linux2':
         try:
             import liblo
+        except Exception, e:
+            return
+        try:
             logger.info( " -----sending %s to %s %s" % (cmd, remote_ip, port))
             target = liblo.Address(remote_ip, port)
             liblo.send(target, cmd)
