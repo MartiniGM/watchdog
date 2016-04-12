@@ -137,6 +137,20 @@ signal.signal(signal.SIGINT, signal_handler)
 ####################
 
 ####################
+# send_to_osc()
+####################
+#sends OSC messages to the show controller
+def send_to_osc(remote_ip, port, cmd):
+    logger.info( " -----sending %s to %s %s" % (cmd, remote_ip, port))
+    try:
+        target = liblo.Address(remote_ip, port)
+        liblo.send(target, cmd)
+    except liblo.AddressError, err:
+        logger.error( str(err))
+    except Exception, e:
+        logger.error( "Error in send_to_osc: %s" % e)
+
+####################
 # setup_logger()
 ####################
 # sets up circular error logging
@@ -238,7 +252,7 @@ def autodetect_softwarelist():
                     if line_entries[0] == "@reboot":
                     #but don't add yourself
                         if len(line_entries) >= 2:
-                            if "watchdog.py" not in line_entries[1]:
+                            if "watchdog.py" not in line_entries[1] and "setupDACs.sh" not in line_entries[1]:
                         #and don't add duplicate entries
                                 if line_entries[1] not in softwarelist:
                                     softwarelist.append(line_entries[1])
