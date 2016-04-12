@@ -162,13 +162,25 @@ def send_to_osc(remote_ip, port, cmd):
                 oscmsg = OSC.OSCMessage()
                 oscmsg.setAddress(cmd)
                 c.send(oscmsg)
+                return
             except Exception, e:
                 logger.error( "Error in send_to_osc: %s" % e)
         else:
             try:
                 import liblo
             except Exception, e:
-                return
+                print "error %s" % e
+                try:
+                    import OSC
+                    c = OSC.OSCClient()
+                    c.connect((remote_ip, port))
+                    oscmsg = OSC.OSCMessage()
+                    oscmsg.setAddress(cmd)
+                    c.send(oscmsg)
+                    return
+                except Exception, e:
+                    logger.error( "Error in send_to_osc: %s" % e)
+                    return
             try:
                 logger.info( " -----sending %s to %s %s" % (cmd, remote_ip, port))
                 target = liblo.Address(remote_ip, port)
