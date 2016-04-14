@@ -24,7 +24,7 @@ from oauth2client.client import SignedJwtAssertionCredentials
 # switch list. add more switches here if you got 'em
 switches = ["10.42.0.3","10.42.0.4","10.42.0.5","10.42.0.6","10.42.0.7",
             "10.42.0.8","10.42.0.9","10.42.0.10","10.42.0.11","10.42.0.12",
-            "10.42.0.13", "10.42.0.14","10.42.0.17","10.42.0.20","10.42.0.21"]
+            "10.42.0.13", "10.42.0.14"]
 
 device_type_item_id = 5
 device_name_item_id = 0
@@ -34,6 +34,7 @@ ip_address_item_id = 1
 
 interface_list = []
 device_name_list = []
+current_name_list = []
 pi_list = []
 pi_output_list = []
 
@@ -45,7 +46,7 @@ json_file = 'mwsheets-91347531e5f4.json.secret'
 # URL for the google sheet. this can be public
 googleSheetKey = "1kHAcbAo8saNSTBc7ffidzrwu_FGK3FaBpmh7rO7hT-U"
 googleWorksheetName = "Networked Devices" #name of the tab on the google sheet
-
+googleWorksheetName_Switches = "Switch Interface Map" #name of the tab on the google sheet
 # dictionary to load Google spreadsheet into (for device types and descriptions)
 googleSheetDict = {}
 googleSheetDictSwitches = {}
@@ -121,6 +122,7 @@ def open_googlesheet():
         global googleSheetKey
         global googleWorksheet
         global list_of_lists
+        global list_of_lists_switches
         global loadGoogleSheetEvery 
         global device_name_list
         global pi_list
@@ -132,9 +134,13 @@ def open_googlesheet():
         gc = gspread.authorize(credentials)
         sh = gc.open_by_key(googleSheetKey)
         googleWorksheet = sh.worksheet(googleWorksheetName)
-
         # reads every item from the Networked Devices tab
         list_of_lists = googleWorksheet.get_all_values()
+
+#and the Switch Interface Map tab
+        googleWorksheet_switches = sh.worksheet(googleWorksheetName_Switches)
+        list_of_lists_switches = googleWorksheet_switches.get_all_values()
+        googleSheetLenSwitches = len(list_of_lists_switches)
 
         device_name_item_id = find_item(list_of_lists, "Device Name")
         mac_address_item_id = find_item(list_of_lists, "Mac Address")
@@ -147,6 +153,24 @@ def open_googlesheet():
                 if device_name is not None and device_name != "" and device_name.lower() != "default":
                     item2 = (mac_address, device_name)
                     device_name_list.append(item2)
+
+        #create searchable dictionary with ID_NAME/IP ADDRESS as the key!
+        if googleSheetLenSwitches != 0:
+            googleSheetDictSwitches = defaultdict(list)
+        #finds location of "IP ADDRESS" column to use as key
+            id_name_column_switch = 1 #default
+            id_name_column_switch = find_item(list_of_lists_switches, "Device Name")
+            switch_ip_column_switch = 1 #default
+            switch_ip_column_switch = find_item(list_of_lists_switches, "Switch IP")
+            switch_interface_column_switch = 1 #default
+            switch_interface_column_switch = find_item(list_of_lists_switches, "Switch Interface")
+
+            if id_name_column_switch is not None:
+                next_column = id_name_column_switch + 1
+                for listy in list_of_lists_switches:
+                    print listy
+                    googleSheetDictSwitches[listy[id_name_column_switch]] += listy[next_column:]
+                    googleSheetLenSwitches = len(googleSheetDictSwitches)
 
         print "made a list from master doc"
         print device_name_list
@@ -239,14 +263,18 @@ def do_a_host(mylist, compare):
 #print_switch: prints matches for this switch and returns them
 ############################################################ 
 def print_switch(switch):
-    entries = ["\t"]*49
+    entries = []
+#    entries = ["\t"]*49
     this_switch = subfinder_switch(interface_list, switch)
     for item in this_switch:
         interface = item[3]
         number = interface.rsplit('/', 1)[-1]
         stringy = item[1] + "\t"
-        entries[int(number)-1] = stringy
-        print "%s: %s at %s" % (switch, item[1], interface) 
+        #entries[int(number)-1] = stringy
+        stringy = "%s\t%s\t%s" % (item[1], switch, interface) 
+        print stringy
+        current_name_list.append(item[1])
+        entries.append(stringy)
     return entries
     
 ############################################################
@@ -386,10 +414,14 @@ try:
         # map into the Master Doc. 
         for item in switch_map:
             target.write(item)
-        target.write("\n")
-        # 10.42.0.3 has two switches, second one isn't in use. print an extra newline
-        if switch == "10.42.0.3":
             target.write("\n")
+    for item in list_of_lists_switches:
+        if item[0] not in current_name_list and item[0] != "Device Name":
+            stringy = "%s\t%s\t%s" % (item[0], item[1], item[2])
+            print stringy
+            target.write(stringy)
+            target.write("\n")
+
     print ""
     print "***Done. Check pi_map.txt and switch_map.txt for formatted output"
     print ""
