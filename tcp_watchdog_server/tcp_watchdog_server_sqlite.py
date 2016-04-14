@@ -149,12 +149,21 @@ def open_googlesheet():
     try:
         #create searchable dictionary with ID_NAME/IP ADDRESS as the key!
         if googleSheetLenSwitches != 0:
-            matches2 = [match for match in find_switch("Switch Prefix")]
-            switch_prefix_index = int(matches2[0][1])
-        
-            matches3 = [match for match in find_switch("Switch IP")]
-            switch_ip_index = int(matches3[0][1])
-            pivot_switches()
+            googleSheetDictSwitches = defaultdict(list)
+        #finds location of "IP ADDRESS" column to use as key
+            id_name_column_switch = 1 #default
+            id_name_column_switch = find_item(list_of_lists_switches, "Device Name")
+            switch_ip_column_switch = 1 #default
+            switch_ip_column_switch = find_item(list_of_lists_switches, "Switch IP")
+            switch_interface_column_switch = 1 #default
+            switch_interface_column_switch = find_item(list_of_lists_switches, "Switch Interface")
+            
+            if id_name_column_switch is not None:
+                next_column = id_name_column_switch + 1
+                for listy in list_of_lists_switches:
+                    print listy
+                    googleSheetDictSwitches[listy[id_name_column_switch]] += listy[next_column:]
+                    googleSheetLenSwitches = len(googleSheetDictSwitches)    
 
     except Exception, e:
         logger.error("error in open_googlesheet for switches: %s" % e)
@@ -214,10 +223,24 @@ def get_item_googlesheet(id_name, item_name):
             our_item = googleSheetDict[id_name]
             item_id = header_item.index("Device Name")
             dev_name = our_item[item_id]
-            our_item2 = googleSheetDictSwitches[dev_name]
-
-#            print "%s %s" % (id_name, our_item2[0])
-            return str(our_item2[0])
+#            print "dev name %s" % dev_name
+            if dev_name is not None and dev_name != "":
+                try:
+                    our_item2 = googleSheetDictSwitches[dev_name]
+#                    print "our item 2 %s" % str(our_item2)
+#                    print "len %d" % len(our_item2)
+                    if len(our_item2) >= 1:
+                        return_item = str(our_item2[0]) + " " + str(our_item2[1])
+#                        print "+++++++" + return_item
+                        return str(return_item)
+                    else:
+                        return ""
+                except Exception, e:
+                    print "error %s" % e
+                    for frame in traceback.extract_tb(sys.exc_info()[2]):
+                        fname,lineno,fn,text = frame
+                        logger.error( "     in %s on line %d" % (fname, lineno))
+                    return ""
         else:
             our_item = googleSheetDict[id_name]
             return_item = re.sub(u"\u2010", "-", our_item[item_id])
