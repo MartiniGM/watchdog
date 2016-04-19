@@ -9,7 +9,7 @@
 			"modernui" : 1
 		}
 ,
-		"rect" : [ 41.0, 133.0, 921.0, 480.0 ],
+		"rect" : [ 70.0, 112.0, 921.0, 480.0 ],
 		"bglocked" : 0,
 		"openinpresentation" : 1,
 		"default_fontsize" : 12.0,
@@ -38,14 +38,29 @@
 		"subpatcher_template" : "",
 		"boxes" : [ 			{
 				"box" : 				{
+					"id" : "obj-1",
+					"maxclass" : "message",
+					"numinlets" : 2,
+					"numoutlets" : 1,
+					"outlettype" : [ "" ],
+					"patching_rect" : [ 303.0, 79.0, 116.0, 22.0 ],
+					"presentation" : 1,
+					"presentation_rect" : [ 391.5, 41.0, 85.0, 22.0 ],
+					"style" : "",
+					"text" : "ARD-0000"
+				}
+
+			}
+, 			{
+				"box" : 				{
 					"id" : "obj-5",
 					"maxclass" : "message",
 					"numinlets" : 2,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
-					"patching_rect" : [ 284.0, 78.0, 280.0, 22.0 ],
+					"patching_rect" : [ 445.0, 78.0, 280.0, 22.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 391.5, 41.0, 280.0, 22.0 ],
+					"presentation_rect" : [ 478.5, 41.0, 280.0, 22.0 ],
 					"style" : "",
 					"text" : "\"NVR recording software\""
 				}
@@ -72,8 +87,8 @@
 					"id" : "obj-33",
 					"maxclass" : "newobj",
 					"numinlets" : 1,
-					"numoutlets" : 2,
-					"outlettype" : [ "", "" ],
+					"numoutlets" : 3,
+					"outlettype" : [ "", "", "" ],
 					"patcher" : 					{
 						"fileversion" : 1,
 						"appversion" : 						{
@@ -84,7 +99,7 @@
 							"modernui" : 1
 						}
 ,
-						"rect" : [ 42.0, 203.0, 640.0, 480.0 ],
+						"rect" : [ 34.0, 331.0, 640.0, 480.0 ],
 						"bglocked" : 0,
 						"openinpresentation" : 0,
 						"default_fontsize" : 12.0,
@@ -112,6 +127,31 @@
 						"style" : "",
 						"subpatcher_template" : "",
 						"boxes" : [ 							{
+								"box" : 								{
+									"id" : "obj-7",
+									"maxclass" : "newobj",
+									"numinlets" : 2,
+									"numoutlets" : 2,
+									"outlettype" : [ "", "" ],
+									"patching_rect" : [ 203.5, 224.0, 87.0, 22.0 ],
+									"style" : "",
+									"text" : "getDescription"
+								}
+
+							}
+, 							{
+								"box" : 								{
+									"comment" : "",
+									"id" : "obj-6",
+									"maxclass" : "outlet",
+									"numinlets" : 1,
+									"numoutlets" : 0,
+									"patching_rect" : [ 271.5, 267.0, 30.0, 30.0 ],
+									"style" : ""
+								}
+
+							}
+, 							{
 								"box" : 								{
 									"comment" : "",
 									"id" : "obj-5",
@@ -145,19 +185,6 @@
 									"patching_rect" : [ 168.0, 173.0, 90.0, 22.0 ],
 									"style" : "",
 									"text" : "t s b s"
-								}
-
-							}
-, 							{
-								"box" : 								{
-									"id" : "obj-7",
-									"maxclass" : "newobj",
-									"numinlets" : 2,
-									"numoutlets" : 1,
-									"outlettype" : [ "" ],
-									"patching_rect" : [ 203.5, 224.0, 87.0, 22.0 ],
-									"style" : "",
-									"text" : "getDescription"
 								}
 
 							}
@@ -264,6 +291,15 @@
 								}
 
 							}
+, 							{
+								"patchline" : 								{
+									"destination" : [ "obj-6", 0 ],
+									"disabled" : 0,
+									"hidden" : 0,
+									"source" : [ "obj-7", 1 ]
+								}
+
+							}
  ]
 					}
 ,
@@ -290,7 +326,7 @@
 					"maxclass" : "newobj",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 381.0, 422.0, 131.0, 23.0 ],
+					"patching_rect" : [ 88.0, 541.0, 131.0, 23.0 ],
 					"style" : "",
 					"text" : "print login @popup 1"
 				}
@@ -305,7 +341,7 @@
 					"maxclass" : "newobj",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 115.0, 216.0, 140.0, 23.0 ],
+					"patching_rect" : [ 98.0, 293.0, 140.0, 23.0 ],
 					"style" : "",
 					"text" : "print reboot @popup 1"
 				}
@@ -552,8 +588,8 @@
 					"id" : "obj-11",
 					"maxclass" : "newobj",
 					"numinlets" : 1,
-					"numoutlets" : 2,
-					"outlettype" : [ "", "" ],
+					"numoutlets" : 1,
+					"outlettype" : [ "" ],
 					"patcher" : 					{
 						"fileversion" : 1,
 						"appversion" : 						{
@@ -564,7 +600,7 @@
 							"modernui" : 1
 						}
 ,
-						"rect" : [ 140.0, 79.0, 640.0, 480.0 ],
+						"rect" : [ 207.0, 79.0, 423.0, 275.0 ],
 						"bglocked" : 0,
 						"openinpresentation" : 0,
 						"default_fontsize" : 12.0,
@@ -591,7 +627,6 @@
 						"tags" : "",
 						"style" : "",
 						"subpatcher_template" : "",
-						"visible" : 1,
 						"boxes" : [ 							{
 								"box" : 								{
 									"id" : "obj-14",
@@ -608,7 +643,7 @@
 											"modernui" : 1
 										}
 ,
-										"rect" : [ 20.0, 411.0, 640.0, 480.0 ],
+										"rect" : [ 34.0, 411.0, 640.0, 480.0 ],
 										"bglocked" : 0,
 										"openinpresentation" : 0,
 										"default_fontsize" : 12.0,
@@ -635,7 +670,6 @@
 										"tags" : "",
 										"style" : "",
 										"subpatcher_template" : "",
-										"visible" : 1,
 										"boxes" : [ 											{
 												"box" : 												{
 													"id" : "obj-4",
@@ -797,7 +831,7 @@
  ]
 									}
 ,
-									"patching_rect" : [ 190.0, 152.0, 18.0, 22.0 ],
+									"patching_rect" : [ 100.0, 150.0, 85.0, 22.0 ],
 									"saved_object_attributes" : 									{
 										"description" : "",
 										"digest" : "",
@@ -807,7 +841,7 @@
 									}
 ,
 									"style" : "",
-									"text" : "p"
+									"text" : "p sendReboot"
 								}
 
 							}
@@ -818,7 +852,7 @@
 									"numinlets" : 1,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 293.0, 152.0, 108.0, 22.0 ],
+									"patching_rect" : [ 203.0, 150.0, 108.0, 22.0 ],
 									"style" : "",
 									"text" : "prepend rebooting"
 								}
@@ -831,7 +865,7 @@
 									"maxclass" : "outlet",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 293.0, 187.0, 30.0, 30.0 ],
+									"patching_rect" : [ 203.0, 185.0, 30.0, 30.0 ],
 									"style" : ""
 								}
 
@@ -843,7 +877,7 @@
 									"numinlets" : 1,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 190.0, 104.0, 29.0, 22.0 ],
+									"patching_rect" : [ 100.0, 102.0, 29.0, 22.0 ],
 									"style" : "",
 									"text" : "v ip"
 								}
@@ -857,70 +891,8 @@
 									"numinlets" : 0,
 									"numoutlets" : 1,
 									"outlettype" : [ "bang" ],
-									"patching_rect" : [ 190.0, 53.0, 30.0, 30.0 ],
+									"patching_rect" : [ 100.0, 51.0, 30.0, 30.0 ],
 									"style" : ""
-								}
-
-							}
-, 							{
-								"box" : 								{
-									"id" : "obj-6",
-									"maxclass" : "comment",
-									"numinlets" : 1,
-									"numoutlets" : 0,
-									"patching_rect" : [ 117.0, 320.0, 150.0, 20.0 ],
-									"style" : "",
-									"text" : "old stuff"
-								}
-
-							}
-, 							{
-								"box" : 								{
-									"id" : "obj-4",
-									"maxclass" : "newobj",
-									"numinlets" : 1,
-									"numoutlets" : 1,
-									"outlettype" : [ "" ],
-									"patching_rect" : [ 220.0, 394.0, 108.0, 22.0 ],
-									"style" : "",
-									"text" : "prepend rebooting"
-								}
-
-							}
-, 							{
-								"box" : 								{
-									"comment" : "",
-									"id" : "obj-1",
-									"maxclass" : "outlet",
-									"numinlets" : 1,
-									"numoutlets" : 0,
-									"patching_rect" : [ 220.0, 429.0, 30.0, 30.0 ],
-									"style" : ""
-								}
-
-							}
-, 							{
-								"box" : 								{
-									"id" : "obj-2",
-									"maxclass" : "newobj",
-									"numinlets" : 1,
-									"numoutlets" : 1,
-									"outlettype" : [ "" ],
-									"patching_rect" : [ 179.0, 356.0, 29.0, 22.0 ],
-									"style" : "",
-									"text" : "v ip"
-								}
-
-							}
-, 							{
-								"box" : 								{
-									"id" : "obj-7",
-									"maxclass" : "newobj",
-									"numinlets" : 2,
-									"numoutlets" : 0,
-									"patching_rect" : [ 117.0, 394.0, 81.0, 22.0 ],
-									"style" : "",
-									"text" : "rebootDevice"
 								}
 
 							}
@@ -949,33 +921,6 @@
 									"disabled" : 0,
 									"hidden" : 0,
 									"source" : [ "obj-11", 0 ]
-								}
-
-							}
-, 							{
-								"patchline" : 								{
-									"destination" : [ "obj-4", 0 ],
-									"disabled" : 0,
-									"hidden" : 0,
-									"source" : [ "obj-2", 0 ]
-								}
-
-							}
-, 							{
-								"patchline" : 								{
-									"destination" : [ "obj-7", 1 ],
-									"disabled" : 0,
-									"hidden" : 0,
-									"source" : [ "obj-2", 0 ]
-								}
-
-							}
-, 							{
-								"patchline" : 								{
-									"destination" : [ "obj-1", 0 ],
-									"disabled" : 0,
-									"hidden" : 0,
-									"source" : [ "obj-4", 0 ]
 								}
 
 							}
@@ -1041,7 +986,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 560.0, 78.0, 213.0, 24.0 ],
+					"patching_rect" : [ 701.0, 78.0, 213.0, 24.0 ],
 					"presentation" : 1,
 					"presentation_rect" : [ 38.5, 13.0, 213.0, 24.0 ],
 					"style" : "",
@@ -1191,7 +1136,7 @@
 , 			{
 				"box" : 				{
 					"id" : "obj-20",
-					"linecount" : 3,
+					"linecount" : 2,
 					"maxclass" : "textedit",
 					"numinlets" : 1,
 					"numoutlets" : 4,
@@ -1199,10 +1144,10 @@
 					"parameter_enable" : 0,
 					"patching_rect" : [ 438.0, 145.0, 441.0, 57.0 ],
 					"presentation" : 1,
-					"presentation_linecount" : 3,
+					"presentation_linecount" : 2,
 					"presentation_rect" : [ 444.0, 108.0, 441.0, 57.0 ],
 					"style" : "",
-					"text" : "These devices are known to be DOWN:\n10.42.16.53/home/pi/RUNNING/builds/chest -- is currently removed \n10.42.16.53/home/pi/RUNNING/builds/laser -- is currently removed"
+					"text" : "These devices are known to be DOWN:\n<example devices>"
 				}
 
 			}
@@ -1287,6 +1232,15 @@
 			}
 , 			{
 				"patchline" : 				{
+					"destination" : [ "obj-1", 1 ],
+					"disabled" : 0,
+					"hidden" : 0,
+					"source" : [ "obj-33", 2 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
 					"destination" : [ "obj-40", 1 ],
 					"disabled" : 0,
 					"hidden" : 0,
@@ -1305,7 +1259,7 @@
 			}
  ],
 		"dependency_cache" : [ 			{
-				"name" : "rebootDevice.maxpat",
+				"name" : "remoteLogin.maxpat",
 				"bootpath" : "~/Documents/Max 7/Library/Show Automation",
 				"type" : "JSON",
 				"implicit" : 1
@@ -1314,12 +1268,6 @@
 				"name" : "watchGod.js",
 				"bootpath" : "~/Documents/Max 7/Library/watchdog",
 				"type" : "TEXT",
-				"implicit" : 1
-			}
-, 			{
-				"name" : "remoteLogin.maxpat",
-				"bootpath" : "~/Documents/Max 7/Library/Show Automation",
-				"type" : "JSON",
 				"implicit" : 1
 			}
 , 			{
