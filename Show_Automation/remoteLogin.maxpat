@@ -9,7 +9,7 @@
 			"modernui" : 1
 		}
 ,
-		"rect" : [ 56.0, 200.0, 1001.0, 760.0 ],
+		"rect" : [ 100.0, 85.0, 1001.0, 760.0 ],
 		"bglocked" : 0,
 		"openinpresentation" : 0,
 		"default_fontsize" : 12.0,
@@ -127,7 +127,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 581.25, 613.0, 154.0, 47.0 ],
+					"patching_rect" : [ 787.25, 626.5, 159.0, 47.0 ],
 					"style" : "",
 					"text" : "does nothing on Software.\nShould never get here thx to regexp above"
 				}
@@ -181,7 +181,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
-					"patching_rect" : [ 581.25, 585.0, 29.0, 22.0 ],
+					"patching_rect" : [ 789.75, 600.0, 34.0, 22.0 ],
 					"style" : "",
 					"text" : "v ip"
 				}
@@ -194,7 +194,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 1,
 					"outlettype" : [ "bang" ],
-					"patching_rect" : [ 581.25, 556.0, 24.0, 22.0 ],
+					"patching_rect" : [ 789.75, 571.0, 29.0, 22.0 ],
 					"style" : "",
 					"text" : "t b"
 				}
@@ -207,7 +207,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 5,
 					"outlettype" : [ "", "", "", "", "" ],
-					"patching_rect" : [ 545.75, 529.0, 90.0, 22.0 ],
+					"patching_rect" : [ 751.75, 542.5, 95.0, 22.0 ],
 					"style" : "",
 					"text" : "regexp oftware"
 				}
@@ -419,9 +419,9 @@
 					"numinlets" : 1,
 					"numoutlets" : 5,
 					"outlettype" : [ "", "", "", "", "" ],
-					"patching_rect" : [ 416.0, 529.0, 102.0, 22.0 ],
+					"patching_rect" : [ 416.0, 529.0, 162.5, 22.0 ],
 					"style" : "",
-					"text" : "regexp indow|PC"
+					"text" : "regexp indow|PC|Mac|mac"
 				}
 
 			}
@@ -445,7 +445,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 4,
 					"outlettype" : [ "", "", "", "" ],
-					"patching_rect" : [ 156.5, 503.0, 408.25, 22.0 ],
+					"patching_rect" : [ 156.5, 503.0, 637.25, 22.0 ],
 					"style" : "",
 					"text" : "t s s s s"
 				}
@@ -948,7 +948,7 @@
  ],
 		"dependency_cache" : [ 			{
 				"name" : "watchGod.js",
-				"bootpath" : "~/Documents/watchdog",
+				"bootpath" : "~/Documents/Max 7/Library/watchdog",
 				"type" : "TEXT",
 				"implicit" : 1
 			}
