@@ -9,7 +9,7 @@
 			"modernui" : 1
 		}
 ,
-		"rect" : [ 139.0, 110.0, 935.0, 823.0 ],
+		"rect" : [ 140.0, 109.0, 935.0, 823.0 ],
 		"bglocked" : 0,
 		"openinpresentation" : 0,
 		"default_fontsize" : 12.0,
@@ -1150,9 +1150,9 @@
 					"numinlets" : 1,
 					"numoutlets" : 5,
 					"outlettype" : [ "", "", "", "", "" ],
-					"patching_rect" : [ 504.5, 564.0, 82.0, 22.0 ],
+					"patching_rect" : [ 504.5, 564.0, 144.5, 22.0 ],
 					"style" : "",
-					"text" : "regexp indow"
+					"text" : "regexp indow|Mac|mac"
 				}
 
 			}
