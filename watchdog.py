@@ -167,26 +167,13 @@ def send_to_osc(remote_ip, port, cmd):
                 logger.error( "Error in send_to_osc: %s" % e)
         else:
             try:
-                import liblo
-            except Exception, e:
-                print "error %s" % e
-                try:
-                    import OSC
-                    c = OSC.OSCClient()
-                    c.connect((remote_ip, port))
-                    oscmsg = OSC.OSCMessage()
-                    oscmsg.setAddress(cmd)
-                    c.send(oscmsg)
-                    return
-                except Exception, e:
-                    logger.error( "Error in send_to_osc: %s" % e)
-                    return
-            try:
-                logger.info( " -----sending %s to %s %s" % (cmd, remote_ip, port))
-                target = liblo.Address(remote_ip, port)
-                liblo.send(target, cmd)
-            except liblo.AddressError, err:
-                logger.error( str(err))
+                import OSC
+                c = OSC.OSCClient()
+                c.connect((remote_ip, port))
+                oscmsg = OSC.OSCMessage()
+                oscmsg.setAddress(cmd)
+                c.send(oscmsg)
+                return
             except Exception, e:
                 logger.error( "Error in send_to_osc: %s" % e)
 
@@ -401,6 +388,7 @@ def rebootscript():
                 if ("reboot" in reboot_cmd):
                     subprocess.call(['osascript', '-e',
                                      'tell app "System Events" to restart'])
+                else:
                     if ("halt" in reboot_cmd):
                         subprocess.call(['osascript', '-e',
                                          'tell app "System Events" to shut down'])
