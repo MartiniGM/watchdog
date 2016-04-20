@@ -161,7 +161,7 @@ def open_googlesheet():
             if id_name_column_switch is not None:
                 next_column = id_name_column_switch + 1
                 for listy in list_of_lists_switches:
-                    print listy
+#                    print listy
                     googleSheetDictSwitches[listy[id_name_column_switch]] += listy[next_column:]
                     googleSheetLenSwitches = len(googleSheetDictSwitches)    
 
@@ -236,7 +236,7 @@ def get_item_googlesheet(id_name, item_name):
                     else:
                         return ""
                 except Exception, e:
-                    print "error %s" % e
+                    logger.error( "error in get_item_googlesheet: %s" % e
                     for frame in traceback.extract_tb(sys.exc_info()[2]):
                         fname,lineno,fn,text = frame
                         logger.error( "     in %s on line %d" % (fname, lineno))
@@ -702,9 +702,12 @@ def sql_data_sqlite(data, ip):
     datalist = data[0]
     non_decimal = re.compile(r'[^\d.]+')
 
-    if len(datalist) != 5 or datalist[0] == "x.x.x.x":
-        logger.warning( "got the IP address error %s " % ip[0])
-        id_name = ip[0]
+    if len(datalist) != 5 or "x.x.x.x" in datalist[0]:
+        logger.warning( "****got the IP address error %s " % ip[0])
+        id_name = str(datalist[0])
+        new_name = str(ip[0])
+        id_name = id_name.replace("x.x.x.x", new_name)
+        logger.warning("new item name is %s" % id_name)
         timestamp = datalist[1]
         status = datalist[2]
         new_status = return_status(status)
@@ -718,7 +721,7 @@ def sql_data_sqlite(data, ip):
         id_name = datalist[0]
         if (id_name[0] == '/'):
  #           print "got the IP address error"
-            id_name = ip + id_name
+            id_name = ip[0] + id_name
         timestamp = datalist[1]
         status = datalist[2]
         new_status = return_status(status)
