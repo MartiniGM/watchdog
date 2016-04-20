@@ -236,7 +236,7 @@ def get_item_googlesheet(id_name, item_name):
                     else:
                         return ""
                 except Exception, e:
-                    logger.error( "error in get_item_googlesheet: %s" % e
+                    logger.error( "error in get_item_googlesheet: %s" % e)
                     for frame in traceback.extract_tb(sys.exc_info()[2]):
                         fname,lineno,fn,text = frame
                         logger.error( "     in %s on line %d" % (fname, lineno))
