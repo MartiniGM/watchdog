@@ -26,7 +26,7 @@ POE_COMMAND = "/Users/Aesir/Documents/watchdog/set_power.exp"
 #command to use to send Wake on Lan messages 
 WOL_COMMAND = "/Users/Aesir/Documents/watchdog/wolcmd"
 DELAY_AFTER_SERVERS = 120.0 #delays 2 minutes between booting windows servers and pis
-DELAY_STOP_PI = 25.0 #delays 6 seconds between halting Pis and cutting PoE
+DELAY_STOP_PI = 15.0 #delays 15 seconds between halting Pis and cutting PoE
 DELAY_BETWEEN_DEVICES = 0.5 #delays a half second between stop/starting devices
 DELAY_BETWEEN_RELAYS = 2.0 #delays 2 seconds between commands to the relays
 DELAY_FOR_PROJECTORS = 360.0 #delays 6 minutes for projector cooldown and/or startup
@@ -82,6 +82,10 @@ concert_mode_volume_list = ["10.42.22.53", "10.42.22.54", "10.42.22.50"] #bug ro
 #Beamspace controller IP / port for DMX control
 DMX_IP = "10.42.20.21"
 DMX_PORT = 6667
+
+#Show controller IP / port for status readback
+SHOW_CONTROLLER_IP = "10.42.16.17"
+SHOW_CONTROLLER_PORT = 4001
 
 #list of valid zones
 zones_ok_list = ["arcade", "art city", "beamcade", "caves", "forest", "house", "portals", "shanty", "theater", "cade"]
@@ -582,7 +586,7 @@ def get_item(remote_ip):
             sql = "SELECT MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE FROM DEVICES WHERE ID_NAME LIKE '%s'" % remote_ip
             cur.execute(sql)
             data = cur.fetchall()
-#            logger.info( data ) 
+            logger.info( data ) 
             return data[0]
     except lite.Error, e:
         logger.error(" ERROR: SQL error! %s" % e)   
@@ -631,7 +635,11 @@ def start_device(switch_ip, switch_interface, device_type, mac_address):
                     logger.info(" now starting... %s %s" % (switch_ip, switch_interface))
                     start_arduino(switch_ip, switch_interface)
             else:
-                logger.error( " ERROR: type %s not matched, exiting..." % device_type)
+                if "mac" in device_type.lower():
+                    print "mac"
+                    start_windows(mac_address)
+                else:
+                    logger.error( " ERROR: type %s not matched, exiting..." % device_type)
 
 ###############
 # STOP DEVICE
@@ -680,7 +688,11 @@ def stop_device(remote_ip, switch_ip, switch_interface, device_type):
                     logger.info( " now stopping... %s %s" % (switch_ip, switch_interface))
                     stop_arduino(switch_ip, switch_interface)
             else:
-                logger.error( " ERROR: type %s not matched, exiting..." % device_type)
+                if "mac" in device_type.lower():
+                    print "stop mac"
+                    stop_windows(remote_ip)
+                else:
+                    logger.error( " ERROR: type %s not matched, exiting..." % device_type)
 
 ###############
 # REBOOT DEVICE
@@ -729,6 +741,10 @@ def reboot_device(remote_ip, switch_ip, switch_interface, device_type):
                 if not args.disable:
                     logger.info(" now rebooting... %s %s" % (switch_ip, switch_interface))
                     reboot_arduino(switch_ip, switch_interface, 2)
+
+            if "mac" in device_type.lower():
+                print "mac"
+                reboot_windows(remote_ip)
             else:
                 logger.error( " ERROR: type %s not matched, exiting..." % device_type)
 
@@ -826,6 +842,22 @@ def on_off_single_relay(on_or_off, relay_name):
         msg = "/relays/%s 0" % item[3]
         send_to_osc(item[4], RELAY_PORT, msg)
 
+def start_switch(command, limit_to_switch_ip, type):
+    print "start switch"
+    if limit_to_switch_ip is None or limit_to_switch_ip == "" or limit_to_switch_ip == " ":
+        logger.warning("%s switch called without a switch! Exiting..." % command)
+        return
+    else:
+        start_stop_reboot_show(command, limit_to_switch_ip, type)
+
+def start_by_type(command, limit_to_switch_ip, type):
+    print "start by type"
+    if type is None or type == "" or type == " ":
+        logger.warning("%s type called without a type! Exiting..." % command)
+        return
+    else:
+        start_stop_reboot_show(command, limit_to_switch_ip, type)
+
 ##############################
 # START/STOP/REBOOT SHOW
 ##############################            
@@ -854,7 +886,7 @@ def start_stop_reboot_show(command, limit_to_switch_ip, type):
         logger.info( "for type %s %s" % (type.lower(), device_type.lower()))
         if "berry" in type.lower() or "pi" in type.lower():
                 start_pi_type = 1
-        if "indows" in type.lower():
+        if "indows" in type.lower() or "mac" in type.lower():
                 start_windows_type = 1
         if "duino" in type.lower():
                 start_arduino_type = 1
@@ -920,7 +952,7 @@ def start_stop_reboot_show(command, limit_to_switch_ip, type):
                     if start_pi_type and "berry" in device_type.lower():
                         start_device(switch_ip, switch_interface, device_type, mac_address)
                         continue
-                    if start_windows_type and "indow" in device_type.lower():
+                    if start_windows_type and ("indow" in device_type.lower() or "mac" in device_type.lower()):
                         start_device(switch_ip, switch_interface, device_type, mac_address)
                         continue
                     if start_arduino_type and "duino" in device_type.lower():
@@ -944,7 +976,7 @@ def start_stop_reboot_show(command, limit_to_switch_ip, type):
                     if start_pi_type and "berry" in device_type.lower():
                         stop_device(remote_ip, switch_ip, switch_interface, device_type)
                         continue
-                    if start_windows_type and "indow" in device_type.lower():
+                    if start_windows_type and ("indow" in device_type.lower() or "mac" in device_type.lower()):
                         stop_device(remote_ip, switch_ip, switch_interface, device_type)
                         continue
                     if start_arduino_type and "duino" in device_type.lower():
@@ -963,7 +995,7 @@ def start_stop_reboot_show(command, limit_to_switch_ip, type):
                     if start_pi_type and "berry" in device_type.lower():
                         reboot_device(remote_ip, switch_ip, switch_interface, device_type)
                         continue
-                    if start_windows_type and "indow" in device_type.lower():
+                    if start_windows_type and ("indow" in device_type.lower() or "mac" in device_type.lower()):
                         reboot_device(remote_ip, switch_ip, switch_interface, device_type)
                         continue
                     if start_arduino_type and "duino" in device_type.lower():
@@ -1280,12 +1312,16 @@ def start_looping_audio(remote_ip):
 def start_looping_video(remote_ip):
     if not args.disable:
         send_to_osc(remote_ip, DO_VIDEO_PORT, "/playnormal")
+        msg = "/watchdog_status %s" % "watchdog got /playnormal for do-video" 
+        send_to_osc(SHOW_CONTROLLER_IP, SHOW_CONTROLLER_PORT, msg)
 
 #kills looping video on a given Pi
 def stop_looping_video(remote_ip):
     #send do-video a stop command
     if not args.disable:
         send_to_osc(remote_ip, DO_VIDEO_PORT, "/stopall")
+        msg = "/watchdog_status %s" % "watchdog got /stopall for do-video" 
+        send_to_osc(SHOW_CONTROLLER_IP, SHOW_CONTROLLER_PORT, msg)
 
 #sends audio pause or unpause command to the given Pi
 def pause(remote_ip, cmd):
@@ -1307,11 +1343,6 @@ def volume_relative_pi(remote_ip, volume_amount):
         cmd = "start_proc " + VOLUME_RELATIVE_COMMAND + " " + volume_amount
         send_to_osc(remote_ip, WATCHDOG_PORT, cmd)
         time.sleep(0.5)
-#        cmd = "start_proc " + VOLUME_DOWN_COMMAND1
-#        send_to_osc(remote_ip, WATCHDOG_PORT, cmd)
-#        time.sleep(0.5)
-#        cmd = "start_proc " + VOLUME_DOWN_COMMAND2
-#        send_to_osc(remote_ip, WATCHDOG_PORT, cmd)
     else:
         log_info = "would send volume relative to " + remote_ip + " as " + volume_amount
         logger.info(log_info)
@@ -1323,11 +1354,6 @@ def volume_off_pi(remote_ip):
         cmd = "start_proc " + VOLUME_DOWN_COMMAND
         send_to_osc(remote_ip, WATCHDOG_PORT, cmd)
         time.sleep(0.5)
-#        cmd = "start_proc " + VOLUME_DOWN_COMMAND1
-#        send_to_osc(remote_ip, WATCHDOG_PORT, cmd)
-#        time.sleep(0.5)
-#        cmd = "start_proc " + VOLUME_DOWN_COMMAND2
-#        send_to_osc(remote_ip, WATCHDOG_PORT, cmd)
     else:
         logger.info("would send volume down to %s" % remote_ip)
 
@@ -1337,11 +1363,6 @@ def volume_on_pi(remote_ip):
         cmd = "start_proc " + VOLUME_UP_COMMAND
         send_to_osc(remote_ip, WATCHDOG_PORT, cmd)
         time.sleep(0.5)
-#        cmd = "start_proc " + VOLUME_UP_COMMAND1
-#        send_to_osc(remote_ip, WATCHDOG_PORT, cmd)
-#        time.sleep(0.5)
-#        cmd = "start_proc " + VOLUME_UP_COMMAND2
-#        send_to_osc(remote_ip, WATCHDOG_PORT, cmd)
     else:
         logger.info("would send volume up to %s" % remote_ip)
 
@@ -1581,6 +1602,9 @@ def concert_mode(on_or_off):
                 #enter concert mode, turn up volume
                 volume_on_pi(item)
 
+        msg = "/concertmode_%s 1" % on_or_off
+        send_to_osc(SHOW_CONTROLLER_IP, SHOW_CONTROLLER_PORT, msg)
+
         return
 
     except lite.Error, e:
@@ -1687,9 +1711,25 @@ if __name__ == "__main__":
                         action='store_true',
                         help='shuts down the whole show (with great power... etc)')
 
+    group.add_argument('--stop_switch',
+                        action='store_true',
+                        help='shuts down the whole show (with great power... etc)')
+
     group.add_argument('--start_show',
                         action='store_true',
                         help='starts the whole show (with great power... etc)')
+
+    group.add_argument('--start_by_type',
+                        action='store_true',
+                        help='starts the whole show for a device type (with great power... etc)')
+
+    group.add_argument('--stop_by_type',
+                        action='store_true',
+                        help='stops the whole show for a device type (with great power... etc)')
+
+    group.add_argument('--start_switch',
+                        action='store_true',
+                        help='starts the whole show for a switch (with great power... etc)')
 
     group.add_argument('--reboot_nonresponsive',
                         action='store_true',
@@ -1847,8 +1887,12 @@ if __name__ == "__main__":
 
     if args.start_show:
         cmd = cmd + (", starting show")
+        msg = "/start_show 1"
+        send_to_osc(SHOW_CONTROLLER_IP, SHOW_CONTROLLER_PORT, msg)
     if args.stop_show:
         cmd = cmd + (", stopping show")
+        msg = "/stop_show 1"
+        send_to_osc(SHOW_CONTROLLER_IP, SHOW_CONTROLLER_PORT, msg)
     if args.stop_device:
         cmd = cmd + (", stopping single device")
     if args.start_device:
@@ -1865,17 +1909,36 @@ if __name__ == "__main__":
         cmd = cmd + (", reboot entry videos")
     if args.play_ableton:
         cmd = cmd + (", play ableton")
+    if args.start_switch:
+        cmd = cmd + (", on by switch:")
+        msg = "/start_show 1"
+        send_to_osc(SHOW_CONTROLLER_IP, SHOW_CONTROLLER_PORT, msg)
+    if args.stop_switch:
+        cmd = cmd + (", off by switch:")
+        msg = "/stop_show 1"
+        send_to_osc(SHOW_CONTROLLER_IP, SHOW_CONTROLLER_PORT, msg)
+    if args.start_by_type:
+        cmd = cmd + (", on by type:")
+        msg = "/start_show 1"
+        send_to_osc(SHOW_CONTROLLER_IP, SHOW_CONTROLLER_PORT, msg)
+    if args.stop_by_type:
+        cmd = cmd + (", off by type:")
+        msg = "/stop_show 1"
+        send_to_osc(SHOW_CONTROLLER_IP, SHOW_CONTROLLER_PORT, msg)
     if args.on_by_zone:
         cmd = cmd + (", on by zone:")
+        msg = "/start_show 1"
+        send_to_osc(SHOW_CONTROLLER_IP, SHOW_CONTROLLER_PORT, msg)
     if args.off_by_zone:
         cmd = cmd + (", off by zone:")
+        msg = "/stop_show 1"
+        send_to_osc(SHOW_CONTROLLER_IP, SHOW_CONTROLLER_PORT, msg)
     if args.volume_up:
         cmd = cmd + (", volume up")
     if args.volume_down:
         cmd = cmd + (", volume down:")
     if args.volume_relative:
         cmd = cmd + (", volume relative:")
-
     if args.ip:
         cmd = cmd + (" with IP %s" % args.ip)
     if args.proc:
@@ -1954,6 +2017,15 @@ if __name__ == "__main__":
             logger.error( " ERROR: --off_by_space or --on_by_space selected but no space name was given with --space. Exiting...")
 
 
+    if args.start_by_type or args.stop_by_type:
+        if args.type is None or args.type == "":
+            logger.error( " ERROR: --off_by_type or --on_by_type selected but no type name was given with --type. Exiting...")
+
+
+    if args.start_switch or args.stop_switch:
+        if args.type is None or args.type == "":
+            logger.error( " ERROR: --start_switch or --stop_switch selected but no switch name was given with --switch. Exiting...")
+
     ###############
     # START DEVICE
     ###############
@@ -1966,7 +2038,6 @@ if __name__ == "__main__":
     ###############
                     
     if args.stop_device:
-        logger.info("in stop device")
         stop_device(remote_ip, switch_ip, switch_interface, device_type)
 
     ###############
@@ -2030,6 +2101,26 @@ if __name__ == "__main__":
         if args.switch:
             switch_interface = args.switch            
         start_stop_reboot_show("reboot", switch_interface, args.type)
+
+    if args.stop_switch:
+        if args.switch:
+            switch_interface = args.switch
+        start_switch("stop", switch_interface, args.type)
+
+    if args.start_switch:
+        if args.switch:
+            switch_interface = args.switch
+        start_switch("start", switch_interface, args.type)
+
+    if args.start_by_type:
+        if args.switch:
+            switch_interface = args.switch            
+        start_by_type("start", switch_interface, args.type)
+
+    if args.stop_by_type:
+        if args.switch:
+            switch_interface = args.switch            
+        start_by_type("stop", switch_interface, args.type)
 
     ###############
     # REBOOT NONRESPONSIVE
