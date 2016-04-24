@@ -237,7 +237,7 @@ def do_a_host(mylist, compare):
         if device_name is None or device_name == '':
             device_name = ip_address
             
-        command = "/Users/Guest/watchdog/tcp_watchdog_server/get_pi_macaddr.exp " + str(ip_address) + " | grep 'eth0' | grep -v 'echo'"
+        command = "./get_pi_macaddr.exp " + str(ip_address) + " | grep 'eth0' | grep -v 'echo'"
         output = subprocess.check_output(command, shell=True, stderr=subprocess.STDOUT)
         for row in output.split('\n'):
             listy = row.split()
@@ -272,7 +272,7 @@ def print_switch(switch):
         stringy = item[1] + "\t"
         #entries[int(number)-1] = stringy
         stringy = "%s\t%s\t%s" % (item[1], switch, interface) 
-        print stringy
+        #print stringy
         current_name_list.append(item[1])
         entries.append(stringy)
     return entries
@@ -288,7 +288,7 @@ def do_a_switch(ip_address):
             print "No 'IP ADDRESS' in the Master Doc for this device, skipping:" + str(mylist)
             return -1
 
-        command = "/Users/Guest/watchdog/get-mac-addr.exp meow %s | grep ' 16 ' | grep Fa" % str(ip_address)
+        command = "../get-mac-addr.exp meow %s | grep ' 16 ' | grep Fa" % str(ip_address)
         print "command " + command
         output = subprocess.check_output(command, shell=True, stderr=subprocess.STDOUT)
         for row in output.split('\n'):
@@ -403,24 +403,63 @@ try:
     
         # go through the switch list, run the expect script for each to get mac addresses for connected devices
     #print interface_list
-    print ""
-    print "---------DETECTED ITEMS:"
 
     target = open("switch_map.txt", 'w')
+
+    final_list = []
 
     for switch in switches:
         switch_map = print_switch(switch)
         # writes out each switch with tabs so you can cut-n-paste the whole
         # map into the Master Doc. 
         for item in switch_map:
-            target.write(item)
-            target.write("\n")
+            final_list.append(item)
+
+    switch_name_list = []
+    new_items_list = []
+    missing_list = []
+
+    for item in list_of_lists_switches:
+        switch_name_list.append(item[0])
+
+    for item in current_name_list:
+        if item not in switch_name_list:
+            new_items_list.append(item)
+
     for item in list_of_lists_switches:
         if item[0] not in current_name_list and item[0] != "Device Name":
             stringy = "%s\t%s\t%s" % (item[0], item[1], item[2])
-            print stringy
-            target.write(stringy)
-            target.write("\n")
+            final_list.append(stringy)
+            missing_list.append(stringy)
+
+    final_list.sort()
+    missing_list.sort()
+    new_items_list.sort()
+
+    print ""
+    print "---------NEW ITEMS (currently up but not yet in the Switch Map):"
+
+    for item in new_items_list:
+        target.write(item)
+        target.write("\n")
+        print(item)
+
+    print ""
+    print "---------PREVIOUSLY DETECTED (in the Switch Map but not currently up):"
+
+    for item in missing_list:
+        target.write(item)
+        target.write("\n")
+        print(item)
+
+    print ""
+    print "---------ALL ITEMS:"
+
+    for item in final_list:
+        target.write(item)
+        target.write("\n")
+        print(item)
+
 
     print ""
     print "***Done. Check pi_map.txt and switch_map.txt for formatted output"
