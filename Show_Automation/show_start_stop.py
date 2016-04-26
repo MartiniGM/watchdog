@@ -38,12 +38,12 @@ WINDOWS_DB_FILENAME = 'c:\\watchdog\\tcp_watchdog_server\\demosdb.db'
 #and for Linux & OSX 
 LINUX_OSX_DB_FILENAME = '/Users/Aesir/Documents/watchdog/tcp_watchdog_server/demosdb.db'
 
-# give a filename for the watchdog's log file here                              
+# give a filename for the watchdog's log file here                           
 LOG_FILENAME = '/Users/Aesir/Documents/watchdog/Show_Automation/show_start_stop.out'
-# give the size for each rolling log segment, in bytes                          
-LOG_SIZE = 2000000 #2 MB, in bytes                                              
-# give the number of rolling log segments to record before the log rolls over   
-LOG_NUM_BACKUPS = 5 # five .out files before they roll over                     
+# give the size for each rolling log segment, in bytes                       
+LOG_SIZE = 2000000 #2 MB, in bytes                                            
+# give the number of rolling log segments to record before the log rolls over 
+LOG_NUM_BACKUPS = 5 # five .out files before they roll over                    
 
 OSC_PORT = 9998 #port to send pause/unpause messages to do-audio on the Pis
 RELAY_PORT = 9999 #port to send on/off messages to power relays
@@ -54,6 +54,7 @@ UNPAUSE_COMMAND = "/unpause" #unpause command sent to do-audio on the Pis
 PAUSE_VIDEO_COMMAND = "/stopall" #pause command sent to do-audio on the Pis
 UNPAUSE_VIDEO_COMMAND = "/playnormal" #unpause command sent to do-audio on the Pis
 
+#commands to send to set volume on the Pis
 VOLUME_RELATIVE_COMMAND = "/home/pi/RUNNING/scripts/set_volume.py --relative"
 VOLUME_DOWN_COMMAND = "/home/pi/RUNNING/scripts/set_volume.py 0%"
 VOLUME_UP_COMMAND = "/home/pi/RUNNING/scripts/set_volume.py"
@@ -74,16 +75,17 @@ ableton_list = ["10.42.18.21", "10.42.20.20", "10.42.20.21", "10.42.21.18", "10.
 
 #list of Pis with videos to kill/start for concert mode
 concert_mode_video_list = ["10.42.22.42", "10.42.23.45", "10.42.22.54", "10.42.23.44"] #benji's dance videos, lighthouse, lucius narrative
-#list of Pis with audio to kill/start for concert mode
-concert_mode_looping_audio_list = ["10.42.23.40"] #lighthouse
-concert_mode_triggered_audio_list = ["10.42.22.52"] #charter clock
-concert_mode_volume_list = ["10.42.22.53", "10.42.22.54", "10.42.22.50"] #bug room, dylan's cartoon room, and 2x shanty global audio] #, "10.42.23.43", 
 
-#Beamspace controller IP / port for DMX control
+#list of Pis with audio to kill/start for concert mode
+concert_mode_looping_audio_list = ["10.42.23.40", "10.42.22.50"] #lighthouse, saloon
+concert_mode_triggered_audio_list = ["10.42.22.52"] #charter clock
+concert_mode_volume_list = ["10.42.22.53", "10.42.22.54", "10.42.22.50"] #bug room, dylan's cartoon room, and 1x shanty global] #, "10.42.23.43", 
+
+#Beamspace server IP & port for DMX control
 DMX_IP = "10.42.20.21"
 DMX_PORT = 6667
 
-#Show controller IP / port for status readback
+#Show controller IP & port for status readback
 SHOW_CONTROLLER_IP = "10.42.16.17"
 SHOW_CONTROLLER_PORT = 4001
 
@@ -100,12 +102,12 @@ relay_files = ["/Users/Aesir/Documents/Max 7/Library/Show Automation/Panel-2LBma
 #empty list for later
 relay_pin_list = []
 
-# json file to hold Google credentials.                                         
-# ----> DO NOT EVER UPLOAD the .json file to public access (github)! <----      
+# json file to hold Google credentials.                                      
+# ----> DO NOT EVER UPLOAD the .json file to public access (github)! <----   
 json_file = '/Users/Aesir/Documents/watchdog/tcp_watchdog_server/mwsheets-91347531e5f4.json.secret'
-# ----> srsly DO NOT DO NOT DO NOT UPLOAD THE .JSON FILE <----                  
-
-# URL for the google sheet. this can be public                                  
+# ----> srsly DO NOT DO NOT DO NOT UPLOAD THE .JSON FILE <----                
+ 
+# URL for the google sheet. this can be public                                 
 googleSheetKey = "1kHAcbAo8saNSTBc7ffidzrwu_FGK3FaBpmh7rO7hT-U"
 googleWorksheetNameRelays = "Circuits and Relays" #name of the tab on the google sheet
 # dictionary to load Google spreadsheet into (for Circuits and Relays tab)
@@ -229,16 +231,16 @@ def find_item(mylist, item_name):
     except Exception, e:
         logger.error( "error in find_item: %s" % e)
 
-############################################################                    
-#subfinder() takes a list of lists and a pattern. finds pattern in the          
+############################################################                 
+#subfinder() takes a list of lists and a pattern. finds pattern in the        
 # id_num column of the list of lists. Returns a list of all lists        
-# that matched.                                                                 
-############################################################                    
+# that matched.                                                                
+############################################################                  
 #returns list of matching items
 def subfinder(mylist, pattern, id_num):
     matches = []
     try:
-        #and then gets every item where the device type matches the pattern     
+        #and then gets every item where the device type matches the pattern   
         for item in mylist:
             if pattern in item[id_num]:
                 matches.append(item)
@@ -248,7 +250,7 @@ def subfinder(mylist, pattern, id_num):
         for frame in traceback.extract_tb(sys.exc_info()[2]):
             fname,lineno,fn,text = frame
             logger.error( "     in %s on line %d" % (fname, lineno))
-        #otherwise return blank list                                            
+        #otherwise return blank list                                          
         return []
 
 ##################
@@ -416,17 +418,16 @@ def get_relay_pins(relay_items):
         relay_items.sort(key=lambda x: x[0])
         return relay_items
 
-####################                                                            
-# EXIT HANDLER                                                                  
+####################                                                          
+# EXIT HANDLER                                                                
 ####################
-
-# upon exit, log exit msg, disconnect from sqlite and close sockets             
+# upon exit, log exit msg, disconnect from sqlite and close sockets           
 def exit_func():
     logger.warning ("     Show start/stop script CLOSED ")
     logger.warning ("     ")
     sys.exit(0)
 
-# exits the program cleanly, logging exit time                                  
+# exits the program cleanly, logging exit time                                 
 def signal_handler(signal, frame):
     print ""
     exit_func()
@@ -816,6 +817,10 @@ def relays_on_off(on_or_off, zone_list, zone):
     #wait 6 minutes 
     #kill the projectors etc
 
+###############
+# RELAYS ON OFF
+###############
+#turns on/off a given relay (needs testing!)  
 def on_off_single_relay(on_or_off, relay_name):
 
     if relay_name is None or relay_name == "":
@@ -842,6 +847,11 @@ def on_off_single_relay(on_or_off, relay_name):
         msg = "/relays/%s 0" % item[3]
         send_to_osc(item[4], RELAY_PORT, msg)
 
+
+###############
+# start_switch
+###############
+#starts/stops/reboots everything on a given switch IP
 def start_switch(command, limit_to_switch_ip, type):
     print "start switch"
     if limit_to_switch_ip is None or limit_to_switch_ip == "" or limit_to_switch_ip == " ":
@@ -850,13 +860,139 @@ def start_switch(command, limit_to_switch_ip, type):
     else:
         start_stop_reboot_show(command, limit_to_switch_ip, type)
 
+###############
+# start_by_type
+###############
+#starts/stops/reboots a given type "windows", "arduino", or "raspberry pi"
 def start_by_type(command, limit_to_switch_ip, type):
     print "start by type"
     if type is None or type == "" or type == " ":
         logger.warning("%s type called without a type! Exiting..." % command)
         return
     else:
-        start_stop_reboot_show(command, limit_to_switch_ip, type)
+        remote_ip = ""
+        mac_address = ""
+        switch_interface = ""
+        device_type = ""
+        start_pi_type = 0
+        start_arduino_type = 0
+        start_windows_type = 0
+
+        if limit_to_switch_ip is None:
+            limit_to_switch_ip = ""
+
+        cmd = " -----%s by type %s" % (command, type)
+        if args.disable:
+            cmd = cmd + ", ***START/STOP DISABLED"
+
+        logger.info(cmd)       
+
+        if type != None and type != "":
+            logger.info( "for type %s %s" % (type.lower(), device_type.lower()))
+            if "berry" in type.lower() or "pi" in type.lower():
+                print "set pi type"
+                start_pi_type = 1
+            if "indows" in type.lower() or "mac" in type.lower():
+                print "set windows type"
+                start_windows_type = 1
+            if "duino" in type.lower():
+                print "set arduino type"
+                start_arduino_type = 1
+
+        try:
+            # Open database connection, create cursor
+            if os.name == 'nt':
+                con = lite.connect(WINDOWS_DB_FILENAME)
+            else:
+                con = lite.connect(LINUX_OSX_DB_FILENAME)     
+        except Exception, e:
+            logger.error( " ERROR: Can't connect to demosdb! %s" % e)
+            return
+    
+        try:
+            with con:
+                cur = con.cursor()
+                where_cmd = ""
+
+                sql = "SELECT ID_NAME, DEVICE_NAME, MAC_ADDRESS, SWITCH_INTERFACE, DEVICE_TYPE, BOOT_ORDER, SPACE, ZONE, DESCRIPTION FROM DEVICES"
+                if args.no_global:
+                    sql = sql + " WHERE DESCRIPTION NOT LIKE '%GLOBAL%'"
+                if ("start" in command):
+                    sql = sql + " ORDER BY BOOT_ORDER ASC, ID_NAME ASC"
+                else:
+                    if ("stop" in command or "reboot" in command):
+                        sql = sql + " ORDER BY BOOT_ORDER DESC, ID_NAME ASC"
+                    else:
+                        logger.error( " ERROR: command %s not recognized", command)
+                        return
+
+                cur.execute(sql)
+                data = cur.fetchall()
+            
+                done_server_delay = 0 #initialize this to 0 so we know when we started
+                for item in data:
+                    (remote_ip, device_name, mac_address, switch_interface, device_type, boot_order, space, zone, description) = item
+                    if mac_address is None:
+                        mac_address = ""
+
+                    if switch_interface is None:
+                        switch_interface = ""
+                        switch_ip = ""
+                    else:
+                        switch_group = switch_interface.split()
+                        switch_ip = switch_group[0]
+                        switch_interface = switch_group[1]
+
+                    if remote_ip is None:
+                        remote_ip = ""
+
+                    if device_name is None:
+                        device_name = ""
+
+                    if device_type is None:
+                        device_type = ""
+
+                    if "software" in device_type.lower() or boot_order == "" or boot_order is None:
+                        continue
+
+                    if command is "start":
+                    #start each item
+                        if start_pi_type == 1 and "berry" in device_type.lower():
+                            start_device(switch_ip, switch_interface, device_type, mac_address)
+                            continue
+                        if start_windows_type == 1 and ("indow" in device_type.lower() or "mac" in device_type.lower()):
+                            start_device(switch_ip, switch_interface, device_type, mac_address)
+                            continue
+                        if start_arduino_type == 1 and "duino" in device_type.lower():
+                            start_device(switch_ip, switch_interface, device_type, mac_address)
+                            continue
+
+                    if command is "stop":
+                    #stop each item
+                        if start_pi_type == 1 and "berry" in device_type.lower():
+                            stop_device(remote_ip, switch_ip, switch_interface, device_type)
+                            continue
+                        if start_windows_type == 1 and ("indow" in device_type.lower() or "mac" in device_type.lower()):
+                            stop_device(remote_ip, switch_ip, switch_interface, device_type)
+                            continue
+                        if start_arduino_type == 1 and "duino" in device_type.lower():
+                            stop_device(remote_ip, switch_ip, switch_interface, device_type)
+                            continue
+                    if command is "reboot":
+                    #reboot each item
+                        if start_pi_type == 1 and "berry" in device_type.lower():
+                            reboot_device(remote_ip, switch_ip, switch_interface, device_type)
+                            continue
+                        if start_windows_type == 1 and ("indow" in device_type.lower() or "mac" in device_type.lower()):
+                            reboot_device(remote_ip, switch_ip, switch_interface, device_type)
+                            continue
+                        if start_arduino_type == 1 and "duino" in device_type.lower():
+                            reboot_device(remote_ip, switch_ip, switch_interface, device_type)
+                            continue
+        except lite.Error, e:
+            logger.error(" ERROR: SQL error! %s" % e)   
+        except Exception, e:
+            logger.error(" ERROR: non-SQL error %s" % e)
 
 ##############################
 # START/STOP/REBOOT SHOW
@@ -882,14 +1018,17 @@ def start_stop_reboot_show(command, limit_to_switch_ip, type):
 
     logger.info(cmd)       
 
-    if type != None and type != "":
-        logger.info( "for type %s %s" % (type.lower(), device_type.lower()))
-        if "berry" in type.lower() or "pi" in type.lower():
-                start_pi_type = 1
-        if "indows" in type.lower() or "mac" in type.lower():
-                start_windows_type = 1
-        if "duino" in type.lower():
-                start_arduino_type = 1
+#    if type != None and type != "":
+#        logger.info( "for type %s %s" % (type.lower(), device_type.lower()))
+#        if "berry" in type.lower() or "pi" in type.lower():
+#            print "set pi type"
+#            start_pi_type = 1
+#        if "indows" in type.lower() or "mac" in type.lower():
+#            print "set windows type"
+#            start_windows_type = 1
+#        if "duino" in type.lower():
+#            print "set arduino type"
+#            start_arduino_type = 1
 
     try:
         # Open database connection, create cursor
@@ -921,6 +1060,8 @@ def start_stop_reboot_show(command, limit_to_switch_ip, type):
             cur.execute(sql)
             data = cur.fetchall()
             
+            print data
+
             done_server_delay = 0 #initialize this to 0 so we know when we started
             for item in data:
                 (remote_ip, device_name, mac_address, switch_interface, device_type, boot_order, space, zone, description) = item
@@ -945,20 +1086,12 @@ def start_stop_reboot_show(command, limit_to_switch_ip, type):
                     device_type = ""
 
                 if "software" in device_type.lower() or boot_order == "" or boot_order is None:
+                    if device_name != "" and device_name != "default":
+                        print "skipping " + str(device_name)
                     continue
 
                 if command is "start":
-                    #start each item
-                    if start_pi_type and "berry" in device_type.lower():
-                        start_device(switch_ip, switch_interface, device_type, mac_address)
-                        continue
-                    if start_windows_type and ("indow" in device_type.lower() or "mac" in device_type.lower()):
-                        start_device(switch_ip, switch_interface, device_type, mac_address)
-                        continue
-                    if start_arduino_type and "duino" in device_type.lower():
-                        start_device(switch_ip, switch_interface, device_type, mac_address)
-                        continue
-
+                    print "would start " + str(device_name)
                     #otherwise just start stuff
                     if "berry" in device_type.lower() and done_server_delay == 0:
                         #delays before the first Pi
@@ -972,45 +1105,19 @@ def start_stop_reboot_show(command, limit_to_switch_ip, type):
                         start_device(switch_ip, switch_interface, device_type, mac_address)
                         
                 if command is "stop":
-                    #stop each item
-                    if start_pi_type and "berry" in device_type.lower():
-                        stop_device(remote_ip, switch_ip, switch_interface, device_type)
-                        continue
-                    if start_windows_type and ("indow" in device_type.lower() or "mac" in device_type.lower()):
-                        stop_device(remote_ip, switch_ip, switch_interface, device_type)
-                        continue
-                    if start_arduino_type and "duino" in device_type.lower():
-                        stop_device(remote_ip, switch_ip, switch_interface, device_type)
-                        continue
-
-                    #otherwise just reboot stuff
                     if limit_to_switch_ip is not None and limit_to_switch_ip != "":
                         if limit_to_switch_ip in switch_group:
                             stop_device(remote_ip, switch_ip, switch_interface, device_type)
                     else:
-                            stop_device(remote_ip, switch_ip, switch_interface, device_type)
+                        stop_device(remote_ip, switch_ip, switch_interface, device_type)
 
                 if command is "reboot":
                     #reboot each item
-                    if start_pi_type and "berry" in device_type.lower():
-                        reboot_device(remote_ip, switch_ip, switch_interface, device_type)
-                        continue
-                    if start_windows_type and ("indow" in device_type.lower() or "mac" in device_type.lower()):
-                        reboot_device(remote_ip, switch_ip, switch_interface, device_type)
-                        continue
-                    if start_arduino_type and "duino" in device_type.lower():
-                        reboot_device(remote_ip, switch_ip, switch_interface, device_type)
-                        continue
-
-                    #otherwise just reboot stuff
                     if limit_to_switch_ip is not None and limit_to_switch_ip != "":
                         if limit_to_switch_ip in switch_group:
                             reboot_device(remote_ip, switch_ip, switch_interface, device_type)
                         else:
                             reboot_device(remote_ip, switch_ip, switch_interface, device_type)
-
-            #then pause before stopping/starting the relays
-            #                    time.sleep(DELAY_FOR_PROJECTORS)
 
             if command is "stop" or command is "start":
                 if command is "stop":
@@ -1022,6 +1129,11 @@ def start_stop_reboot_show(command, limit_to_switch_ip, type):
                 if (args.no_relays or args.with_relays == 0):
                     logger.warning("--no_relays, or --with_relays not found, skipping relays")
                     return
+
+            #then pause before stopping/starting the relays
+                logger.warning("Pausing before %s-ing relays" % command)
+                time.sleep(DELAY_FOR_PROJECTORS)
+
                 get_relay_pins(relay_pin_list)
                 relay_list = get_all_relays(relay_pin_list)
 
@@ -1029,6 +1141,8 @@ def start_stop_reboot_show(command, limit_to_switch_ip, type):
 
     except lite.Error, e:
         logger.error(" ERROR: SQL error! %s" % e)   
+    except Exception, e:
+        logger.error(" ERROR: non-SQL error %s" % e)
 
 ##############################
 # REBOOT NONRESPONSIVE DEVICES
@@ -1307,6 +1421,7 @@ def start_looping_audio(remote_ip):
         send_to_osc(remote_ip, WATCHDOG_PORT, "start_proc /home/pi/RUNNING/scripts/looping-audio.sh")
         send_to_osc(remote_ip, WATCHDOG_PORT, "start_proc /home/pi/RUNNING/scripts/looping-audio1.sh")
         send_to_osc(remote_ip, WATCHDOG_PORT, "start_proc /home/pi/RUNNING/scripts/looping-audio2.sh")
+        send_to_osc(remote_ip, WATCHDOG_PORT, "start_proc /home/pi/RUNNING/scripts/looping-audio3.sh")
 
 #starts looping video on a given Pi
 def start_looping_video(remote_ip):
@@ -1328,9 +1443,8 @@ def pause(remote_ip, cmd):
     if not args.disable:
         send_to_osc(remote_ip, OSC_PORT, cmd)
 
-#sends volume off to the given Pi
+#sends volume setting to the given Pi
 def volume_relative_pi(remote_ip, volume_amount):
-
     if volume_amount is None: 
         logger.info("Error: no --volume given with --volume_relative")
         return
@@ -1529,9 +1643,8 @@ def concert_on_dmx():
     if not args.disable:
         logger.info( "setting dmx preset 2 on %s: entering concert mode" % DMX_IP)
         msg = "/dmxMode 2"
-#        udpsend(msg, DMX_IP, DMX_PORT) 
-#        udpsend(cmd, remote_ip, WATCHDOG_PORT)
-#        send_to_osc(DMX_IP, DMX_PORT, msg)
+        udpsend(msg, DMX_IP, DMX_PORT) 
+        send_to_osc(DMX_IP, DMX_PORT, msg)
     else:
         logger.info( "would set dmx preset 2 on %s: to enter concert mode" % DMX_IP)
 
@@ -1539,12 +1652,10 @@ def concert_off_dmx():
     if not args.disable:
         logger.info( "setting dmx preset 1 on %s: entering exhibition mode" % DMX_IP)
         msg = "/dmxMode 1"
-#        udpsend(msg, DMX_IP, DMX_PORT) 
-#        send_to_osc(DMX_IP, DMX_PORT, msg)
+        udpsend(msg, DMX_IP, DMX_PORT) 
+        send_to_osc(DMX_IP, DMX_PORT, msg)
     else:
         logger.info( "would set dmx preset 1 on %s: to enter exhibition mode" % DMX_IP)
-
-
 
 # hits play on Ableton for a given list of media servers
 def play_ableton():
@@ -1562,14 +1673,14 @@ def concert_mode(on_or_off):
     logger.info( " -----concert mode %s" % on_or_off)
         
     try:
-#        if (on_or_off is "on"):
+        if (on_or_off is "on"):
             #enter concert mode, set DMX to preset 2
-#            concert_on_dmx()
-#        else:
+            concert_on_dmx()
+        else:
             #enter exhibition mode, set DMX to preset 1
-#            concert_off_dmx()
+            concert_off_dmx()
 
-        #turn on or off concert mode for each device                                          
+        #turn on or off concert mode for each device                         
         for item in concert_mode_video_list:
             if (on_or_off is "on"):
                 #enter concert mode, kill looping video/audio
@@ -1609,7 +1720,6 @@ def concert_mode(on_or_off):
 
     except lite.Error, e:
         logger.error(" ERROR: SQL error! %s" % e) 
-
 
 # reboots the entry video Pis at around the same time, for sync
 def reboot_entry_videos():
