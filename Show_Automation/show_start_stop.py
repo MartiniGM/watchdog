@@ -1741,343 +1741,356 @@ if __name__ == "__main__":
     ##################                                                          
     # LOGGING SETUP                                                             
     ##################                                                          
-
+    try:
+    
     # defines log levels for the log file. Default is 'info' and above.         
     # Run program with "debug" on the command line for extra debugging output   
-    LEVELS = {
-        'debug':logging.DEBUG,
-        'info':logging.INFO,
-        'warning':logging.WARNING,
-        'error':logging.ERROR,
-        'critical':logging.CRITICAL, }
+        LEVELS = {
+            'debug':logging.DEBUG,
+            'info':logging.INFO,
+            'warning':logging.WARNING,
+            'error':logging.ERROR,
+            'critical':logging.CRITICAL, }
 
     # default log level is info (prints info, warning, error, etc).             
     # run with "tcp_watchdog_sqlite.py debug" to print/log debug messages       
-    level = LEVELS.get('info', logging.NOTSET)
-    logging.basicConfig(level=level)
-
+        level = LEVELS.get('info', logging.NOTSET)
+        logging.basicConfig(level=level)
+        
     # creates our logger with the settings above/below                          
-    logger = logging.getLogger('StartStopLog')
-
-    # Add the log message handler to the logger. Creates a rolling/circular log
-    # with LOG_NUM_BACKUPS backups, each of size LOG_SIZE bytes                 
-    handler = logging.handlers.RotatingFileHandler(LOG_FILENAME,
-                                                   maxBytes=LOG_SIZE,
-                                                   backupCount=LOG_NUM_BACKUPS)
-
+        logger = logging.getLogger('StartStopLog')
+        
+        # Add the log message handler to the logger. Creates a rolling/circular log
+        # with LOG_NUM_BACKUPS backups, each of size LOG_SIZE bytes                 
+        handler = logging.handlers.RotatingFileHandler(LOG_FILENAME,
+                                                       maxBytes=LOG_SIZE,
+                                                       backupCount=LOG_NUM_BACKUPS)
+        
     # sets the message & timestamp format for the log                           
-    frmt = logging.Formatter('%(asctime)s - %(message)s',"%m/%d/%Y %H:%M:%S")
-    handler.setFormatter(frmt)
-    logger.addHandler(handler)
-    ch = logging.StreamHandler(sys.stdout)
-    ch.setLevel(logging.DEBUG)
-    formatter = logging.Formatter('%(message)s')
-    ch.setFormatter(formatter)
-    logger.addHandler(ch)
-
-    remote_ip = ""
-    mac_address = ""
-    switch_interface = ""
-    device_type = ""
-
-    parser = argparse.ArgumentParser()
-
+        frmt = logging.Formatter('%(asctime)s - %(message)s',"%m/%d/%Y %H:%M:%S")
+        handler.setFormatter(frmt)
+        logger.addHandler(handler)
+        ch = logging.StreamHandler(sys.stdout)
+        ch.setLevel(logging.DEBUG)
+        formatter = logging.Formatter('%(message)s')
+        ch.setFormatter(formatter)
+        logger.addHandler(ch)
+        
+        remote_ip = ""
+        mac_address = ""
+        switch_interface = ""
+        device_type = ""
+        
+        parser = argparse.ArgumentParser()
+        
     ##### stand-alone arguments (choose only one)
-    group = parser.add_mutually_exclusive_group()
-
-    group.add_argument('--start_device',
-                        action='store_true',
-                        help='starts a single device (given ip address in --ip)' )
-
-    group.add_argument('--stop_device',
-                        action='store_true',
-                        help='stops a single device (given ip address in --ip)' )
-
-    group.add_argument('--reboot_device',
-                        action='store_true',
-                        help='reboots a single device (given ip address in --ip)' )
-
-    group.add_argument('--start_proc_device',
-                        action='store_true',
-                        help='tells the watchdog to spawn a process on device (given ip address in --ip). Expects a program name to start, including full path')
-
-    group.add_argument('--kill_proc_device',
-                        action='store_true',
-                       help='tells the watchdog to kill a process on device (given ip address in --ip). This uses pkill -f to kill all similar process names, use carefully!')
-
-    group.add_argument('--pause_audio_device',
-                        action='store_true',
-                        help='pauses audio on a single device (given ip address in --ip)' )
-
-    group.add_argument('--unpause_audio_device',
-                        action='store_true',
-                        help='unpauses (plays) audio on a single device (given ip address in --ip)' )
-
-    group.add_argument('--reboot_show',
-                        action='store_true',
-                        help='reboots the whole show (with great power... etc)')
-
-    group.add_argument('--stop_show',
-                        action='store_true',
-                        help='shuts down the whole show (with great power... etc)')
-
-    group.add_argument('--stop_switch',
-                        action='store_true',
-                        help='shuts down the whole show (with great power... etc)')
-
-    group.add_argument('--start_show',
-                        action='store_true',
-                        help='starts the whole show (with great power... etc)')
-
-    group.add_argument('--start_by_type',
-                        action='store_true',
-                        help='starts the whole show for a device type (with great power... etc)')
-
-    group.add_argument('--stop_by_type',
-                        action='store_true',
-                        help='stops the whole show for a device type (with great power... etc)')
-
-    group.add_argument('--start_switch',
-                        action='store_true',
-                        help='starts the whole show for a switch (with great power... etc)')
-
-    group.add_argument('--reboot_nonresponsive',
-                        action='store_true',
-                        help='reboots all nonresponsive devices in the whole show (with great power... etc)')
-
-    group.add_argument('--reboot_unresponsive',
-                        action='store_true',
-                        help='reboots all nonresponsive devices in the whole show (with great power... etc)')
-
-    group.add_argument('--concert_mode_on',
-                        action='store_true',
-                        help='enters concert mode (stops shantytown audio & sends light control to console')
-
-    group.add_argument('--concert_mode_off',
-                        action='store_true',
-                        help='leaves concert mode (starts shantytown audio & sends light control to devices')
-
-    group.add_argument('--concert_mode_on_device',
-                        action='store_true',
-                        help='enters concert mode (stops shantytown audio & sends light control to console')
-
-    group.add_argument('--concert_mode_off_device',
-                        action='store_true',
-                        help='leaves concert mode (starts shantytown audio & sends light control to devices')
-
-    group.add_argument('--on_by_zone',
-                        action='store_true',
-                        help='turns everything in the given zone on, in boot order')
-
-    group.add_argument('--off_by_zone',
-                        action='store_true',
-                        help='turns everything in the given zone off, in reverse boot order')
-
-    group.add_argument('--on_by_space',
-                        action='store_true',
-                        help='turns everything in the given space on, in boot order')
-
-    group.add_argument('--off_by_space',
-                        action='store_true',
-                        help='turns everything in the given space off, in reverse boot order')
-
-    group.add_argument('--dump_devices',
-                        action='store_true',
-                        help='dumps device list to the log')
-
-    group.add_argument('--reboot_entry_videos',
-                        action='store_true',
-                        help='simul(ish)-reboots the entry video (Benji as Agent 35) Pis')
-
-    group.add_argument('--restart_pod',
-                        action='store_true',
-                        help='restarts the MAX patch on Russels Livestock POD')
-
-    group.add_argument('--volume_up',
-                        action='store_true',
-                        help='sets volume to 80 percent on Pis')
-
-    group.add_argument('--volume_down',
-                        action='store_true',
-                        help='sets volume to 0 percent on Pis')
-
-    group.add_argument('--volume_relative',
-                        action='store_true',
-                        help='sets volume to +/- given percent on Pis')
-
-    group.add_argument('--play_ableton',
-                        action='store_true',
-                        help='sends /live/play message to media servers, to hit play on Ableton')
-
+        group = parser.add_mutually_exclusive_group()
+        
+        group.add_argument('--start_device',
+                           action='store_true',
+                           help='starts a single device (given ip address in --ip)' )
+        
+        group.add_argument('--stop_device',
+                           action='store_true',
+                           help='stops a single device (given ip address in --ip)' )
+        
+        group.add_argument('--reboot_device',
+                           action='store_true',
+                           help='reboots a single device (given ip address in --ip)' )
+        
+        group.add_argument('--start_proc_device',
+                           action='store_true',
+                           help='tells the watchdog to spawn a process on device (given ip address in --ip). Expects a program name to start, including full path')
+        
+        group.add_argument('--kill_proc_device',
+                           action='store_true',
+                           help='tells the watchdog to kill a process on device (given ip address in --ip). This uses pkill -f to kill all similar process names, use carefully!')
+        
+        group.add_argument('--pause_audio_device',
+                           action='store_true',
+                           help='pauses audio on a single device (given ip address in --ip)' )
+        
+        group.add_argument('--unpause_audio_device',
+                           action='store_true',
+                           help='unpauses (plays) audio on a single device (given ip address in --ip)' )
+        
+        group.add_argument('--reboot_show',
+                           action='store_true',
+                           help='reboots the whole show (with great power... etc)')
+        
+        group.add_argument('--stop_show',
+                           action='store_true',
+                           help='shuts down the whole show (with great power... etc)')
+        
+        group.add_argument('--stop_switch',
+                           action='store_true',
+                           help='shuts down the whole show (with great power... etc)')
+        
+        group.add_argument('--start_show',
+                           action='store_true',
+                           help='starts the whole show (with great power... etc)')
+        
+        group.add_argument('--start_by_type',
+                           action='store_true',
+                           help='starts the whole show for a device type (with great power... etc)')
+        
+        group.add_argument('--stop_by_type',
+                           action='store_true',
+                           help='stops the whole show for a device type (with great power... etc)')
+        
+        group.add_argument('--start_switch',
+                           action='store_true',
+                           help='starts the whole show for a switch (with great power... etc)')
+        
+        group.add_argument('--reboot_nonresponsive',
+                           action='store_true',
+                           help='reboots all nonresponsive devices in the whole show (with great power... etc)')
+        
+        group.add_argument('--reboot_unresponsive',
+                           action='store_true',
+                           help='reboots all nonresponsive devices in the whole show (with great power... etc)')
+        
+        group.add_argument('--concert_mode_on',
+                           action='store_true',
+                           help='enters concert mode (stops shantytown audio & sends light control to console')
+        
+        group.add_argument('--concert_mode_off',
+                           action='store_true',
+                           help='leaves concert mode (starts shantytown audio & sends light control to devices')
+        
+        group.add_argument('--concert_mode_on_device',
+                           action='store_true',
+                           help='enters concert mode (stops shantytown audio & sends light control to console')
+        
+        group.add_argument('--concert_mode_off_device',
+                           action='store_true',
+                           help='leaves concert mode (starts shantytown audio & sends light control to devices')
+        
+        group.add_argument('--on_by_zone',
+                           action='store_true',
+                           help='turns everything in the given zone on, in boot order')
+        
+        group.add_argument('--off_by_zone',
+                           action='store_true',
+                           help='turns everything in the given zone off, in reverse boot order')
+        
+        group.add_argument('--on_by_space',
+                           action='store_true',
+                           help='turns everything in the given space on, in boot order')
+        
+        group.add_argument('--off_by_space',
+                           action='store_true',
+                           help='turns everything in the given space off, in reverse boot order')
+        
+        group.add_argument('--dump_devices',
+                           action='store_true',
+                           help='dumps device list to the log')
+        
+        group.add_argument('--reboot_entry_videos',
+                           action='store_true',
+                           help='simul(ish)-reboots the entry video (Benji as Agent 35) Pis')
+        
+        group.add_argument('--restart_pod',
+                           action='store_true',
+                           help='restarts the MAX patch on Russels Livestock POD')
+        
+        group.add_argument('--volume_up',
+                           action='store_true',
+                           help='sets volume to 80 percent on Pis')
+        
+        group.add_argument('--volume_down',
+                           action='store_true',
+                           help='sets volume to 0 percent on Pis')
+        
+        group.add_argument('--volume_relative',
+                           action='store_true',
+                           help='sets volume to +/- given percent on Pis')
+        
+        group.add_argument('--play_ableton',
+                           action='store_true',
+                           help='sends /live/play message to media servers, to hit play on Ableton')
+        
+        
+        group.add_argument('--test_item',
+                           action='store_true',
+                           help='test item, does nothing real')
+        
     ##### add-on arguments (can be applied to the above)
-    parser.add_argument("--switch",
-                       type=str,
-                       help='Limits start_show and stop_show to this switch IP address (i.e. 10.42.16.166)' ) 
-    
-    parser.add_argument('--disable',
-                        action='store_true',
-                        help='Disables start/stop/reboot commands (test mode)')
-
-    parser.add_argument('--no_servers',
-                        action='store_true',
-                        help='Skip start/stop/reboot commands for servers (Windows/Mac); start/stop/reboot Pis and Arduinos only')
-
-
-    parser.add_argument('--no_relays',
-                        action='store_true',
-                        help='Skip start/stop/reboot commands for power relays (managed outlets)')
-
-    parser.add_argument('--with_relays',
-                        action='store_true',
-                        help='Adds start/stop/reboot commands for power relays (managed outlets)')
-
-    group.add_argument('--relay_on',
-                        action='store_true',
-                        help='starts a single device (given relay name in --relay)' )
-
-    group.add_argument('--relay_off',
-                        action='store_true',
-                        help='stops a single device (given relay name in --relay)' )
-
-    parser.add_argument('--no_global',
-                        action='store_true',
-                        help='Skip global audio devices (devices with "global" in the description)')
-
-    parser.add_argument('--no_delay',
-                        action='store_true',
-                        help='Skip initial delay')
-
-    parser.add_argument('--ip', 
-                        type=str,
-                        help='IP address to use with start/stop/reboot_device (i.e. 10.42.16.166)' )
-
-    parser.add_argument('--proc', 
-                        type=str,
-                        help='Process to use with proc_ commands')
-
-    parser.add_argument('--with_dump', 
-                        action='store_true',
-                        help='Dumps OKAY and NONRESPONSIVE lists to the log')
-
-    parser.add_argument('--zone', 
-                        type=str,
-                        help='Zone to use with _zone commands')
-
-    parser.add_argument('--type', 
-                        type=str,
-                        help='Zone to use with _type commands')
-
-    parser.add_argument('--space', 
-                        type=str,
-                        help='Space to use with _space commands')
-
-    parser.add_argument('--relay', 
-                        type=str,
-                        help='Relay name to use with _relay commands')
-
-    parser.add_argument('--volume', 
-                        type=str,
-                        help='Volume to use with --volume_relative (i.e. 5-, 10+') 
-    args = parser.parse_args()
-
+        parser.add_argument("--switch",
+                            type=str,
+                            help='Limits start_show and stop_show to this switch IP address (i.e. 10.42.16.166)' ) 
+        
+        parser.add_argument('--disable',
+                            action='store_true',
+                            help='Disables start/stop/reboot commands (test mode)')
+        
+        parser.add_argument('--no_servers',
+                            action='store_true',
+                            help='Skip start/stop/reboot commands for servers (Windows/Mac); start/stop/reboot Pis and Arduinos only')
+        
+        
+        parser.add_argument('--no_relays',
+                            action='store_true',
+                            help='Skip start/stop/reboot commands for power relays (managed outlets)')
+        
+        parser.add_argument('--with_relays',
+                            action='store_true',
+                            help='Adds start/stop/reboot commands for power relays (managed outlets)')
+        
+        group.add_argument('--relay_on',
+                           action='store_true',
+                           help='starts a single device (given relay name in --relay)' )
+        
+        group.add_argument('--relay_off',
+                           action='store_true',
+                           help='stops a single device (given relay name in --relay)' )
+        
+        parser.add_argument('--no_global',
+                            action='store_true',
+                            help='Skip global audio devices (devices with "global" in the description)')
+        
+        parser.add_argument('--no_delay',
+                            action='store_true',
+                            help='Skip initial delay')
+        
+        parser.add_argument('--ip', 
+                            type=str,
+                            help='IP address to use with start/stop/reboot_device (i.e. 10.42.16.166)' )
+        
+        parser.add_argument('--proc', 
+                            type=str,
+                            help='Process to use with proc_ commands')
+        
+        parser.add_argument('--with_dump', 
+                            action='store_true',
+                            help='Dumps OKAY and NONRESPONSIVE lists to the log')
+        
+        parser.add_argument('--zone', 
+                            type=str,
+                            help='Zone to use with _zone commands')
+        
+        parser.add_argument('--type', 
+                            type=str,
+                            help='Zone to use with _type commands')
+        
+        parser.add_argument('--space', 
+                            type=str,
+                            help='Space to use with _space commands')
+        
+        parser.add_argument('--relay', 
+                            type=str,
+                            help='Relay name to use with _relay commands')
+        
+        parser.add_argument('--volume', 
+                            type=str,
+                            help='Volume to use with --volume_relative (i.e. 5-, 10+') 
+        args = parser.parse_args()
+        
     ###############################################
     # sets args for single-device start/stop/reboot
     ###############################################            
+        
+        cmd = " Show start/stop script OPENED"
+        
+        if args.dump_devices:
+            dump_devices("OKAY")
+            dump_devices("NONRESPONSIVE")
+            exit()
+            
+        if args.with_dump:
+            dump_devices("OKAY")
+            dump_devices("NONRESPONSIVE")
+                
+        if args.test_item:
+            logger.info("test item, does nothing...")
+            exit()
 
-    cmd = " Show start/stop script OPENED"
+        if args.start_show:
+            cmd = cmd + (", starting show")
+            msg = "/start_show 1"
+            send_to_osc(SHOW_CONTROLLER_IP, SHOW_CONTROLLER_PORT, msg)
+        if args.stop_show:
+            cmd = cmd + (", stopping show")
+            msg = "/stop_show 1"
+            send_to_osc(SHOW_CONTROLLER_IP, SHOW_CONTROLLER_PORT, msg)
+        if args.stop_device:
+            cmd = cmd + (", stopping single device")
+        if args.start_device:
+            cmd = cmd + (", starting single device")
+        if args.pause_audio_device:
+            cmd = cmd + (", pausing audio for a single device")
+        if args.unpause_audio_device:
+            cmd = cmd + (", unpausing (playing) audio for a single device")
+        if args.concert_mode_on:
+            cmd = cmd + (", enter concert mode")
+        if args.concert_mode_off:
+            cmd = cmd + (", leave concert mode")
+        if args.reboot_entry_videos:
+            cmd = cmd + (", reboot entry videos")
+        if args.play_ableton:
+            cmd = cmd + (", play ableton")
+        if args.start_switch:
+            cmd = cmd + (", on by switch:")
+            msg = "/start_show 1"
+            send_to_osc(SHOW_CONTROLLER_IP, SHOW_CONTROLLER_PORT, msg)
+        if args.stop_switch:
+            cmd = cmd + (", off by switch:")
+            msg = "/stop_show 1"
+            send_to_osc(SHOW_CONTROLLER_IP, SHOW_CONTROLLER_PORT, msg)
+        if args.start_by_type:
+            cmd = cmd + (", on by type:")
+            msg = "/start_show 1"
+            send_to_osc(SHOW_CONTROLLER_IP, SHOW_CONTROLLER_PORT, msg)
+        if args.stop_by_type:
+            cmd = cmd + (", off by type:")
+            msg = "/stop_show 1"
+            send_to_osc(SHOW_CONTROLLER_IP, SHOW_CONTROLLER_PORT, msg)
+        if args.on_by_zone:
+            cmd = cmd + (", on by zone:")
+            msg = "/start_show 1"
+            send_to_osc(SHOW_CONTROLLER_IP, SHOW_CONTROLLER_PORT, msg)
+        if args.off_by_zone:
+            cmd = cmd + (", off by zone:")
+            msg = "/stop_show 1"
+            send_to_osc(SHOW_CONTROLLER_IP, SHOW_CONTROLLER_PORT, msg)
+        if args.volume_up:
+            cmd = cmd + (", volume up")
+        if args.volume_down:
+            cmd = cmd + (", volume down:")
+        if args.volume_relative:
+            cmd = cmd + (", volume relative:")
+        if args.ip:
+            cmd = cmd + (" with IP %s" % args.ip)
+        if args.proc:
+            cmd = cmd + (" with process %s" % args.proc)
+        if args.relay:
+            cmd = cmd + (" with relay %s" % args.relay)
+        if args.no_relays:
+            cmd = cmd + (", with --no_relays")      
+        if args.with_relays:
+            cmd = cmd + (", with --with_relays")      
+        if args.no_servers:
+            cmd = cmd + (", with --no_servers")      
+        if args.no_global:
+            cmd = cmd + (", with --no_global")      
+        if args.switch:
+            cmd = cmd + (", limited to switch %s" % args.switch)
+        if args.zone:
+            cmd = cmd + (", for zone %s" % args.zone)
+        if args.type:
+            cmd = cmd + (", for device type %s" % args.type)
+        if args.space:
+            cmd = cmd + (", for space %s" % args.space)
+        if args.volume:
+            cmd = cmd + (" with volume %s" % args.volume)
+        logger.info(cmd)
 
-    if args.dump_devices:
-        dump_devices("OKAY")
-        dump_devices("NONRESPONSIVE")
-        exit()
-
-    if args.with_dump:
-        dump_devices("OKAY")
-        dump_devices("NONRESPONSIVE")
-
-    if args.start_show:
-        cmd = cmd + (", starting show")
-        msg = "/start_show 1"
-        send_to_osc(SHOW_CONTROLLER_IP, SHOW_CONTROLLER_PORT, msg)
-    if args.stop_show:
-        cmd = cmd + (", stopping show")
-        msg = "/stop_show 1"
-        send_to_osc(SHOW_CONTROLLER_IP, SHOW_CONTROLLER_PORT, msg)
-    if args.stop_device:
-        cmd = cmd + (", stopping single device")
-    if args.start_device:
-        cmd = cmd + (", starting single device")
-    if args.pause_audio_device:
-        cmd = cmd + (", pausing audio for a single device")
-    if args.unpause_audio_device:
-        cmd = cmd + (", unpausing (playing) audio for a single device")
-    if args.concert_mode_on:
-        cmd = cmd + (", enter concert mode")
-    if args.concert_mode_off:
-        cmd = cmd + (", leave concert mode")
-    if args.reboot_entry_videos:
-        cmd = cmd + (", reboot entry videos")
-    if args.play_ableton:
-        cmd = cmd + (", play ableton")
-    if args.start_switch:
-        cmd = cmd + (", on by switch:")
-        msg = "/start_show 1"
-        send_to_osc(SHOW_CONTROLLER_IP, SHOW_CONTROLLER_PORT, msg)
-    if args.stop_switch:
-        cmd = cmd + (", off by switch:")
-        msg = "/stop_show 1"
-        send_to_osc(SHOW_CONTROLLER_IP, SHOW_CONTROLLER_PORT, msg)
-    if args.start_by_type:
-        cmd = cmd + (", on by type:")
-        msg = "/start_show 1"
-        send_to_osc(SHOW_CONTROLLER_IP, SHOW_CONTROLLER_PORT, msg)
-    if args.stop_by_type:
-        cmd = cmd + (", off by type:")
-        msg = "/stop_show 1"
-        send_to_osc(SHOW_CONTROLLER_IP, SHOW_CONTROLLER_PORT, msg)
-    if args.on_by_zone:
-        cmd = cmd + (", on by zone:")
-        msg = "/start_show 1"
-        send_to_osc(SHOW_CONTROLLER_IP, SHOW_CONTROLLER_PORT, msg)
-    if args.off_by_zone:
-        cmd = cmd + (", off by zone:")
-        msg = "/stop_show 1"
-        send_to_osc(SHOW_CONTROLLER_IP, SHOW_CONTROLLER_PORT, msg)
-    if args.volume_up:
-        cmd = cmd + (", volume up")
-    if args.volume_down:
-        cmd = cmd + (", volume down:")
-    if args.volume_relative:
-        cmd = cmd + (", volume relative:")
-    if args.ip:
-        cmd = cmd + (" with IP %s" % args.ip)
-    if args.proc:
-        cmd = cmd + (" with process %s" % args.proc)
-    if args.relay:
-        cmd = cmd + (" with relay %s" % args.relay)
-    if args.no_relays:
-        cmd = cmd + (", with --no_relays")      
-    if args.with_relays:
-        cmd = cmd + (", with --with_relays")      
-    if args.no_servers:
-        cmd = cmd + (", with --no_servers")      
-    if args.no_global:
-        cmd = cmd + (", with --no_global")      
-    if args.switch:
-        cmd = cmd + (", limited to switch %s" % args.switch)
-    if args.zone:
-        cmd = cmd + (", for zone %s" % args.zone)
-    if args.type:
-        cmd = cmd + (", for device type %s" % args.type)
-    if args.space:
-        cmd = cmd + (", for space %s" % args.space)
-    if args.volume:
-        cmd = cmd + (" with volume %s" % args.volume)
-    logger.info(cmd)
-
-    if args.disable:
-        logger.warning(" WARNING: disable (test/dry run) option has been selected.")
+        if args.disable:
+            logger.warning(" WARNING: disable (test/dry run) option has been selected.")
     
+    except Exception, e:
+        logger.warning("Error: %s" % e)
+
         #checks whether this is a standalone call or requires arguments
     single_item = False
     if not (args.start_device or args.stop_device or args.reboot_device or args.pause_audio_device or args.unpause_audio_device or args.kill_proc_device or args.start_proc_device or args.volume_up or args.volume_down or args.volume_relative):
