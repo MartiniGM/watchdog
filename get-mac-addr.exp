@@ -5,8 +5,8 @@ set host      [lindex $argv 1]
 #set password  [lindex $argv 2]
 #set enable    [lindex $argv 3]
 
-set password [read [open "/Users/Guest/watchdog/power_passphrase1.secret" r]]
-set enable [read [open "/Users/Guest/watchdog/power_passphrase2.secret" r]]
+set password [read [open "power_passphrase1.secret" r]]
+set enable [read [open "power_passphrase2.secret" r]]
 
 set timeout 9
 

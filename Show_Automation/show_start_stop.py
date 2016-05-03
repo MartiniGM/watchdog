@@ -745,12 +745,12 @@ def reboot_device(remote_ip, switch_ip, switch_interface, device_type):
                 if not args.disable:
                     logger.info(" now rebooting... %s %s" % (switch_ip, switch_interface))
                     reboot_arduino(switch_ip, switch_interface, 2)
-
-            if "mac" in device_type.lower():
-                print "mac"
-                reboot_windows(remote_ip)
             else:
-                logger.error( " ERROR: type %s not matched, exiting..." % device_type)
+                if "mac" in device_type.lower():
+                    print "mac"
+                    reboot_windows(remote_ip)
+                else:
+                    logger.error( " ERROR: type %s not matched, exiting..." % device_type)
 
 ###############
 # RELAYS ON OFF
@@ -1024,18 +1024,6 @@ def start_stop_reboot_show(command, limit_to_switch_ip, type):
         cmd = cmd + ", ***START/STOP DISABLED"
 
     logger.info(cmd)       
-
-#    if type != None and type != "":
-#        logger.info( "for type %s %s" % (type.lower(), device_type.lower()))
-#        if "berry" in type.lower() or "pi" in type.lower():
-#            print "set pi type"
-#            start_pi_type = 1
-#        if "indows" in type.lower() or "mac" in type.lower():
-#            print "set windows type"
-#            start_windows_type = 1
-#        if "duino" in type.lower():
-#            print "set arduino type"
-#            start_arduino_type = 1
 
     try:
         # Open database connection, create cursor
@@ -1831,7 +1819,7 @@ if __name__ == "__main__":
         
         group.add_argument('--stop_switch',
                            action='store_true',
-                           help='shuts down the whole show (with great power... etc)')
+                           help='shuts down all devices on a given --switch IP (with great power... etc)')
         
         group.add_argument('--start_show',
                            action='store_true',
@@ -1847,7 +1835,7 @@ if __name__ == "__main__":
         
         group.add_argument('--start_switch',
                            action='store_true',
-                           help='starts the whole show for a switch (with great power... etc)')
+                           help='starts the whole show for a given switch IP (with great power... etc)')
         
         group.add_argument('--reboot_nonresponsive',
                            action='store_true',
@@ -1863,15 +1851,15 @@ if __name__ == "__main__":
         
         group.add_argument('--concert_mode_off',
                            action='store_true',
-                           help='leaves concert mode (starts shantytown audio & sends light control to devices')
+                           help='leaves concert mode (starts shantytown audio & sends light control to devices)')
         
         group.add_argument('--concert_mode_on_device',
                            action='store_true',
-                           help='enters concert mode (stops shantytown audio & sends light control to console')
+                           help='enters concert mode (stops shantytown audio & sends light control to console) for a single device')
         
         group.add_argument('--concert_mode_off_device',
                            action='store_true',
-                           help='leaves concert mode (starts shantytown audio & sends light control to devices')
+                           help='leaves concert mode (starts shantytown audio & sends light control to devices) for a single device')
         
         group.add_argument('--on_by_zone',
                            action='store_true',
@@ -1899,11 +1887,11 @@ if __name__ == "__main__":
         
         group.add_argument('--restart_pod',
                            action='store_true',
-                           help='restarts the MAX patch on Russels Livestock POD')
+                           help='stops the MAX patch on Russels Livestock POD, then reboots the machine')
         
         group.add_argument('--volume_up',
                            action='store_true',
-                           help='sets volume to 80 percent on Pis')
+                           help='sets volume to preset on Pis')
         
         group.add_argument('--volume_down',
                            action='store_true',
@@ -1911,12 +1899,11 @@ if __name__ == "__main__":
         
         group.add_argument('--volume_relative',
                            action='store_true',
-                           help='sets volume to +/- given percent on Pis')
+                           help='sets volume to the preset, +/- the given percent on Pis')
         
         group.add_argument('--play_ableton',
                            action='store_true',
                            help='sends /live/play message to media servers, to hit play on Ableton')
-        
         
         group.add_argument('--test_item',
                            action='store_true',
@@ -1925,16 +1912,15 @@ if __name__ == "__main__":
     ##### add-on arguments (can be applied to the above)
         parser.add_argument("--switch",
                             type=str,
-                            help='Limits start_show and stop_show to this switch IP address (i.e. 10.42.16.166)' ) 
+                            help='Limits start_switch and stop_switch to this switch IP address (i.e. 10.42.16.166)' ) 
         
         parser.add_argument('--disable',
                             action='store_true',
-                            help='Disables start/stop/reboot commands (test mode)')
+                            help='Disables all commands (test mode)')
         
         parser.add_argument('--no_servers',
                             action='store_true',
                             help='Skip start/stop/reboot commands for servers (Windows/Mac); start/stop/reboot Pis and Arduinos only')
-        
         
         parser.add_argument('--no_relays',
                             action='store_true',
@@ -1946,11 +1932,11 @@ if __name__ == "__main__":
         
         group.add_argument('--relay_on',
                            action='store_true',
-                           help='starts a single device (given relay name in --relay)' )
+                           help='starts a single relay (given relay name in --relay)' )
         
         group.add_argument('--relay_off',
                            action='store_true',
-                           help='stops a single device (given relay name in --relay)' )
+                           help='stops a single relay (given relay name in --relay)' )
         
         parser.add_argument('--no_global',
                             action='store_true',
@@ -1986,7 +1972,7 @@ if __name__ == "__main__":
         
         parser.add_argument('--relay', 
                             type=str,
-                            help='Relay name to use with _relay commands')
+                            help='Relay name to use with relay_ commands')
         
         parser.add_argument('--volume', 
                             type=str,
@@ -2103,17 +2089,17 @@ if __name__ == "__main__":
         logger.warning("Error: %s" % e)
 
         #checks whether this is a standalone call or requires arguments
-    single_item = False
-    if not (args.start_device or args.stop_device or args.reboot_device or args.pause_audio_device or args.unpause_audio_device or args.kill_proc_device or args.start_proc_device or args.volume_up or args.volume_down or args.volume_relative):
-        single_item = True
+    multi_item = False
+    if not (args.start_device or args.stop_device or args.reboot_device or args.pause_audio_device or args.unpause_audio_device or args.kill_proc_device or args.start_proc_device or args.volume_up or args.volume_down or args.volume_relative or args.relay_on or args.relay_off):
+        multi_item = True
         
-    if (single_item):
+    if (multi_item):
         if not (args.no_delay):
             delay_with_countdown(INIT_DELAY)
 
     #if we included the IP, check it to make sure it's in the Master Doc
     if args.ip:
-        if not (single_item):
+        if not (multi_item):
             remote_ip = args.ip
             (mac_address, switch_interface, device_type) = get_item(remote_ip)
             if device_type is None:
