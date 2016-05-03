@@ -242,6 +242,7 @@ def subfinder(mylist, pattern, id_num):
     try:
         #and then gets every item where the device type matches the pattern   
         for item in mylist:
+#            print "compare " + pattern + " with " + item[id_num]
             if pattern in item[id_num]:
                 matches.append(item)
         return matches
@@ -320,7 +321,7 @@ def get_relay_zones(zone, zone_items):
             circuit_on_relay = item[circuit_on_relay_item_id].replace(':','').lower()
             circuit_space = item[circuit_space_item_id]
             circuit_name = item[circuit_name_item_id]        
-            
+
         #if the zone matches and this circuit is on a relay, get relay info and add it to the list
             if zone.lower() in zone_item.lower() and circuit_on_relay == "yes":
                 pin = -1
@@ -367,12 +368,14 @@ def get_single_relay(relay, relay_items):
             circuit_on_relay = item[circuit_on_relay_item_id].replace(':','').lower()
             circuit_space = item[circuit_space_item_id]
             circuit_name = item[circuit_name_item_id]        
-            
+#            print relay.upper() + " '" + circuit_name + "'"
+
         #if the zone matches and this circuit is on a relay, get relay info and add it to the list
-            if circuit_name.endswith(relay.lower()) and circuit_on_relay == "yes":
+            if circuit_name.endswith(relay.upper()) and circuit_on_relay == "yes":
                 pin = -1
             #grab the pin from the relay map file
-                item = subfinder(zone_items, circuit_name, 0)
+                item = subfinder(relay_items, circuit_name, 0)
+#                print item
                 if item != []:
                     pin = item[0][1]
             #grab the IP address for this relay
@@ -835,18 +838,22 @@ def on_off_single_relay(on_or_off, relay_name):
       
     get_relay_pins(relay_pin_list)
     relay_list = get_single_relay(relay_name, relay_pin_list)
-    
-    item = relay_list[0]
+#    print relay_list
+    if len(relay_list) >= 1:
+        item = relay_list[0]
 
-    if (on_or_off == "on"):
-        logger.info("send to " + str(item[1]))
-        msg = "/relays/%s 1" % item[3]
-        send_to_osc(item[4], RELAY_PORT, msg)
+        if (on_or_off == "on"):
+            logger.info("would send to " + str(item[1]))
+            msg = "/relays/%s 1" % item[3]
+            print msg
+            send_to_osc(item[4], RELAY_PORT, msg)
+        else:
+            logger.info("would send to " + str(item[1]))
+            msg = "/relays/%s 0" % item[3]
+            print msg
+            send_to_osc(item[4], RELAY_PORT, msg)
     else:
-        logger.info("send to " + str(item[1]))
-        msg = "/relays/%s 0" % item[3]
-        send_to_osc(item[4], RELAY_PORT, msg)
-
+        logger.warning( "relay %s not found!" % relay_name)
 
 ###############
 # start_switch
@@ -2017,6 +2024,10 @@ if __name__ == "__main__":
             cmd = cmd + (", stopping single device")
         if args.start_device:
             cmd = cmd + (", starting single device")
+        if args.relay_off:
+            cmd = cmd + (", stopping single relay")
+        if args.relay_on:
+            cmd = cmd + (", starting single relay")
         if args.pause_audio_device:
             cmd = cmd + (", pausing audio for a single device")
         if args.unpause_audio_device:
