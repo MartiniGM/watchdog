@@ -22,6 +22,7 @@ import gspread
 from oauth2client.client import SignedJwtAssertionCredentials
 
 device_type_item_id = 5
+description_item_id = 11
 hostname_item_id = 4
 ip_address_item_id = 1
 
@@ -177,15 +178,16 @@ def find_item(mylist, item_name):
 ############################################################
 #subfinder() takes a list of lists and a pattern. finds pattern in the
 # "Device Type" column of the list of lists. Returns a list of all lists
-# that matched.
+# that matched but did NOT match pattern2 to the "Description" column.
 ############################################################
-def subfinder(mylist, pattern):
+def subfinder(mylist, pattern, pattern2):
     matches = []
     try:
         #and then gets every item where the device type matches the pattern 
+        #but does not match pattern2 (global Pis) 
         for item in mylist:
 #            print "%s in %s?" % (pattern, item[item_id])
-            if pattern in item[device_type_item_id]:
+            if pattern in item[device_type_item_id] and pattern2 not in item[description_item_id]:
                 matches.append(item)
         return matches
     except Exception, e:
@@ -219,6 +221,7 @@ def do_a_host(mylist, compare):
 
             #do the thing
             command = "/Users/Guest/watchdog/tcp_watchdog_server/install_pi_volumeconfig.exp " + str(ip_address)
+#            command = "/Users/Guest/watchdog/tcp_watchdog_server/check_for_volumeconfig.exp " + str(ip_address)
             os.system(command)
             
     except Exception, e:
@@ -261,8 +264,8 @@ if __name__ == "__main__":
                 #sorts by device type
                 list_of_lists.sort(key=lambda x: x[5])
                 #creates list of pis
-                print "PIS"
-                pi_list = subfinder(list_of_lists, "berry")
+                print "PIS, sans global"
+                pi_list = subfinder(list_of_lists, "berry", "lobal")
                 print pi_list
                 print
                 print
