@@ -28,10 +28,12 @@ WOL_COMMAND = "/Users/Aesir/Documents/watchdog/wolcmd"
 DELAY_AFTER_SERVERS = 120.0 #delays 2 minutes between booting windows servers and pis
 DELAY_STOP_PI = 15.0 #delays 15 seconds between halting Pis and cutting PoE
 DELAY_BETWEEN_DEVICES = 0.5 #delays a half second between stop/starting devices
-DELAY_BETWEEN_RELAYS = 2.0 #delays 2 seconds between commands to the relays
+DELAY_BETWEEN_RELAYS = 1.0 #delays 2 seconds between commands to the relays
 DELAY_FOR_PROJECTORS = 360.0 #delays 6 minutes for projector cooldown and/or startup
 DELAY_FOR_TVARCH = 120.0 #delays 2 minutes for the TV Arch Pis to start
 INIT_DELAY = 30 #delays 30 seconds before starting script so people can cancel
+NO_POE = 0
+WITH_POE = 1
 
 # give a filename for the watchdog's SQLite database here, on Windows
 WINDOWS_DB_FILENAME = 'c:\\watchdog\\tcp_watchdog_server\\demosdb.db'
@@ -441,11 +443,11 @@ signal.signal(signal.SIGINT, signal_handler)
 # PoE, WOL, UDPSEND
 ###################
 #turns PoE on or off
-def set_PoE(auto_or_never, remote_ip, switch):
+def set_PoE(auto_or_never, remote_ip, switch, device_name, description):
     import subprocess
     if not args.disable:
         try:
-            logger.info( "set PoE %s for %s%s" % (auto_or_never, remote_ip, switch))
+            logger.info( "%s %s set PoE %s for %s %s" % (device_name, description, auto_or_never, remote_ip, switch))
             command = [POE_COMMAND, auto_or_never, remote_ip, switch]
             p = subprocess.Popen(command, stdout=subprocess.PIPE)
             for line in p.stdout:
@@ -454,7 +456,7 @@ def set_PoE(auto_or_never, remote_ip, switch):
         except Exception, e:
             logger.error( " ERROR: set_PoE error: %s" % e)
     else:
-        logger.info( "would set PoE %s for %s%s" % (auto_or_never, remote_ip, switch))
+        logger.info( "would set %s %s PoE %s for %s %s" % (device_name, description, auto_or_never, remote_ip, switch))
 
 #sends messages to Pi or Windows watchdog via UDP
 def udpsend(message, remote_ip, port):
@@ -498,11 +500,11 @@ def wake_on_lan(mac_address):
 def start_windows(mac_address):
     wake_on_lan(mac_address)
         
-def start_pi(remote_ip, switch):
-    set_PoE("auto", remote_ip, switch)
+def start_pi(remote_ip, switch, device_name, description):
+    set_PoE("auto", remote_ip, switch, device_name, description)
 
-def start_arduino(remote_ip, switch):
-    set_PoE("auto", remote_ip, switch)
+def start_arduino(remote_ip, switch, device_name, description):
+    set_PoE("auto", remote_ip, switch, device_name, description)
 
 ###############
 # REBOOT TYPES
@@ -514,25 +516,26 @@ def reboot_windows(remote_ip):
 def reboot_pi(remote_ip):
     udpsend("reboot now", remote_ip, 6666)
 
-def reboot_arduino(switch_ip, switch_interface, delay):
-    set_PoE("never", switch_ip, switch_interface)
+def reboot_arduino(switch_ip, switch_interface, device_name, description, delay):
+    set_PoE("never", switch_ip, switch_interface, device_name, description)
     time.sleep(delay)
-    set_PoE("auto", switch_ip, switch_interface)
+    set_PoE("auto", switch_ip, switch_interface, device_name, description)
 
 ###############
 # STOP TYPES
 ###############
 #run these to stop a device of the given type. stop_device calls these for the proper type
-def stop_arduino(remote_ip, switch):
-    set_PoE("never", remote_ip, switch)
+def stop_arduino(remote_ip, switch, device_name, description):
+    set_PoE("never", remote_ip, switch, device_name, description)
 
 def stop_windows(remote_ip):
     udpsend("halt now", remote_ip, 6666)
 
-def stop_pi(remote_ip, switch_ip, switch_interface, delay):
+def stop_pi(remote_ip, switch_ip, switch_interface, delay, device_name, description, poe_flag):
     udpsend("halt now", remote_ip, 6666)
-    time.sleep(delay)
-    set_PoE("never", switch_ip, switch_interface)
+    if (poe_flag == WITH_POE):
+        time.sleep(delay)
+        set_PoE("never", switch_ip, switch_interface, device_name, description)
 
 ###############
 # CHECK FUNCTIONS
@@ -599,18 +602,18 @@ def get_item(remote_ip):
 # START DEVICE
 ###############
 #starts a generic device; checks the type and inputs, then calls the correct start function
-def start_device(switch_ip, switch_interface, device_type, mac_address):        
-    if "berry" in device_type.lower(): 
+def start_device(switch_ip, switch_interface, device_type, mac_address, device_name, description):        
+    if "berry" in device_type.lower() or "cubi" in device_type.lower(): 
 #        print "start pi"
         ret = check_switch(switch_ip, switch_interface)
         if (ret != 0):
-            logger.info( "ERROR: Switch info not set: %s %s" % (switch_ip, switch_interface))
+            logger.info( "ERROR: Switch info not set: %s %s %s" % (device_name, description, switch_ip, switch_interface))
             return
-        logger.info( " would start pi: %s %s" % (switch_ip, switch_interface))
+        logger.info( " would start pi: %s %s %s %s" % (device_name, description, switch_ip, switch_interface))
         time.sleep(DELAY_BETWEEN_DEVICES)
         if not args.disable:
-            logger.info(" now starting... %s %s" %  (switch_ip, switch_interface))
-            start_pi(switch_ip, switch_interface)
+            logger.info(" now starting... %s %s %s %s" %  (device_name, description, switch_ip, switch_interface))
+            start_pi(switch_ip, switch_interface, device_name, description)
     else:
         if "indow" in device_type.lower():
 #            print "start windows"
@@ -618,10 +621,10 @@ def start_device(switch_ip, switch_interface, device_type, mac_address):
             if (ret != 0):
                 logger.info( "ERROR: MAC address not set!")
                 return
-            logger.info(" would start windows: %s" % (mac_address))
+            logger.info(" would start windows: %s %s %s" % (device_name, description, mac_address))
             time.sleep(DELAY_BETWEEN_DEVICES)
             if (not args.disable) and not (args.no_servers):
-                logger.info("now starting... %s" % (mac_address))                
+                logger.info("now starting... %s %s %s" % (device_name, description, mac_address))         
                 start_windows(mac_address)
             else:
                 if args.no_servers:
@@ -631,13 +634,13 @@ def start_device(switch_ip, switch_interface, device_type, mac_address):
 #                print "start arduino"                    
                 ret = check_switch(switch_ip, switch_interface)
                 if (ret != 0):
-                    logger.info("ERROR: Switch info not set: %s %s" % (switch_ip, switch_interface))
+                    logger.info("ERROR: Switch info not set: %s %s %s %s" % (device_name, description, switch_ip, switch_interface))
                     return
-                logger.info(" would start arduino: %s %s" % (switch_ip, switch_interface))
+                logger.info(" would start arduino: %s %s %s %s" % (device_name, description,  switch_ip, switch_interface))
                 time.sleep(DELAY_BETWEEN_DEVICES)
                 if not args.disable:
-                    logger.info(" now starting... %s %s" % (switch_ip, switch_interface))
-                    start_arduino(switch_ip, switch_interface)
+                    logger.info(" now starting... %s %s %s %s" % (device_name, description, switch_ip, switch_interface))
+                    start_arduino(switch_ip, switch_interface, device_name, description)
             else:
                 if "mac" in device_type.lower():
                     print "mac"
@@ -649,19 +652,19 @@ def start_device(switch_ip, switch_interface, device_type, mac_address):
 # STOP DEVICE
 ###############
 #stops a generic device; checks the type and inputs, then calls the correct stop function
-def stop_device(remote_ip, switch_ip, switch_interface, device_type):
-    if "berry" in device_type.lower(): 
+def stop_device(remote_ip, switch_ip, switch_interface, device_type, device_name, description, poe_flag):
+    if "berry" in device_type.lower() or "cubi" in device_type.lower(): 
 #        print "stop pi"
         ret = check_remoteip_switch(remote_ip, switch_ip, switch_interface)
         if (ret != 0):
-            logger.info( "ERROR: Remote IP %s or switch info %s %s not set!" % (remote_ip, switch_ip, switch_interface))
+            logger.info( "ERROR: %s %s Remote IP %s or switch info %s %s not set!" % (device_name, description, remote_ip, switch_ip, switch_interface))
             return
             #print error
-        logger.info( " would stop pi: %s %s %s" % (remote_ip, switch_ip, switch_interface))
+        logger.info( " would stop pi: %s %s %s %s %s" % (device_name, description, remote_ip, switch_ip, switch_interface))
         time.sleep(DELAY_BETWEEN_DEVICES)
         if not args.disable:
-            logger.info( " now stopping... %s %s %s" % (remote_ip, switch_ip, switch_interface))
-            stop_pi(remote_ip, switch_ip, switch_interface, DELAY_STOP_PI)        
+            logger.info( " now stopping... %s %s %s %s %s" % (device_name, description, remote_ip, switch_ip, switch_interface))
+            stop_pi(remote_ip, switch_ip, switch_interface, DELAY_STOP_PI, device_name, description, poe_flag)    
     else:
         if "indow" in device_type.lower():
 #            print "stop windows"
@@ -669,32 +672,34 @@ def stop_device(remote_ip, switch_ip, switch_interface, device_type):
             if (ret != 0):
                 logger.info( "ERROR: Remote IP not set!")
                 return
-            logger.info( " would stop windows: %s" % (remote_ip))
+            logger.info( " would stop windows: %s %s %s" % (device_name, description, remote_ip))
             time.sleep(DELAY_BETWEEN_DEVICES)
 
             if not args.disable and not args.no_servers:
-                logger.info( "now stopping... %s" % (remote_ip))
+                logger.info( "now stopping... %s %s %s" % (device_name, description, remote_ip))
                 stop_windows(remote_ip)
             else:
                 if args.no_servers:
                     logger.info(" skip device due to --no_servers")
         else:
             if "duino" in device_type.lower() or "eensy" in device_type.lower():            
-#                print "stop arduino"
+#                logger.warning( "stop arduino")
                 ret = check_switch(switch_ip, switch_interface)
                 if (ret != 0):
-                    logger.info( "ERROR: Switch info not set: %s %s" % (switch_ip, switch_interface))
+                    logger.info( "ERROR: Switch info not set: %s %s %s %s" % (device_name, description, switch_ip, switch_interface))
                     return
-                logger.info( " would stop arduino: %s %s" % (switch_ip, switch_interface))
+                logger.info( " would stop arduino: %s %s %s %s" % (device_name, description, switch_ip, switch_interface))
                 time.sleep(DELAY_BETWEEN_DEVICES)
 
                 if not args.disable:
-                    logger.info( " now stopping... %s %s" % (switch_ip, switch_interface))
+                    logger.info( " now stopping... %s %s %s %s" % (device_name, description, switch_ip, switch_interface))
                     stop_arduino(switch_ip, switch_interface)
             else:
                 if "mac" in device_type.lower():
-                    print "stop mac"
-                    stop_windows(remote_ip)
+                    logger.info("would stop mac: %s %s %s" % (device_name, description, remote_ip))
+                    if not args.disable:
+                        logger.info("now stopping mac: %s %s %s" % (device_name, description, remote_ip))
+                        stop_windows(remote_ip)
                 else:
                     logger.error( " ERROR: type %s not matched, exiting..." % device_type)
 
@@ -702,19 +707,19 @@ def stop_device(remote_ip, switch_ip, switch_interface, device_type):
 # REBOOT DEVICE
 ###############
 #reboots a generic device; checks the type and inputs, then calls the correct reboot function
-def reboot_device(remote_ip, switch_ip, switch_interface, device_type):
-    if "berry" in device_type.lower(): 
+def reboot_device(remote_ip, switch_ip, switch_interface, device_type, device_name, description):
+    if "berry" in device_type.lower() or "cubi" in device_type.lower(): 
 #        print "reboot pi"
         ret = check_remoteip(remote_ip)
         if (ret != 0):
             logger.info( "ERROR: Remote IP not set!")
             return
-        logger.info( " would reboot pi: %s" % (remote_ip))
+        logger.info( " would reboot pi: %s %s %s" % (device_name, description, remote_ip))
 
         time.sleep(DELAY_BETWEEN_DEVICES)
 
         if not args.disable:
-            logger.info( " now rebooting... %s" % (remote_ip))
+            logger.info( " now rebooting... %s %s %s" % (device_name, description, remote_ip))
             reboot_pi(remote_ip)        
     else:
         if "indow" in device_type.lower():
@@ -723,11 +728,11 @@ def reboot_device(remote_ip, switch_ip, switch_interface, device_type):
             if (ret != 0):
                 logger.info( "ERROR: Remote IP not set!")
                 return
-            logger.info( " would reboot windows: %s" % (remote_ip))
+            logger.info( " would reboot windows: %s %s %s" % (device_name, description, remote_ip))
             time.sleep(DELAY_BETWEEN_DEVICES)
         
             if not args.disable and not args.no_servers:
-                logger.info( " now rebooting... %s" % (remote_ip))
+                logger.info( " now rebooting... %s %s %s" % (device_name, description, remote_ip))
                 reboot_windows(remote_ip)
             else:
                 if args.no_servers:
@@ -737,14 +742,14 @@ def reboot_device(remote_ip, switch_ip, switch_interface, device_type):
 #                print "reboot arduino"
                 ret = check_switch(switch_ip, switch_interface)
                 if (ret != 0):
-                    logger.info( "ERROR: Switch info not set: %s %s" % (switch_ip, switch_interface))
+                    logger.info( "ERROR: Switch info not set: %s %s %s %s" % (device_name, description, switch_ip, switch_interface))
                     return
                 time.sleep(DELAY_BETWEEN_DEVICES)
-                logger.info(" would reboot arduino: %s %s" % (switch_ip, switch_interface))
+                logger.info(" would reboot arduino: %s %s %s %s" % (device_name, description, switch_ip, switch_interface))
 
                 if not args.disable:
-                    logger.info(" now rebooting... %s %s" % (switch_ip, switch_interface))
-                    reboot_arduino(switch_ip, switch_interface, 2)
+                    logger.info(" now rebooting... %s %s %s %s" % (device_name, description, switch_ip, switch_interface))
+                    reboot_arduino(switch_ip, switch_interface, device_name, description, 2)
             else:
                 if "mac" in device_type.lower():
                     print "mac"
@@ -779,19 +784,19 @@ def relays_on_off(on_or_off, zone_list, zone):
         #turn on the TV arch Pis first
         item = zone_list[0]
         logger.info("send to " + str(item[1]))
-        msg = "/relays/%s 1" % item[3]
+        msg = "/relay %s 1" % item[3]
         send_to_osc(item[4], RELAY_PORT, msg)
         time.sleep(DELAY_BETWEEN_RELAYS)
         item = zone_list[1]
         logger.info("send to " + str(item[1]))
-        msg = "/relays/%s 1" % item[3]
+        msg = "/relay %s 1" % item[3]
         send_to_osc(item[4], RELAY_PORT, msg)
         delay_with_countdown(DELAY_FOR_TVARCH)
         #then the remainder of the list
         for item in zone_list[2:]:
             time.sleep(DELAY_BETWEEN_RELAYS)
             logger.info("send to " + str(item[1]))
-            msg = "/relays/%s 1" % item[3]
+            msg = "/relay %s 1" % item[3]
             send_to_osc(item[4], RELAY_PORT, msg)
         return
     
@@ -801,11 +806,11 @@ def relays_on_off(on_or_off, zone_list, zone):
             time.sleep(DELAY_BETWEEN_RELAYS)
             if (on_or_off == "on"):
                 logger.info("send to " + str(item[1]))
-                msg = "/relays/%s 1" % item[3]
+                msg = "/relay %s 1" % item[3]
                 send_to_osc(item[4], RELAY_PORT, msg)
             else:
                 logger.info("send to " + str(item[1]))
-                msg = "/relays/%s 0" % item[3]
+                msg = "/relay %s 0" % item[3]
                 send_to_osc(item[4], RELAY_PORT, msg)
 
 #on boot order
@@ -844,12 +849,12 @@ def on_off_single_relay(on_or_off, relay_name):
 
         if (on_or_off == "on"):
             logger.info("would send to " + str(item[1]))
-            msg = "/relays/%s 1" % item[3]
+            msg = "/relay %s 1" % item[3]
             print msg
             send_to_osc(item[4], RELAY_PORT, msg)
         else:
             logger.info("would send to " + str(item[1]))
-            msg = "/relays/%s 0" % item[3]
+            msg = "/relay %s 0" % item[3]
             print msg
             send_to_osc(item[4], RELAY_PORT, msg)
     else:
@@ -896,7 +901,7 @@ def start_by_type(command, limit_to_switch_ip, type):
 
         if type != None and type != "":
             logger.info( "for type %s %s" % (type.lower(), device_type.lower()))
-            if "berry" in type.lower() or "pi" in type.lower():
+            if "berry" in type.lower() or "pi" in type.lower() or "cubi" in device_type.lower():
                 print "set pi type"
                 start_pi_type = 1
             if "indows" in type.lower() or "mac" in type.lower():
@@ -964,37 +969,37 @@ def start_by_type(command, limit_to_switch_ip, type):
 
                     if command is "start":
                     #start each item
-                        if start_pi_type == 1 and "berry" in device_type.lower():
-                            start_device(switch_ip, switch_interface, device_type, mac_address)
+                        if start_pi_type == 1 and "berry" in device_type.lower() or "cubi" in device_type.lower():
+                            start_device(switch_ip, switch_interface, device_type, mac_address, device_name, description)
                             continue
                         if start_windows_type == 1 and ("indow" in device_type.lower() or "mac" in device_type.lower()):
-                            start_device(switch_ip, switch_interface, device_type, mac_address)
+                            start_device(switch_ip, switch_interface, device_type, mac_address, device_name, description)
                             continue
                         if start_arduino_type == 1 and "duino" in device_type.lower():
-                            start_device(switch_ip, switch_interface, device_type, mac_address)
+                            start_device(switch_ip, switch_interface, device_type, mac_address, device_name, description)
                             continue
 
                     if command is "stop":
                     #stop each item
-                        if start_pi_type == 1 and "berry" in device_type.lower():
-                            stop_device(remote_ip, switch_ip, switch_interface, device_type)
+                        if start_pi_type == 1 and "berry" in device_type.lower() or "cubi" in device_type.lower():
+                            stop_device(remote_ip, switch_ip, switch_interface, device_type, device_name, description, WITH_POE)
                             continue
                         if start_windows_type == 1 and ("indow" in device_type.lower() or "mac" in device_type.lower()):
-                            stop_device(remote_ip, switch_ip, switch_interface, device_type)
+                            stop_device(remote_ip, switch_ip, switch_interface, device_type, device_name, description, WITH_POE)
                             continue
                         if start_arduino_type == 1 and "duino" in device_type.lower():
-                            stop_device(remote_ip, switch_ip, switch_interface, device_type)
+                            stop_device(remote_ip, switch_ip, switch_interface, device_type, device_name, description, WITH_POE)
                             continue
                     if command is "reboot":
                     #reboot each item
-                        if start_pi_type == 1 and "berry" in device_type.lower():
-                            reboot_device(remote_ip, switch_ip, switch_interface, device_type)
+                        if start_pi_type == 1 and "berry" in device_type.lower() or "cubi" in device_type.lower():
+                            reboot_device(remote_ip, switch_ip, switch_interface, device_type, device_name, description)
                             continue
                         if start_windows_type == 1 and ("indow" in device_type.lower() or "mac" in device_type.lower()):
-                            reboot_device(remote_ip, switch_ip, switch_interface, device_type)
+                            reboot_device(remote_ip, switch_ip, switch_interface, device_type, device_name, description)
                             continue
                         if start_arduino_type == 1 and "duino" in device_type.lower():
-                            reboot_device(remote_ip, switch_ip, switch_interface, device_type)
+                            reboot_device(remote_ip, switch_ip, switch_interface, device_type, device_name, description)
                             continue
         except lite.Error, e:
             logger.error(" ERROR: SQL error! %s" % e)   
@@ -1055,9 +1060,9 @@ def start_stop_reboot_show(command, limit_to_switch_ip, type):
             cur.execute(sql)
             data = cur.fetchall()
             
-            print data
-
             done_server_delay = 0 #initialize this to 0 so we know when we started
+            poe_list = []
+
             for item in data:
                 (remote_ip, device_name, mac_address, switch_interface, device_type, boot_order, space, zone, description) = item
                 if mac_address is None:
@@ -1080,6 +1085,9 @@ def start_stop_reboot_show(command, limit_to_switch_ip, type):
                 if device_type is None:
                     device_type = ""
 
+                if description is None:
+                    description = ""
+
                 if "software" in device_type.lower() or boot_order == "" or boot_order is None:
                     if device_name != "" and device_name != "default":
                         print "skipping " + str(device_name)
@@ -1088,31 +1096,54 @@ def start_stop_reboot_show(command, limit_to_switch_ip, type):
                 if command is "start":
                     print "would start " + str(device_name)
                     #otherwise just start stuff
-                    if "berry" in device_type.lower() and done_server_delay == 0:
+                    if "berry" in device_type.lower() or "cubi" in device_type.lower() and done_server_delay == 0:
                         #delays before the first Pi
                         done_server_delay = 1;
                         delay_with_countdown(DELAY_AFTER_SERVERS)
 
                     if limit_to_switch_ip is not None and limit_to_switch_ip != "":
                         if limit_to_switch_ip in switch_group:
-                            start_device(switch_ip, switch_interface, device_type, mac_address)
+                            start_device(switch_ip, switch_interface, device_type, mac_address, device_name, description)
                     else:
-                        start_device(switch_ip, switch_interface, device_type, mac_address)
+                        if boot_order != "" and boot_order is not None:
+                            start_device(switch_ip, switch_interface, device_type, mac_address, device_name, description)
                         
                 if command is "stop":
                     if limit_to_switch_ip is not None and limit_to_switch_ip != "":
                         if limit_to_switch_ip in switch_group:
-                            stop_device(remote_ip, switch_ip, switch_interface, device_type)
+                            #temporarily rebooting pis instead of stopping them
+                            if "berry" in device_type.lower() and "video" in description.lower():
+                                logger.warning("reboot video pi instead")
+                                reboot_device(remote_ip, switch_ip, switch_interface, device_type, device_name, description)
+                            else:
+                                if "berry" in device_type.lower() or "cubi" in device_type.lower():
+                                    poe_list.append([remote_ip, switch_ip, switch_interface, device_type, description])
+                                logger.warning("nope, stopping")
+                                stop_device(remote_ip, switch_ip, switch_interface, device_type, device_name, description, NO_POE)
                     else:
-                        stop_device(remote_ip, switch_ip, switch_interface, device_type)
+                        if boot_order != "" and boot_order is not None:
+                            if "berry" in device_type.lower() or "cubi" in device_type.lower():
+                                poe_list.append([remote_ip, switch_ip, switch_interface, device_type, description])
+                            stop_device(remote_ip, switch_ip, switch_interface, device_type, device_name, description, NO_POE)
 
                 if command is "reboot":
                     #reboot each item
                     if limit_to_switch_ip is not None and limit_to_switch_ip != "":
                         if limit_to_switch_ip in switch_group:
-                            reboot_device(remote_ip, switch_ip, switch_interface, device_type)
+                            reboot_device(remote_ip, switch_ip, switch_interface, device_type, device_name, description)
                         else:
-                            reboot_device(remote_ip, switch_ip, switch_interface, device_type)
+                            if boot_order != "" and boot_order is not None:
+                                reboot_device(remote_ip, switch_ip, switch_interface, device_type, device_name, description)
+
+
+            # then kill every Pi PoE
+            if command is "stop":
+                if len(poe_list) > 0:
+                    logger.warning("delay %d seconds to make sure Pis halt" % DELAY_STOP_PI)
+                    time.sleep(DELAY_STOP_PI)
+
+                for item in poe_list:
+                    set_PoE("never", item[0], item[1], "", item[4])
 
             if command is "stop" or command is "start":
                 if command is "stop":
@@ -1193,9 +1224,9 @@ def reboot_unresponsive(limit_to_switch_ip):
                 #stop each item, then delay
                 if limit_to_switch_ip is not None and limit_to_switch_ip != "":
                     if limit_to_switch_ip in switch_group:
-                        reboot_device(remote_ip, switch_ip, switch_interface, device_type)
+                        reboot_device(remote_ip, switch_ip, switch_interface, device_type, device_name, description)
                 else:
-                    reboot_device(remote_ip, switch_ip, switch_interface, device_type)
+                    reboot_device(remote_ip, switch_ip, switch_interface, device_type, device_name, description)
                 
     except lite.Error, e:
         logger.error(" ERROR: SQL error! %s" % e) 
@@ -1244,6 +1275,8 @@ def on_by_zone(on_or_off, zone):
             cur.execute(sql)
             data = cur.fetchall()
 
+            poe_list = []
+
             #and step through devices, turning them on/off
             for item in data:
                 (remote_ip, device_name, mac_address, switch_interface, device_type, boot_order, space, zone, description) = item
@@ -1270,19 +1303,39 @@ def on_by_zone(on_or_off, zone):
 
                 #kill or start each device
                 if on_or_off == "on":
-                    logger.info( device_name)
-                    start_device(switch_ip, switch_interface, device_type, mac_address)       
+                    if boot_order != "" and boot_order is not None:
+                        if remote_ip != "10.42.21.18":
+                            logger.info( device_name)
+                            start_device(switch_ip, switch_interface, device_type, mac_address, device_name, description)       
                 else:
-                    logger.info( device_name)
-                    stop_device(remote_ip, switch_ip, switch_interface, device_type)
+                    if boot_order != "" and boot_order is not None:
+                        if remote_ip != "10.42.21.18":
+                            #temporarily rebooting pis instead of stopping them
+                            if "berry" in device_type.lower() and "video" in description.lower():
+                                logger.warning("reboot video pi instead")
+                                reboot_device(remote_ip, switch_ip, switch_interface, device_type, device_name, description)
+                            else:
+                                if "berry" in device_type.lower() or "cubi" in device_type.lower():
+                                    poe_list.append([remote_ip, switch_ip, switch_interface, device_type, description])
+                                logger.info( device_name)
+                                stop_device(remote_ip, switch_ip, switch_interface, device_type, device_name, description, NO_POE)
 
-            #then pause
-            #                    time.sleep(DELAY_FOR_PROJECTORS)
+            # then kill every Pi PoE
+            if on_or_off == "off":
+                if len(poe_list) > 0:
+                    logger.warning("delay %d seconds to make sure Pis halt" % DELAY_STOP_PI)
+                    time.sleep(DELAY_STOP_PI)
+
+                for item in poe_list:
+                    set_PoE("never", item[0], item[1], "", item[4])
 
             #then kill or start the relays for this zone
             if (args.no_relays or args.with_relays == 0):
                 logger.warning("--no_relays, or --with_relays not found, skipping relays")
                 return
+            #then pause
+            logger.warning("Pausing before %s-ing relays" % on_or_off)
+            time.sleep(DELAY_FOR_PROJECTORS)
             get_relay_pins(relay_pin_list)
             zone_list = get_relay_zones(zone, relay_pin_list)
             print "zone is %s" % zone.lower()
@@ -1358,10 +1411,10 @@ def on_by_space(on_or_off, space):
                 #kill or start each device
                 if on_or_off == "on":
                     logger.info( device_name)
-                    start_device(switch_ip, switch_interface, device_type, mac_address)               
+                    start_device(switch_ip, switch_interface, device_type, mac_address, device_name, description)               
                 else:
                     logger.info( device_name)
-                    stop_device(remote_ip, switch_ip, switch_interface, device_type)
+                    stop_device(remote_ip, switch_ip, switch_interface, device_type, device_name, description, WITH_POE)
 #by space doesn't do relays
     except lite.Error, e:
         logger.error(" ERROR: SQL error! %s" % e)
@@ -2151,21 +2204,21 @@ if __name__ == "__main__":
     ###############
         
     if args.start_device:
-        start_device(switch_ip, switch_interface, device_type, mac_address)
+        start_device(switch_ip, switch_interface, device_type, mac_address, "", "")
         
     ###############
     # STOP DEVICE
     ###############
                     
     if args.stop_device:
-        stop_device(remote_ip, switch_ip, switch_interface, device_type)
+        stop_device(remote_ip, switch_ip, switch_interface, device_type, "", "", WITH_POE)
 
     ###############
     # REBOOT DEVICE
     ###############
                     
     if args.reboot_device:
-        reboot_device(remote_ip, switch_ip, switch_interface, device_type)
+        reboot_device(remote_ip, switch_ip, switch_interface, device_type, "", "")
 
     ###############
     # PAUSE AUDIO ON DEVICE
