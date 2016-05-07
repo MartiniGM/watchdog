@@ -366,7 +366,7 @@ def rebootscript():
                 command = "sudo /sbin/reboot"
             else:
                 if ("halt" in reboot_cmd):
-                    command = "sudo /sbin/halt"
+                    command = "sudo /sbin/shutdown now"
                 else:
                     logger.error("Didn't recognize %s in rebootscript" % reboot_cmd)
             subprocess.call(command, shell = True)
