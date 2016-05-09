@@ -482,7 +482,7 @@ def init_items():
         uptime = ""
         (location, device_type, zone, space, device_name, description, switch_interface, mac_address, boot_order) = get_all_from_googlesheet(id_name)
         if device_type is not None and device_type != "" and id_name is not None and id_name != "" and id_name != "n/a":
-            if "berry" in device_type.lower() or "duino" in device_type.lower() or "indow" in device_type.lower() or "mac" in device_type.lower() or "eensy" in device_type.lower() and id_name is not None and id_name != "": 
+            if "berry" in device_type.lower() or "duino" in device_type.lower() or "indow" in device_type.lower() or "mac" in device_type.lower() or "eensy" in device_type.lower() or "tablet" in device_type.lower() or "cubi" in device_type.lower() and id_name is not None and id_name != "": 
 #                print "this item %s" % id_name
                 try:
                     cur = con.cursor()
@@ -491,6 +491,14 @@ def init_items():
                     if data is None:
                         cur.execute("INSERT OR IGNORE INTO DEVICES(ID_NAME, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME, LAST_UPTIME_SEC, LOCATION, DEVICE_TYPE, LAST_RESET_TIMESTAMP, ZONE, SPACE, DEVICE_NAME, DESCRIPTION, SWITCH_INTERFACE, MAC_ADDRESS, BOOT_ORDER) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",  (id_name,timestamp,status, uptime_sec,uptime,uptime_sec, location, device_type, last_reset_timestamp, zone, space, device_name, description, switch_interface, mac_address, boot_order))
                         con.commit()
+                    else:
+                        # this updates UNKNOWN items with current info
+                        cur = con.cursor()
+                        cur.execute("SELECT status FROM devices WHERE id_name = ?", (id_name,))
+                        data = cur.fetchone()
+                        if "UNKNOWN" in data[0]:
+                            cur.execute("INSERT OR REPLACE INTO DEVICES(ID_NAME, TIMESTAMP, STATUS, UPTIME_SEC, UPTIME, LAST_UPTIME_SEC, LOCATION, DEVICE_TYPE, LAST_RESET_TIMESTAMP, ZONE, SPACE, DEVICE_NAME, DESCRIPTION, SWITCH_INTERFACE, MAC_ADDRESS, BOOT_ORDER) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",  (id_name,timestamp,status, uptime_sec,uptime,uptime_sec, location, device_type, last_reset_timestamp, zone, space, device_name, description, switch_interface, mac_address, boot_order))
+                            con.commit()
                 except lite.Error, e:
                     for frame in traceback.extract_tb(sys.exc_info()[2]):
                         fname,lineno,fn,text = frame
