@@ -390,8 +390,9 @@ def rebootscript():
                                      'tell app "System Events" to restart'])
                 else:
                     if ("halt" in reboot_cmd):
-                        subprocess.call(['osascript', '-e',
-                                         'tell app "System Events" to shut down'])
+#                        subprocess.call(['osascript', '-e',                                         'tell app "System Events" to shut down'])
+# mac OS doesn't support wake on lan from shutdown, so just sleep :l
+                        subprocess.call(['osascript', '-e',                                         'tell app "Finder" to sleep'])
                     else:
                         logger.error("Didn't recognize %s in rebootscript" % reboot_cmd)
     except Exception, e:
@@ -564,7 +565,7 @@ def get_uptime():
                 uptime_string = uptime_string.split('.')[0]
                 return (uptime_string, uptime_seconds)
             else: # mac os probably
-                output = subprocess.check_output(['sysctl', '-n', 'kern.boottime']).strip()
+                output = subprocess.check_output(['/usr/sbin/sysctl', '-n', 'kern.boottime']).strip()
                 boottime = re.search('sec = (\d+),', output).group(1)
                 uptime_seconds = datetime.timedelta(seconds=float(boottime)).seconds
                 uptime_string = str(datetime.timedelta(seconds = uptime_seconds))
