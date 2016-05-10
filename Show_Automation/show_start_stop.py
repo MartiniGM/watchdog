@@ -51,6 +51,7 @@ OSC_PORT = 9998 #port to send pause/unpause messages to do-audio on the Pis
 RELAY_PORT = 9999 #port to send on/off messages to power relays
 WATCHDOG_PORT = 6666 #port to send commands to the watchdog on the Pis
 DO_VIDEO_PORT = 9995 #port to send commands to do-video
+LYCRA_PORT = 10000 #port to send start commands to the lycratunnel
 PAUSE_COMMAND = "/pause" #pause command sent to do-audio on the Pis
 UNPAUSE_COMMAND = "/unpause" #unpause command sent to do-audio on the Pis
 PAUSE_VIDEO_COMMAND = "/stopall" #pause command sent to do-audio on the Pis
@@ -63,6 +64,9 @@ VOLUME_UP_COMMAND = "/home/pi/RUNNING/scripts/set_volume.py"
 
 #list of entry videos to be rebooted simultaneously
 entry_video_list = ["10.42.27.41", "10.42.27.42"]
+
+#IP address for the Lycratunnel
+lycra_ip = "10.42.22.20"
 
 #IP address for the POD
 POD_ip = "10.42.24.21"
@@ -152,10 +156,6 @@ def dump_devices(okay_or_nonresponsive):
     except lite.Error, e:
         logger.error(" ERROR: SQL error! %s" % e)   
 
-#dump_devices("OKAY")
-#time.sleep(1.0)
-#dump_devices("NONRESPONSIVE")
-
 ####################################
 #DELAY_WITH_COUNTDOWN
 ####################################
@@ -221,7 +221,7 @@ def open_googlesheet():
 # find_item()
 ################################
 def find_item(mylist, item_name):
-    # gets the position of "item" in the sublists & returns                     
+    # gets the position of "item" in the sublists & returns                   
     try:
         for item in mylist:
             i = 0
@@ -475,6 +475,25 @@ def udpsend(message, remote_ip, port):
     else:
         logger.info( " would send " + message + " to " + remote_ip )
 
+
+
+#tells a Windows or Mac server to wake on lan (boot from the off state)
+def wake_on_lan_mac(mac_address):
+    import subprocess
+    if not args.disable:
+        try:
+            logger.info( " sending WoL to %s" % mac_address )
+            command = [WOL_COMMAND, mac_address, "255.255.255.255",
+                   "255.255.255.255", "4343"]
+            p = subprocess.Popen(command, stdout=subprocess.PIPE)
+            for line in p.stdout:
+                logger.info(line)
+
+        except Exception, e:
+            logger.error( " ERROR: set_PoE error: %s" % e)
+    else:
+        logger.info( " would send WoL to %s" % mac_address )
+
 #tells a Windows or Mac server to wake on lan (boot from the off state)
 def wake_on_lan(mac_address):
     import subprocess
@@ -499,6 +518,9 @@ def wake_on_lan(mac_address):
 #run these to start a device of the given type. start_device calls these for the proper type
 def start_windows(mac_address):
     wake_on_lan(mac_address)
+
+def start_mac(mac_address):
+    wake_on_lan_mac(mac_address)
         
 def start_pi(remote_ip, switch, device_name, description):
     set_PoE("auto", remote_ip, switch, device_name, description)
@@ -644,7 +666,7 @@ def start_device(switch_ip, switch_interface, device_type, mac_address, device_n
             else:
                 if "mac" in device_type.lower():
                     print "mac"
-                    start_windows(mac_address)
+                    start_mac(mac_address)
                 else:
                     logger.error( " ERROR: type %s not matched, exiting..." % device_type)
 
@@ -693,7 +715,7 @@ def stop_device(remote_ip, switch_ip, switch_interface, device_type, device_name
 
                 if not args.disable:
                     logger.info( " now stopping... %s %s %s %s" % (device_name, description, switch_ip, switch_interface))
-                    stop_arduino(switch_ip, switch_interface)
+                    stop_arduino(switch_ip, switch_interface, device_name, description)
             else:
                 if "mac" in device_type.lower():
                     logger.info("would stop mac: %s %s %s" % (device_name, description, remote_ip))
@@ -1112,12 +1134,12 @@ def start_stop_reboot_show(command, limit_to_switch_ip, type):
                     if limit_to_switch_ip is not None and limit_to_switch_ip != "":
                         if limit_to_switch_ip in switch_group:
                             #temporarily rebooting pis instead of stopping them
-                            if "berry" in device_type.lower() and "video" in description.lower():
-                                logger.warning("reboot video pi instead")
-                                reboot_device(remote_ip, switch_ip, switch_interface, device_type, device_name, description)
-                            else:
-                                if "berry" in device_type.lower() or "cubi" in device_type.lower():
-                                    poe_list.append([remote_ip, switch_ip, switch_interface, device_type, description])
+#                            if "berry" in device_type.lower() and "video" in description.lower():
+#                                logger.warning("reboot video pi instead")
+#                                reboot_device(remote_ip, switch_ip, switch_interface, device_type, device_name, description)
+#                            else:
+                            if "berry" in device_type.lower() or "cubi" in device_type.lower():
+                                poe_list.append([remote_ip, switch_ip, switch_interface, device_type, description])
                                 logger.warning("nope, stopping")
                                 stop_device(remote_ip, switch_ip, switch_interface, device_type, device_name, description, NO_POE)
                     else:
@@ -1164,6 +1186,11 @@ def start_stop_reboot_show(command, limit_to_switch_ip, type):
                 relay_list = get_all_relays(relay_pin_list)
 
                 relays_on_off(on_or_off, relay_list, "")
+
+            if command is "start":
+                logger.warning("starting post-projector media server programs")
+                start_lycra()
+                play_ableton()
 
     except lite.Error, e:
         logger.error(" ERROR: SQL error! %s" % e)   
@@ -1305,19 +1332,19 @@ def on_by_zone(on_or_off, zone):
                 if on_or_off == "on":
                     if boot_order != "" and boot_order is not None:
                         if remote_ip != "10.42.21.18":
-                            logger.info( device_name)
+#                            logger.info( device_name)
                             start_device(switch_ip, switch_interface, device_type, mac_address, device_name, description)       
                 else:
                     if boot_order != "" and boot_order is not None:
                         if remote_ip != "10.42.21.18":
                             #temporarily rebooting pis instead of stopping them
-                            if "berry" in device_type.lower() and "video" in description.lower():
-                                logger.warning("reboot video pi instead")
-                                reboot_device(remote_ip, switch_ip, switch_interface, device_type, device_name, description)
-                            else:
-                                if "berry" in device_type.lower() or "cubi" in device_type.lower():
-                                    poe_list.append([remote_ip, switch_ip, switch_interface, device_type, description])
-                                logger.info( device_name)
+                            #if "berry" in device_type.lower() and "video" in description.lower():
+                            #    logger.warning("reboot video pi instead")
+                            #    reboot_device(remote_ip, switch_ip, switch_interface, device_type, device_name, description)
+                            #else:
+                            if "berry" in device_type.lower() or "cubi" in device_type.lower():
+                                poe_list.append([remote_ip, switch_ip, switch_interface, device_type, description])
+#                                logger.info( device_name)
                                 stop_device(remote_ip, switch_ip, switch_interface, device_type, device_name, description, NO_POE)
 
             # then kill every Pi PoE
@@ -1410,10 +1437,10 @@ def on_by_space(on_or_off, space):
 
                 #kill or start each device
                 if on_or_off == "on":
-                    logger.info( device_name)
+#                    logger.info( device_name)
                     start_device(switch_ip, switch_interface, device_type, mac_address, device_name, description)               
                 else:
-                    logger.info( device_name)
+#                    logger.info( device_name)
                     stop_device(remote_ip, switch_ip, switch_interface, device_type, device_name, description, WITH_POE)
 #by space doesn't do relays
     except lite.Error, e:
@@ -1437,6 +1464,12 @@ def send_to_osc(remote_ip, port, cmd):
     else:
         logger.info( " -----would send %s to %s" % (cmd, remote_ip))
                 
+#tells the watchdog to kill a process (example: "looping-audio" kills all such functions) on the given Pi
+def start_lycra():
+    if not args.disable:
+        msg = "/start_lycra 1"
+        send_to_osc(SHOW_CONTROLLER_IP, SHOW_CONTROLLER_PORT, msg)
+
 #tells the watchdog to kill a process (example: "looping-audio" kills all such functions) on the given Pi
 def kill_proc_device(remote_ip, procname):
     if not args.disable:
@@ -1957,6 +1990,10 @@ if __name__ == "__main__":
         group.add_argument('--play_ableton',
                            action='store_true',
                            help='sends /live/play message to media servers, to hit play on Ableton')
+
+        group.add_argument('--start_lycra',
+                           action='store_true',
+                           help='sends /show  message to the Lycratunnel server, to start projected art')
         
         group.add_argument('--test_item',
                            action='store_true',
@@ -2079,6 +2116,8 @@ if __name__ == "__main__":
             cmd = cmd + (", reboot entry videos")
         if args.play_ableton:
             cmd = cmd + (", play ableton")
+        if args.start_lycra:
+            cmd = cmd + (", start the lycratunnel")
         if args.start_switch:
             cmd = cmd + (", on by switch:")
             msg = "/start_show 1"
@@ -2143,7 +2182,7 @@ if __name__ == "__main__":
 
         #checks whether this is a standalone call or requires arguments
     multi_item = False
-    if not (args.start_device or args.stop_device or args.reboot_device or args.pause_audio_device or args.unpause_audio_device or args.kill_proc_device or args.start_proc_device or args.volume_up or args.volume_down or args.volume_relative or args.relay_on or args.relay_off):
+    if not (args.start_device or args.stop_device or args.reboot_device or args.pause_audio_device or args.unpause_audio_device or args.kill_proc_device or args.start_proc_device or args.volume_up or args.volume_down or args.volume_relative or args.relay_on or args.relay_off or args.start_lycra):
         multi_item = True
         
     if (multi_item):
@@ -2412,6 +2451,13 @@ if __name__ == "__main__":
 
     if args.play_ableton:
         play_ableton()
+
+    #################
+    # START LYCRATUNNEL
+    #################
+
+    if args.start_lycra:
+        start_lycra()
 
     #################
     # RESTART POD
