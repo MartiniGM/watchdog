@@ -29,7 +29,7 @@ DELAY_AFTER_SERVERS = 120.0 #delays 2 minutes between booting windows servers an
 DELAY_STOP_PI = 15.0 #delays 15 seconds between halting Pis and cutting PoE
 DELAY_BETWEEN_DEVICES = 0.5 #delays a half second between stop/starting devices
 DELAY_BETWEEN_RELAYS = 1.0 #delays 2 seconds between commands to the relays
-DELAY_FOR_PROJECTORS = 360.0 #delays 6 minutes for projector cooldown and/or startup
+DELAY_FOR_PROJECTORS = 200.0 #delays 5 minutes for projector cooldown and/or startup
 DELAY_FOR_TVARCH = 120.0 #delays 2 minutes for the TV Arch Pis to start
 INIT_DELAY = 30 #delays 30 seconds before starting script so people can cancel
 NO_POE = 0
@@ -67,6 +67,9 @@ entry_video_list = ["10.42.27.41", "10.42.27.42"]
 
 #IP address for the Lycratunnel
 lycra_ip = "10.42.22.20"
+nicolae_ip = "10.42.17.20"
+global_ip = "10.42.21.18"
+entertainment_ip = "10.42.17.11"
 
 #IP address for the POD
 POD_ip = "10.42.24.21"
@@ -478,17 +481,34 @@ def udpsend(message, remote_ip, port):
 
 
 #tells a Windows or Mac server to wake on lan (boot from the off state)
-def wake_on_lan_mac(mac_address):
+def wake_on_lan_mac(ip_address):
     import subprocess
+    ok = 1
+    logger.info( " sending WoL to %s" % mac_address )
+    command = [WOL_COMMAND, mac_address, "255.255.255.255",
+               "255.255.255.255", "4343"]
+    p = subprocess.Popen(command, stdout=subprocess.PIPE)
+    for line in p.stdout:
+        logger.info(line)
+
     if not args.disable:
         try:
-            logger.info( " sending WoL to %s" % mac_address )
-            command = [WOL_COMMAND, mac_address, "255.255.255.255",
-                   "255.255.255.255", "4343"]
-            p = subprocess.Popen(command, stdout=subprocess.PIPE)
-            for line in p.stdout:
-                logger.info(line)
+            if ip_address == nicolae_ip:
+                    msg = "/wake_nicolae"
+            else:
+                if ip_address == global_ip:
+                    msg = "/wake_global"
+                else:
+                    if ip_address == entertainment_ip:
+                        msg = "/wake_entertainment"
+                    else:
+                        logger.warning("error: %s not a recognized Mac OS server", ip_address)
+                        ok = 0
+            if ok == 1:
+                send_to_osc(SHOW_CONTROLLER_IP, SHOW_CONTROLLER_PORT, msg)
 
+#can't get wake on lan to work on macs, but screen sharing wakes them...
+            
         except Exception, e:
             logger.error( " ERROR: set_PoE error: %s" % e)
     else:
@@ -519,8 +539,8 @@ def wake_on_lan(mac_address):
 def start_windows(mac_address):
     wake_on_lan(mac_address)
 
-def start_mac(mac_address):
-    wake_on_lan_mac(mac_address)
+def start_mac(remote_ip):
+    wake_on_lan_mac(remote_ip)
         
 def start_pi(remote_ip, switch, device_name, description):
     set_PoE("auto", remote_ip, switch, device_name, description)
@@ -625,11 +645,11 @@ def get_item(remote_ip):
 ###############
 #starts a generic device; checks the type and inputs, then calls the correct start function
 def start_device(switch_ip, switch_interface, device_type, mac_address, device_name, description):        
-    if "berry" in device_type.lower() or "cubi" in device_type.lower(): 
+    if "berry" in device_type.lower():
 #        print "start pi"
         ret = check_switch(switch_ip, switch_interface)
         if (ret != 0):
-            logger.info( "ERROR: Switch info not set: %s %s %s" % (device_name, description, switch_ip, switch_interface))
+            logger.info( "ERROR: Switch info not set: %s %s %s %s" % (device_name, description, switch_ip, switch_interface))
             return
         logger.info( " would start pi: %s %s %s %s" % (device_name, description, switch_ip, switch_interface))
         time.sleep(DELAY_BETWEEN_DEVICES)
@@ -666,7 +686,7 @@ def start_device(switch_ip, switch_interface, device_type, mac_address, device_n
             else:
                 if "mac" in device_type.lower():
                     print "mac"
-                    start_mac(mac_address)
+                    start_mac(remote_ip)
                 else:
                     logger.error( " ERROR: type %s not matched, exiting..." % device_type)
 
@@ -675,7 +695,7 @@ def start_device(switch_ip, switch_interface, device_type, mac_address, device_n
 ###############
 #stops a generic device; checks the type and inputs, then calls the correct stop function
 def stop_device(remote_ip, switch_ip, switch_interface, device_type, device_name, description, poe_flag):
-    if "berry" in device_type.lower() or "cubi" in device_type.lower(): 
+    if "berry" in device_type.lower():
 #        print "stop pi"
         ret = check_remoteip_switch(remote_ip, switch_ip, switch_interface)
         if (ret != 0):
@@ -688,7 +708,7 @@ def stop_device(remote_ip, switch_ip, switch_interface, device_type, device_name
             logger.info( " now stopping... %s %s %s %s %s" % (device_name, description, remote_ip, switch_ip, switch_interface))
             stop_pi(remote_ip, switch_ip, switch_interface, DELAY_STOP_PI, device_name, description, poe_flag)    
     else:
-        if "indow" in device_type.lower():
+        if "indow" in device_type.lower() or "cubi" in device_type.lower():
 #            print "stop windows"
             ret = check_remoteip(remote_ip)
             if (ret != 0):
@@ -806,20 +826,46 @@ def relays_on_off(on_or_off, zone_list, zone):
         #turn on the TV arch Pis first
         item = zone_list[0]
         logger.info("send to " + str(item[1]))
-        msg = "/relay %s 1" % item[3]
-        send_to_osc(item[4], RELAY_PORT, msg)
+        c = OSC.OSCClient()
+        c.connect((item[4], RELAY_PORT)) 
+        oscmsg = OSC.OSCMessage()
+        oscmsg.setAddress("/relay")
+        oscmsg.append(int(item[3]))
+        oscmsg.append(1)
+        c.send(oscmsg)
+#        oscmsg = OSC.OSCMessage("/relay", [int(item[3]), 1])
+#        c.send(oscmsg)
+#        msg = "/relay %s 1" % item[3]
+#        send_to_osc(item[4], RELAY_PORT, msg)
         time.sleep(DELAY_BETWEEN_RELAYS)
         item = zone_list[1]
         logger.info("send to " + str(item[1]))
-        msg = "/relay %s 1" % item[3]
-        send_to_osc(item[4], RELAY_PORT, msg)
+        c = OSC.OSCClient()
+        c.connect((item[4], RELAY_PORT)) 
+        oscmsg = OSC.OSCMessage()
+        oscmsg.setAddress("/relay")
+        oscmsg.append(int(item[3]))
+        oscmsg.append(1)
+        c.send(oscmsg)
+#        oscmsg = OSC.OSCMessage("/relay", [int(item[3]), 1])
+#        c.send(oscmsg)
+#        msg = "/relay %s 1" % item[3]
+#        send_to_osc(item[4], RELAY_PORT, msg)
         delay_with_countdown(DELAY_FOR_TVARCH)
         #then the remainder of the list
         for item in zone_list[2:]:
             time.sleep(DELAY_BETWEEN_RELAYS)
             logger.info("send to " + str(item[1]))
-            msg = "/relay %s 1" % item[3]
-            send_to_osc(item[4], RELAY_PORT, msg)
+            c = OSC.OSCClient()
+            c.connect((item[4], RELAY_PORT)) 
+#            oscmsg = OSC.OSCMessage("/relay", [int(item[3]), 1])
+            oscmsg = OSC.OSCMessage()
+            oscmsg.setAddress("/relay")
+            oscmsg.append(int(item[3]))
+            oscmsg.append(1)
+            c.send(oscmsg)
+#            msg = "/relay %s 1" % item[3]
+#            send_to_osc(item[4], RELAY_PORT, msg)
         return
     
     #if this isn't art city or we're turning art city off, just do each
@@ -828,12 +874,29 @@ def relays_on_off(on_or_off, zone_list, zone):
             time.sleep(DELAY_BETWEEN_RELAYS)
             if (on_or_off == "on"):
                 logger.info("send to " + str(item[1]))
-                msg = "/relay %s 1" % item[3]
-                send_to_osc(item[4], RELAY_PORT, msg)
+                c = OSC.OSCClient()
+                c.connect((item[4], RELAY_PORT)) 
+#                oscmsg = OSC.OSCMessage("/relay", [int(item[3]), 1])
+                oscmsg = OSC.OSCMessage()
+                oscmsg.setAddress("/relay")
+                oscmsg.append(int(item[3]))
+                oscmsg.append(1)
+                c.send(oscmsg)
+#                msg = "/relay %s 1" % item[3]
+#                send_to_osc(item[4], RELAY_PORT, msg)
             else:
                 logger.info("send to " + str(item[1]))
-                msg = "/relay %s 0" % item[3]
-                send_to_osc(item[4], RELAY_PORT, msg)
+#                msg = "/relay %s 0" % item[3]
+#                send_to_osc(item[4], RELAY_PORT, msg)
+                c = OSC.OSCClient()
+                c.connect((item[4], RELAY_PORT)) 
+#                oscmsg = OSC.OSCMessage("/relay", [int(item[3]), 0])
+                oscmsg = OSC.OSCMessage()
+                oscmsg.setAddress("/relay")
+                oscmsg.append(int(item[3]))
+                oscmsg.append(0)
+                c.send(oscmsg)
+                c.send(oscmsg)
 
 #on boot order
     #start media server
@@ -871,14 +934,29 @@ def on_off_single_relay(on_or_off, relay_name):
 
         if (on_or_off == "on"):
             logger.info("would send to " + str(item[1]))
-            msg = "/relay %s 1" % item[3]
-            print msg
-            send_to_osc(item[4], RELAY_PORT, msg)
+#            msg = "/relay %s 1" % item[3]
+#            print msg
+#            send_to_osc(item[4], RELAY_PORT, msg)
+            c = OSC.OSCClient()
+            c.connect((item[4], RELAY_PORT)) 
+            oscmsg = OSC.OSCMessage()
+            oscmsg.setAddress("/relay")
+            oscmsg.append(int(item[3]))
+            oscmsg.append(1)
+            c.send(oscmsg)
         else:
             logger.info("would send to " + str(item[1]))
-            msg = "/relay %s 0" % item[3]
-            print msg
-            send_to_osc(item[4], RELAY_PORT, msg)
+#            msg = "/relay %s 0" % item[3]
+#            print msg
+#            send_to_osc(item[4], RELAY_PORT, msg)
+            c = OSC.OSCClient()
+            c.connect((item[4], RELAY_PORT)) 
+#            oscmsg = OSC.OSCMessage("/relay", [int(item[3]), 0])
+            oscmsg = OSC.OSCMessage()
+            oscmsg.setAddress("/relay")
+            oscmsg.append(int(item[3]))
+            oscmsg.append(0)
+            c.send(oscmsg)
     else:
         logger.warning( "relay %s not found!" % relay_name)
 
@@ -1027,7 +1105,9 @@ def start_by_type(command, limit_to_switch_ip, type):
             logger.error(" ERROR: SQL error! %s" % e)   
         except Exception, e:
             logger.error(" ERROR: non-SQL error %s" % e)
-
+            for frame in traceback.extract_tb(sys.exc_info()[2]):
+                fname,lineno,fn,text = frame
+                logger.error( "     in %s on line %d" % (fname, lineno))
 ##############################
 # START/STOP/REBOOT SHOW
 ##############################            
@@ -1084,6 +1164,7 @@ def start_stop_reboot_show(command, limit_to_switch_ip, type):
             
             done_server_delay = 0 #initialize this to 0 so we know when we started
             poe_list = []
+            video_list = []
 
             for item in data:
                 (remote_ip, device_name, mac_address, switch_interface, device_type, boot_order, space, zone, description) = item
@@ -1118,16 +1199,20 @@ def start_stop_reboot_show(command, limit_to_switch_ip, type):
                 if command is "start":
                     print "would start " + str(device_name)
                     #otherwise just start stuff
-                    if "berry" in device_type.lower() or "cubi" in device_type.lower() and done_server_delay == 0:
+                    if ("berry" in device_type.lower() or "cubi" in device_type.lower()) and done_server_delay == 0:
                         #delays before the first Pi
                         done_server_delay = 1;
                         delay_with_countdown(DELAY_AFTER_SERVERS)
 
                     if limit_to_switch_ip is not None and limit_to_switch_ip != "":
                         if limit_to_switch_ip in switch_group:
+                            if "berry" in device_type.lower() and "video" in description.lower():
+                                video_list.append([remote_ip, switch_ip, switch_interface, device_type, mac_address, device_name, description])
                             start_device(switch_ip, switch_interface, device_type, mac_address, device_name, description)
                     else:
                         if boot_order != "" and boot_order is not None:
+                            if "berry" in device_type.lower() and "video" in description.lower():
+                                video_list.append([remote_ip, switch_ip, switch_interface, device_type, mac_address, device_name, description])
                             start_device(switch_ip, switch_interface, device_type, mac_address, device_name, description)
                         
                 if command is "stop":
@@ -1165,7 +1250,7 @@ def start_stop_reboot_show(command, limit_to_switch_ip, type):
                     time.sleep(DELAY_STOP_PI)
 
                 for item in poe_list:
-                    set_PoE("never", item[0], item[1], "", item[4])
+                    set_PoE("never", item[1], item[2], "", item[4])
 
             if command is "stop" or command is "start":
                 if command is "stop":
@@ -1176,26 +1261,62 @@ def start_stop_reboot_show(command, limit_to_switch_ip, type):
 
                 if (args.no_relays or args.with_relays == 0):
                     logger.warning("--no_relays, or --with_relays not found, skipping relays")
-                    return
-
+                else:
             #then pause before stopping/starting the relays
-                logger.warning("Pausing before %s-ing relays" % command)
-                time.sleep(DELAY_FOR_PROJECTORS)
+                    logger.warning("Pausing before %s-ing relays" % command)
+                    time.sleep(DELAY_FOR_PROJECTORS)
 
-                get_relay_pins(relay_pin_list)
-                relay_list = get_all_relays(relay_pin_list)
+                    get_relay_pins(relay_pin_list)
+                    relay_list = get_all_relays(relay_pin_list)
+                    
+                    relays_on_off(on_or_off, relay_list, "")
 
-                relays_on_off(on_or_off, relay_list, "")
-
-            if command is "start":
+            if command is "start":          
                 logger.warning("starting post-projector media server programs")
                 start_lycra()
                 play_ableton()
+
+                logger.warning("rebooting video Pis")
+                for item in video_list:
+                    (remote_ip, switch_ip, switch_interface, device_type, mac_address, device_name, description) = item
+                    reboot_device(remote_ip, switch_ip, switch_interface, device_type, device_name, description)
+
 
     except lite.Error, e:
         logger.error(" ERROR: SQL error! %s" % e)   
     except Exception, e:
         logger.error(" ERROR: non-SQL error %s" % e)
+        for frame in traceback.extract_tb(sys.exc_info()[2]):
+            fname,lineno,fn,text = frame
+            logger.error( "     in %s on line %d" % (fname, lineno))
+
+def all_relays_on():
+    on_or_off = "on"
+                #then kill or start all relays 
+    
+    if (args.no_relays or args.with_relays == 0):
+        logger.warning("--no_relays, or --with_relays not found, skipping relays")
+    else:
+            #then pause before stopping/starting the relays
+
+        get_relay_pins(relay_pin_list)
+        relay_list = get_all_relays(relay_pin_list)
+        
+        relays_on_off(on_or_off, relay_list, "")
+
+def all_relays_off():
+    on_or_off = "off"
+                #then kill or start all relays 
+    
+    if (args.no_relays or args.with_relays == 0):
+        logger.warning("--no_relays, or --with_relays not found, skipping relays")
+    else:
+            #then pause before stopping/starting the relays
+        
+        get_relay_pins(relay_pin_list)
+        relay_list = get_all_relays(relay_pin_list)
+        
+        relays_on_off(on_or_off, relay_list, "")
 
 ##############################
 # REBOOT NONRESPONSIVE DEVICES
@@ -1354,7 +1475,7 @@ def on_by_zone(on_or_off, zone):
                     time.sleep(DELAY_STOP_PI)
 
                 for item in poe_list:
-                    set_PoE("never", item[0], item[1], "", item[4])
+                    set_PoE("never", item[1], item[2], "", item[4])
 
             #then kill or start the relays for this zone
             if (args.no_relays or args.with_relays == 0):
@@ -1463,12 +1584,26 @@ def send_to_osc(remote_ip, port, cmd):
                 logger.error( "     in %s on line %d" % (fname, lineno))
     else:
         logger.info( " -----would send %s to %s" % (cmd, remote_ip))
-                
-#tells the watchdog to kill a process (example: "looping-audio" kills all such functions) on the given Pi
+
+#wakes nicolae's PC
+def wake_nicolae():
+    msg = "/wake_nicolae 1"
+    send_to_osc(SHOW_CONTROLLER_IP, SHOW_CONTROLLER_PORT, msg)
+
+#wakes global server
+def wake_global():
+    msg = "/wake_global 1"
+    send_to_osc(SHOW_CONTROLLER_IP, SHOW_CONTROLLER_PORT, msg)
+
+#wakes the entertainment system
+def wake_nicolae():
+    msg = "/wake_entertainment 1"
+    send_to_osc(SHOW_CONTROLLER_IP, SHOW_CONTROLLER_PORT, msg)
+
+#presses the giant start button on the lycratunnel
 def start_lycra():
-    if not args.disable:
-        msg = "/start_lycra 1"
-        send_to_osc(SHOW_CONTROLLER_IP, SHOW_CONTROLLER_PORT, msg)
+    msg = "/start_lycra 1"
+    send_to_osc(SHOW_CONTROLLER_IP, SHOW_CONTROLLER_PORT, msg)
 
 #tells the watchdog to kill a process (example: "looping-audio" kills all such functions) on the given Pi
 def kill_proc_device(remote_ip, procname):
@@ -2024,6 +2159,14 @@ if __name__ == "__main__":
                            action='store_true',
                            help='starts a single relay (given relay name in --relay)' )
         
+        group.add_argument('--all_relays_off',
+                           action='store_true',
+                           help='stops a single relay (given relay name in --relay)' )
+
+        group.add_argument('--all_relays_on',
+                           action='store_true',
+                           help='starts a single relay (given relay name in --relay)' )
+        
         group.add_argument('--relay_off',
                            action='store_true',
                            help='stops a single relay (given relay name in --relay)' )
@@ -2444,6 +2587,21 @@ if __name__ == "__main__":
 
     if args.relay_off:
         on_off_single_relay("off", args.relay)
+
+
+    #################
+    # RELAY ON
+    #################
+
+    if args.all_relays_on:
+        all_relays_on()
+
+    #################
+    # RELAY OFF
+    #################
+
+    if args.all_relays_off:
+        all_relays_off()
 
     #################
     # RELAY OFF
