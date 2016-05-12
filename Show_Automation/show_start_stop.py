@@ -27,9 +27,11 @@ POE_COMMAND = "/Users/Aesir/Documents/watchdog/set_power.exp"
 WOL_COMMAND = "/Users/Aesir/Documents/watchdog/wolcmd"
 DELAY_AFTER_SERVERS = 120.0 #delays 2 minutes between booting windows servers and pis
 DELAY_STOP_PI = 15.0 #delays 15 seconds between halting Pis and cutting PoE
+DELAY_STOP_PI_LONG = 45.0 #delays 15 seconds between halting Pis and cutting PoE
 DELAY_BETWEEN_DEVICES = 0.5 #delays a half second between stop/starting devices
 DELAY_BETWEEN_RELAYS = 1.0 #delays 2 seconds between commands to the relays
 DELAY_FOR_PROJECTORS = 200.0 #delays 5 minutes for projector cooldown and/or startup
+DELAY_FOR_MEDIASERVERS = 200.0 #delays 5 minutes for ableton & touchcreator to start
 DELAY_FOR_TVARCH = 120.0 #delays 2 minutes for the TV Arch Pis to start
 INIT_DELAY = 30 #delays 30 seconds before starting script so people can cancel
 NO_POE = 0
@@ -826,29 +828,27 @@ def relays_on_off(on_or_off, zone_list, zone):
         #turn on the TV arch Pis first
         item = zone_list[0]
         logger.info("send to " + str(item[1]))
-        c = OSC.OSCClient()
-        c.connect((item[4], RELAY_PORT)) 
-        oscmsg = OSC.OSCMessage()
-        oscmsg.setAddress("/relay")
-        oscmsg.append(int(item[3]))
-        oscmsg.append(1)
-        c.send(oscmsg)
-#        oscmsg = OSC.OSCMessage("/relay", [int(item[3]), 1])
+        send_to_osc_arguments(item[4], RELAY_PORT, "/relay", [int(item[3]), 1])
+#        c = OSC.OSCClient()
+#        c.connect((item[4], RELAY_PORT)) 
+#        oscmsg = OSC.OSCMessage()
+#        oscmsg.setAddress("/relay")
+#        oscmsg.append(int(item[3]))
+#        oscmsg.append(1)
 #        c.send(oscmsg)
 #        msg = "/relay %s 1" % item[3]
 #        send_to_osc(item[4], RELAY_PORT, msg)
         time.sleep(DELAY_BETWEEN_RELAYS)
         item = zone_list[1]
         logger.info("send to " + str(item[1]))
-        c = OSC.OSCClient()
-        c.connect((item[4], RELAY_PORT)) 
-        oscmsg = OSC.OSCMessage()
-        oscmsg.setAddress("/relay")
-        oscmsg.append(int(item[3]))
-        oscmsg.append(1)
-        c.send(oscmsg)
-#        oscmsg = OSC.OSCMessage("/relay", [int(item[3]), 1])
+#        c = OSC.OSCClient()
+#        c.connect((item[4], RELAY_PORT)) 
+#        oscmsg = OSC.OSCMessage()
+#        oscmsg.setAddress("/relay")
+#        oscmsg.append(int(item[3]))
+#        oscmsg.append(1)
 #        c.send(oscmsg)
+        send_to_osc_arguments(item[4], RELAY_PORT, "/relay", [int(item[3]), 1])
 #        msg = "/relay %s 1" % item[3]
 #        send_to_osc(item[4], RELAY_PORT, msg)
         delay_with_countdown(DELAY_FOR_TVARCH)
@@ -856,14 +856,14 @@ def relays_on_off(on_or_off, zone_list, zone):
         for item in zone_list[2:]:
             time.sleep(DELAY_BETWEEN_RELAYS)
             logger.info("send to " + str(item[1]))
-            c = OSC.OSCClient()
-            c.connect((item[4], RELAY_PORT)) 
-#            oscmsg = OSC.OSCMessage("/relay", [int(item[3]), 1])
-            oscmsg = OSC.OSCMessage()
-            oscmsg.setAddress("/relay")
-            oscmsg.append(int(item[3]))
-            oscmsg.append(1)
-            c.send(oscmsg)
+#            c = OSC.OSCClient()
+#            c.connect((item[4], RELAY_PORT)) 
+#            oscmsg = OSC.OSCMessage()
+#            oscmsg.setAddress("/relay")
+#            oscmsg.append(int(item[3]))
+#            oscmsg.append(1)
+#            c.send(oscmsg)
+            send_to_osc_arguments(item[4], RELAY_PORT, "/relay", [int(item[3]), 1])
 #            msg = "/relay %s 1" % item[3]
 #            send_to_osc(item[4], RELAY_PORT, msg)
         return
@@ -874,29 +874,31 @@ def relays_on_off(on_or_off, zone_list, zone):
             time.sleep(DELAY_BETWEEN_RELAYS)
             if (on_or_off == "on"):
                 logger.info("send to " + str(item[1]))
-                c = OSC.OSCClient()
-                c.connect((item[4], RELAY_PORT)) 
-#                oscmsg = OSC.OSCMessage("/relay", [int(item[3]), 1])
-                oscmsg = OSC.OSCMessage()
-                oscmsg.setAddress("/relay")
-                oscmsg.append(int(item[3]))
-                oscmsg.append(1)
-                c.send(oscmsg)
+#                c = OSC.OSCClient()
+#                c.connect((item[4], RELAY_PORT)) 
+#                oscmsg = OSC.OSCMessage()
+#                oscmsg.setAddress("/relay")
+#                oscmsg.append(int(item[3]))
+#                oscmsg.append(1)
+#                c.send(oscmsg)
+                send_to_osc_arguments(item[4], RELAY_PORT, "/relay", [int(item[3]), 1])
 #                msg = "/relay %s 1" % item[3]
 #                send_to_osc(item[4], RELAY_PORT, msg)
             else:
                 logger.info("send to " + str(item[1]))
 #                msg = "/relay %s 0" % item[3]
 #                send_to_osc(item[4], RELAY_PORT, msg)
-                c = OSC.OSCClient()
-                c.connect((item[4], RELAY_PORT)) 
-#                oscmsg = OSC.OSCMessage("/relay", [int(item[3]), 0])
-                oscmsg = OSC.OSCMessage()
-                oscmsg.setAddress("/relay")
-                oscmsg.append(int(item[3]))
-                oscmsg.append(0)
-                c.send(oscmsg)
-                c.send(oscmsg)
+#                c = OSC.OSCClient()
+#                c.connect((item[4], RELAY_PORT)) 
+#                oscmsg = OSC.OSCMessage()
+#                oscmsg.setAddress("/relay")
+#                oscmsg.append(int(item[3]))
+#                oscmsg.append(0)
+#                c.send(oscmsg)
+                if item[1] != "2LB-11":        
+                    send_to_osc_arguments(item[4], RELAY_PORT, "/relay", [int(item[3]), 0])
+                else:
+                    logger.warning("skipping %s, don't kill fish (or matt's feelings)" % item[1])
 
 #on boot order
     #start media server
@@ -937,26 +939,28 @@ def on_off_single_relay(on_or_off, relay_name):
 #            msg = "/relay %s 1" % item[3]
 #            print msg
 #            send_to_osc(item[4], RELAY_PORT, msg)
-            c = OSC.OSCClient()
-            c.connect((item[4], RELAY_PORT)) 
-            oscmsg = OSC.OSCMessage()
-            oscmsg.setAddress("/relay")
-            oscmsg.append(int(item[3]))
-            oscmsg.append(1)
-            c.send(oscmsg)
+            send_to_osc_arguments(item[4], RELAY_PORT, "/relay", [int(item[3]), 1])
+
+#            c = OSC.OSCClient()
+#            c.connect((item[4], RELAY_PORT)) 
+#            oscmsg = OSC.OSCMessage()
+#            oscmsg.setAddress("/relay")
+#            oscmsg.append(int(item[3]))
+#            oscmsg.append(1)
+#            c.send(oscmsg)
         else:
             logger.info("would send to " + str(item[1]))
 #            msg = "/relay %s 0" % item[3]
 #            print msg
 #            send_to_osc(item[4], RELAY_PORT, msg)
-            c = OSC.OSCClient()
-            c.connect((item[4], RELAY_PORT)) 
-#            oscmsg = OSC.OSCMessage("/relay", [int(item[3]), 0])
-            oscmsg = OSC.OSCMessage()
-            oscmsg.setAddress("/relay")
-            oscmsg.append(int(item[3]))
-            oscmsg.append(0)
-            c.send(oscmsg)
+            send_to_osc_arguments(item[4], RELAY_PORT, "/relay", [int(item[3]), 0])
+#            c = OSC.OSCClient()
+#            c.connect((item[4], RELAY_PORT)) 
+#            oscmsg = OSC.OSCMessage()
+#            oscmsg.setAddress("/relay")
+#            oscmsg.append(int(item[3]))
+#            oscmsg.append(0)
+#            c.send(oscmsg)
     else:
         logger.warning( "relay %s not found!" % relay_name)
 
@@ -1242,13 +1246,13 @@ def start_stop_reboot_show(command, limit_to_switch_ip, type):
                             if boot_order != "" and boot_order is not None:
                                 reboot_device(remote_ip, switch_ip, switch_interface, device_type, device_name, description)
 
-
-            # then kill every Pi PoE
+            # then kill every PoE
             if command is "stop":
                 if len(poe_list) > 0:
-                    logger.warning("delay %d seconds to make sure Pis halt" % DELAY_STOP_PI)
-                    time.sleep(DELAY_STOP_PI)
+                    logger.warning("delay %d seconds to make sure Pis halt" % DELAY_STOP_PI_LONG)
+                    delay_with_countdown(DELAY_STOP_PI_LONG)
 
+                #new POE script goes here
                 for item in poe_list:
                     set_PoE("never", item[1], item[2], "", item[4])
 
@@ -1264,23 +1268,24 @@ def start_stop_reboot_show(command, limit_to_switch_ip, type):
                 else:
             #then pause before stopping/starting the relays
                     logger.warning("Pausing before %s-ing relays" % command)
-                    time.sleep(DELAY_FOR_PROJECTORS)
+                    delay_with_countdown(DELAY_FOR_PROJECTORS)
 
                     get_relay_pins(relay_pin_list)
                     relay_list = get_all_relays(relay_pin_list)
                     
                     relays_on_off(on_or_off, relay_list, "")
 
-            if command is "start":          
-                logger.warning("starting post-projector media server programs")
-                start_lycra()
-                play_ableton()
-
                 logger.warning("rebooting video Pis")
                 for item in video_list:
                     (remote_ip, switch_ip, switch_interface, device_type, mac_address, device_name, description) = item
                     reboot_device(remote_ip, switch_ip, switch_interface, device_type, device_name, description)
 
+                if command is "start":
+                    logger.warning("Pausing before starting media server programs")
+                    delay_with_countdown(DELAY_FOR_MEDIASERVERS)
+                    logger.warning("starting post-projector media server programs")
+                    start_lycra()
+                    play_ableton()
 
     except lite.Error, e:
         logger.error(" ERROR: SQL error! %s" % e)   
@@ -1292,13 +1297,10 @@ def start_stop_reboot_show(command, limit_to_switch_ip, type):
 
 def all_relays_on():
     on_or_off = "on"
-                #then kill or start all relays 
-    
+                #kill or start all relays     
     if (args.no_relays or args.with_relays == 0):
         logger.warning("--no_relays, or --with_relays not found, skipping relays")
     else:
-            #then pause before stopping/starting the relays
-
         get_relay_pins(relay_pin_list)
         relay_list = get_all_relays(relay_pin_list)
         
@@ -1306,13 +1308,10 @@ def all_relays_on():
 
 def all_relays_off():
     on_or_off = "off"
-                #then kill or start all relays 
-    
+                #kill or start all relays     
     if (args.no_relays or args.with_relays == 0):
         logger.warning("--no_relays, or --with_relays not found, skipping relays")
     else:
-            #then pause before stopping/starting the relays
-        
         get_relay_pins(relay_pin_list)
         relay_list = get_all_relays(relay_pin_list)
         
@@ -1585,6 +1584,26 @@ def send_to_osc(remote_ip, port, cmd):
     else:
         logger.info( " -----would send %s to %s" % (cmd, remote_ip))
 
+#sends OSC messages to the relays/Pis/etc
+def send_to_osc_arguments(remote_ip, port, cmd, argslist):
+    if not args.disable:
+        logger.info( " -----sending %s %s to %s" % (cmd, argslist, remote_ip))
+        try:
+            c = OSC.OSCClient()
+            c.connect((remote_ip, port)) 
+            oscmsg = OSC.OSCMessage()
+            oscmsg.setAddress(cmd)
+            for item in argslist:
+                oscmsg.append(item)
+            c.send(oscmsg)
+        except Exception, e:
+            logger.error( "error in send_to_osc_arguments: %s" % e)
+            for frame in traceback.extract_tb(sys.exc_info()[2]):
+                fname,lineno,fn,text = frame
+                logger.error( "     in %s on line %d" % (fname, lineno))
+    else:
+        logger.info( " -----would send %s %s to %s" % (cmd, argslist, remote_ip))
+
 #wakes nicolae's PC
 def wake_nicolae():
     msg = "/wake_nicolae 1"
@@ -1602,8 +1621,11 @@ def wake_nicolae():
 
 #presses the giant start button on the lycratunnel
 def start_lycra():
-    msg = "/start_lycra 1"
-    send_to_osc(SHOW_CONTROLLER_IP, SHOW_CONTROLLER_PORT, msg)
+#    msg = "/start_lycra 1"
+#    send_to_osc(SHOW_CONTROLLER_IP, SHOW_CONTROLLER_PORT, msg)
+    send_to_osc(lycra_ip, LYCRA_PORT, "/show", [1])
+    time.sleep(.1)
+    send_to_osc(lycra_ip, LYCRA_PORT, "/show", [0])
 
 #tells the watchdog to kill a process (example: "looping-audio" kills all such functions) on the given Pi
 def kill_proc_device(remote_ip, procname):
