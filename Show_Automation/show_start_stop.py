@@ -23,6 +23,8 @@ from oauth2client.client import SignedJwtAssertionCredentials
 
 #command to use to set PoE on/off
 POE_COMMAND = "/Users/Aesir/Documents/watchdog/set_power.exp"
+#command to use to set PoE on/off for an entire switch
+POE_ALL_COMMAND = "/Users/Aesir/Documents/watchdog/set-poe.py"
 #command to use to send Wake on Lan messages 
 WOL_COMMAND = "/Users/Aesir/Documents/watchdog/wolcmd"
 DELAY_AFTER_SERVERS = 120.0 #delays 2 minutes between booting windows servers and pis
@@ -63,6 +65,11 @@ UNPAUSE_VIDEO_COMMAND = "/playnormal" #unpause command sent to do-audio on the P
 VOLUME_RELATIVE_COMMAND = "/home/pi/RUNNING/scripts/set_volume.py --relative"
 VOLUME_DOWN_COMMAND = "/home/pi/RUNNING/scripts/set_volume.py 0%"
 VOLUME_UP_COMMAND = "/home/pi/RUNNING/scripts/set_volume.py"
+
+#list of switches to poe on/off
+list_of_switches = ["10.42.0.3", "10.42.0.4", "10.42.0.5", "10.42.0.6", "10.42.0.7",
+                    "10.42.0.8", "10.42.0.9", "10.42.0.10", "10.42.0.11", "10.42.0.12",
+                    "10.42.0.13", "10.42.0.14"]
 
 #list of entry videos to be rebooted simultaneously
 entry_video_list = ["10.42.27.41", "10.42.27.42"]
@@ -462,6 +469,22 @@ def set_PoE(auto_or_never, remote_ip, switch, device_name, description):
             logger.error( " ERROR: set_PoE error: %s" % e)
     else:
         logger.info( "would set %s %s PoE %s for %s %s" % (device_name, description, auto_or_never, remote_ip, switch))
+
+#turns PoE on or off for an entire switch
+def set_PoE_all(auto_or_never, remote_ip):
+    import subprocess
+    if not args.disable:
+        try:
+            logger.info( "set PoE ALL %s for %s" % (auto_or_never, remote_ip))
+            command = [POE_ALL_COMMAND, auto_or_never, remote_ip]
+            p = subprocess.Popen(command, stdout=subprocess.PIPE)
+            for line in p.stdout:
+                logger.info( line )
+
+        except Exception, e:
+            logger.error( " ERROR: set_PoE error: %s" % e)
+    else:
+        logger.info( "would set PoE ALL %s for %s" % (auto_or_never, remote_ip))
 
 #sends messages to Pi or Windows watchdog via UDP
 def udpsend(message, remote_ip, port):
@@ -1167,7 +1190,6 @@ def start_stop_reboot_show(command, limit_to_switch_ip, type):
             data = cur.fetchall()
             
             done_server_delay = 0 #initialize this to 0 so we know when we started
-            poe_list = []
             video_list = []
 
             for item in data:
@@ -1203,40 +1225,36 @@ def start_stop_reboot_show(command, limit_to_switch_ip, type):
                 if command is "start":
                     print "would start " + str(device_name)
                     #otherwise just start stuff
-                    if ("berry" in device_type.lower() or "cubi" in device_type.lower()) and done_server_delay == 0:
+#                    if ("berry" in device_type.lower() or "cubi" in device_type.lower()) and done_server_delay == 0:
                         #delays before the first Pi
-                        done_server_delay = 1;
-                        delay_with_countdown(DELAY_AFTER_SERVERS)
+#                        done_server_delay = 1;
+#                        delay_with_countdown(DELAY_AFTER_SERVERS)
 
                     if limit_to_switch_ip is not None and limit_to_switch_ip != "":
                         if limit_to_switch_ip in switch_group:
                             if "berry" in device_type.lower() and "video" in description.lower():
                                 video_list.append([remote_ip, switch_ip, switch_interface, device_type, mac_address, device_name, description])
-                            start_device(switch_ip, switch_interface, device_type, mac_address, device_name, description)
+                            if "indows" in device_type.lower() or "mac" in device_type.lower():
+                                start_device(switch_ip, switch_interface, device_type, mac_address, device_name, description)
+                                #else we'll start these via PoE on the entire switch
                     else:
                         if boot_order != "" and boot_order is not None:
                             if "berry" in device_type.lower() and "video" in description.lower():
                                 video_list.append([remote_ip, switch_ip, switch_interface, device_type, mac_address, device_name, description])
-                            start_device(switch_ip, switch_interface, device_type, mac_address, device_name, description)
-                        
+                            if "indow" in device_type.lower() or "mac" in device_type.lower():
+                                start_device(switch_ip, switch_interface, device_type, mac_address, device_name, description)
+                        #else we'll start these via PoE on the entire switch
                 if command is "stop":
                     if limit_to_switch_ip is not None and limit_to_switch_ip != "":
                         if limit_to_switch_ip in switch_group:
-                            #temporarily rebooting pis instead of stopping them
-#                            if "berry" in device_type.lower() and "video" in description.lower():
-#                                logger.warning("reboot video pi instead")
-#                                reboot_device(remote_ip, switch_ip, switch_interface, device_type, device_name, description)
-#                            else:
-                            if "berry" in device_type.lower() or "cubi" in device_type.lower():
-                                poe_list.append([remote_ip, switch_ip, switch_interface, device_type, description])
-                                logger.warning("nope, stopping")
+                            if "indows" in device_type.lower() or "mac" in device_type.lower() or "berry" in device_type.lower():
                                 stop_device(remote_ip, switch_ip, switch_interface, device_type, device_name, description, NO_POE)
+                                #else we'll start these via PoE on the entire switch
                     else:
                         if boot_order != "" and boot_order is not None:
-                            if "berry" in device_type.lower() or "cubi" in device_type.lower():
-                                poe_list.append([remote_ip, switch_ip, switch_interface, device_type, description])
-                            stop_device(remote_ip, switch_ip, switch_interface, device_type, device_name, description, NO_POE)
-
+                            if "indow" in device_type.lower() or "mac" in device_type.lower() or "berry" in device_type.lower():
+                                stop_device(remote_ip, switch_ip, switch_interface, device_type, device_name, description, NO_POE)
+#else we'll start these via PoE on the entire switch
                 if command is "reboot":
                     #reboot each item
                     if limit_to_switch_ip is not None and limit_to_switch_ip != "":
@@ -1248,13 +1266,16 @@ def start_stop_reboot_show(command, limit_to_switch_ip, type):
 
             # then kill every PoE
             if command is "stop":
-                if len(poe_list) > 0:
-                    logger.warning("delay %d seconds to make sure Pis halt" % DELAY_STOP_PI_LONG)
-                    delay_with_countdown(DELAY_STOP_PI_LONG)
+                logger.warning("delay %d seconds to make sure Pis halt" % DELAY_STOP_PI_LONG)
+                delay_with_countdown(DELAY_STOP_PI_LONG)
 
-                #new POE script goes here
-                for item in poe_list:
-                    set_PoE("never", item[1], item[2], "", item[4])
+                for item in list_of_switches:
+                    set_PoE_all("never", item) 
+            if command is "start":
+                logger.warning("delay %d seconds to make sure Pis boot completely before being rebooted" % DELAY_AFTER_SERVERS)
+                delay_with_countdown(DELAY_AFTER_SERVERS)
+                for item in list_of_switches:
+                    set_PoE_all("auto", item) 
 
             if command is "stop" or command is "start":
                 if command is "stop":
@@ -1623,9 +1644,9 @@ def wake_nicolae():
 def start_lycra():
 #    msg = "/start_lycra 1"
 #    send_to_osc(SHOW_CONTROLLER_IP, SHOW_CONTROLLER_PORT, msg)
-    send_to_osc(lycra_ip, LYCRA_PORT, "/show", [1])
+    send_to_osc_arguments(lycra_ip, LYCRA_PORT, "/show", [1])
     time.sleep(.1)
-    send_to_osc(lycra_ip, LYCRA_PORT, "/show", [0])
+    send_to_osc_arguments(lycra_ip, LYCRA_PORT, "/show", [0])
 
 #tells the watchdog to kill a process (example: "looping-audio" kills all such functions) on the given Pi
 def kill_proc_device(remote_ip, procname):
