@@ -9,7 +9,7 @@ import re
 import time
 
 # this is all we really care about
-interfaceRegex = re.compile(r'Fa\d/\d/\d')
+interfaceRegex = re.compile(r'Fa\d{1,2}/\d{1,2}/\d{1,2}')
 
 try:
     powerArg = str(sys.argv[1])
@@ -35,13 +35,14 @@ try:
     s.logfile = sys.stdout
     s.expect(u'[Pp]assword:')
     s.send(ssh_pass)
-
+    print "eee3"
     s.expect(u'>')
     s.send(u'enable\r')
     s.expect(u'[Pp]assword:')
     s.send(enable_pass)
     s.expect(u'#')
-    s.send(u'show vlan id 16\r')
+# this might work
+    s.send(u'show vlan id 16\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r')
     s.expect(u'#')
     matches = interfaceRegex.findall(s.before)
 
