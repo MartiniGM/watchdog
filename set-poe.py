@@ -20,10 +20,10 @@ except:
     sys.exit(2)
 
 try:
-    f1 = open('/Users/mcf/Documents/watchdog/power_passphrase1.secret', 'r')
+    f1 = open('/Users/Aesir/Documents/watchdog/power_passphrase1.secret', 'r')
     ssh_pass = f1.readline()
     f1.close()
-    f2 = open('/Users/mcf/Documents/watchdog/power_passphrase2.secret', 'r')
+    f2 = open('/Users/Aesir/Documents/watchdog/power_passphrase2.secret', 'r')
     enable_pass = f2.readline()
     f2.close()
 except IOError as e:
