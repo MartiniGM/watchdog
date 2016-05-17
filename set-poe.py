@@ -6,6 +6,7 @@
 import pexpect
 import sys
 import re
+import socket
 import time
 
 # this is all we really care about
@@ -13,7 +14,12 @@ interfaceRegex = re.compile(r'Fa\d{1,2}/\d{1,2}/\d{1,2}')
 
 try:
     powerArg = str(sys.argv[1])
+    if powerArg != "auto":
+      if powerArg != "never":
+        raise
+
     switchIP = str(sys.argv[2])
+    socket.inet_aton(switchIP)  # check valid IP address
 except:
     print("usage: " + str(sys.argv[0]) + " <auto|never> <ip address>")
     print( sys.exc_info()[0])
@@ -35,7 +41,6 @@ try:
     s.logfile = sys.stdout
     s.expect(u'[Pp]assword:')
     s.send(ssh_pass)
-    print "eee3"
     s.expect(u'>')
     s.send(u'enable\r')
     s.expect(u'[Pp]assword:')
@@ -64,6 +69,7 @@ try:
         s.expect(u'\(config-if\)#')
         s.send(u'exit\r')
         s.expect(u'\(config\)#')
+        time.sleep(.1)
 except EOFError as e:
     print("eof error")
     print("debug information:")
