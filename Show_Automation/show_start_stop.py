@@ -1,6 +1,7 @@
 #!/usr/bin/python 
 import OSC
 import socket
+import select
 import sqlite3 as lite
 import datetime
 import time
@@ -40,6 +41,7 @@ DELAY_FOR_VIDEO_PIS = 45.0 #delays 30 seconds for video pis to boot
 INIT_DELAY = 30 #delays 30 seconds before starting script so people can cancel
 NO_POE = 0
 WITH_POE = 1
+USE_SOCKETS = 1
 
 # give a filename for the watchdog's SQLite database here, on Windows
 WINDOWS_DB_FILENAME = 'c:\\watchdog\\tcp_watchdog_server\\demosdb.db'
@@ -58,6 +60,7 @@ RELAY_PORT = 9999 #port to send on/off messages to power relays
 WATCHDOG_PORT = 6666 #port to send commands to the watchdog on the Pis
 DO_VIDEO_PORT = 9995 #port to send commands to do-video
 LYCRA_PORT = 10000 #port to send start commands to the lycratunnel
+RELAY_REPLY_PORT = 7766
 PAUSE_COMMAND = "/pause" #pause command sent to do-audio on the Pis
 UNPAUSE_COMMAND = "/unpause" #unpause command sent to do-audio on the Pis
 PAUSE_VIDEO_COMMAND = "/stopall" #pause command sent to do-audio on the Pis
@@ -442,8 +445,13 @@ def get_relay_pins(relay_items):
 ####################
 # upon exit, log exit msg, disconnect from sqlite and close sockets           
 def exit_func():
+    import subprocess
     logger.warning ("     Show start/stop script CLOSED ")
     logger.warning ("     ")
+    cmd = "grep 'local Max' /var/log/system.log > /Users/Aesir/Documents/watchdog/Show_Automation/maxlog.txt"
+    p = subprocess.check_output(cmd, shell=True)
+    for line in p.stdout:
+        logger.info( line )
     sys.exit(0)
 
 # exits the program cleanly, logging exit time                                 
@@ -852,6 +860,7 @@ def relays_on_off(on_or_off, zone_list, zone):
         item = zone_list[0]
         logger.info("send to " + str(item[1]))
         send_to_osc_arguments(item[4], RELAY_PORT, "/relay", [int(item[3]), 1])
+
 #        c = OSC.OSCClient()
 #        c.connect((item[4], RELAY_PORT)) 
 #        oscmsg = OSC.OSCMessage()
@@ -964,7 +973,6 @@ def on_off_single_relay(on_or_off, relay_name):
 #            print msg
 #            send_to_osc(item[4], RELAY_PORT, msg)
             send_to_osc_arguments(item[4], RELAY_PORT, "/relay", [int(item[3]), 1])
-
 #            c = OSC.OSCClient()
 #            c.connect((item[4], RELAY_PORT)) 
 #            oscmsg = OSC.OSCMessage()
