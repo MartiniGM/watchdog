@@ -392,7 +392,8 @@ def rebootscript():
                     if ("halt" in reboot_cmd):
 #                        subprocess.call(['osascript', '-e',                                         'tell app "System Events" to shut down'])
 # mac OS doesn't support wake on lan from shutdown, so just sleep :l
-                        subprocess.call(['osascript', '-e',                                         'tell app "Finder" to sleep'])
+#                        subprocess.call(['osascript', '-e',                                         'tell app "Finder" to sleep'])
+                        subprocess.call(['sudo', 'shutdown', '-u', '-h', 'now'])
                     else:
                         logger.error("Didn't recognize %s in rebootscript" % reboot_cmd)
     except Exception, e:
