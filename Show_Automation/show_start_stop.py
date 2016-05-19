@@ -450,8 +450,6 @@ def exit_func():
     logger.warning ("     ")
     cmd = "grep 'local Max' /var/log/system.log > /Users/Aesir/Documents/watchdog/Show_Automation/maxlog.txt"
     p = subprocess.check_output(cmd, shell=True)
-    for line in p.stdout:
-        logger.info( line )
     sys.exit(0)
 
 # exits the program cleanly, logging exit time                                 
@@ -829,7 +827,10 @@ def reboot_device(remote_ip, switch_ip, switch_interface, device_type, device_na
 #power cycles a generic device; checks the type and inputs, then calls the correct reboot function
 def power_cycle_device(remote_ip, switch_ip, switch_interface, device_type, device_name, description, mac_address):
     stop_device(remote_ip, switch_ip, switch_interface, device_type, device_name, description, WITH_POE)
-    delay_with_countdown(DELAY_FOR_POWERCYCLE)
+    if "indows" not in device_type.lower() and "mac" not in device_type.lower():
+        delay_with_countdown(5.0)
+    else:
+        delay_with_countdown(45.0)
     start_device(switch_ip, switch_interface, device_type, mac_address, device_name, description)
 
 ###############
