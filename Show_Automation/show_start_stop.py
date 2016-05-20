@@ -34,7 +34,7 @@ DELAY_STOP_PI_LONG = 45.0 #delays 15 seconds between halting Pis and cutting PoE
 DELAY_BETWEEN_DEVICES = 0.5 #delays a half second between stop/starting devices
 DELAY_BETWEEN_RELAYS = 1.0 #delays 2 seconds between commands to the relays
 DELAY_FOR_PROJECTORS = 200.0 #delays 5 minutes for projector cooldown and/or startup
-DELAY_FOR_MEDIASERVERS = 200.0 #delays 5 minutes for ableton & touchcreator to start
+DELAY_FOR_MEDIASERVERS = 400.0 #delays 5 minutes for ableton & touchcreator to start
 DELAY_FOR_TVARCH = 120.0 #delays 2 minutes for the TV Arch Pis to start
 DELAY_FOR_POWERCYCLE = 30.0 #delays 30 seconds for device to stop
 DELAY_FOR_VIDEO_PIS = 45.0 #delays 30 seconds for video pis to boot
@@ -84,6 +84,12 @@ lycra_ip = "10.42.22.20"
 nicolae_ip = "10.42.17.20"
 global_ip = "10.42.21.18"
 entertainment_ip = "10.42.17.11"
+dining_ip = "10.42.25.20"
+laser_harp_controller_ip = "10.42.20.91"
+mushroom_1_ip = "10.42.21.80"
+mushroom_2_ip = "10.42.21.81"
+mushroom_3_ip = "10.42.21.89"
+mushroom_4_ip = "10.42.21.91"
 
 #IP address for the POD
 POD_ip = "10.42.24.21"
@@ -862,43 +868,16 @@ def relays_on_off(on_or_off, zone_list, zone):
         logger.info("send to " + str(item[1]))
         send_to_osc_arguments(item[4], RELAY_PORT, "/relay", [int(item[3]), 1])
 
-#        c = OSC.OSCClient()
-#        c.connect((item[4], RELAY_PORT)) 
-#        oscmsg = OSC.OSCMessage()
-#        oscmsg.setAddress("/relay")
-#        oscmsg.append(int(item[3]))
-#        oscmsg.append(1)
-#        c.send(oscmsg)
-#        msg = "/relay %s 1" % item[3]
-#        send_to_osc(item[4], RELAY_PORT, msg)
         time.sleep(DELAY_BETWEEN_RELAYS)
         item = zone_list[1]
         logger.info("send to " + str(item[1]))
-#        c = OSC.OSCClient()
-#        c.connect((item[4], RELAY_PORT)) 
-#        oscmsg = OSC.OSCMessage()
-#        oscmsg.setAddress("/relay")
-#        oscmsg.append(int(item[3]))
-#        oscmsg.append(1)
-#        c.send(oscmsg)
         send_to_osc_arguments(item[4], RELAY_PORT, "/relay", [int(item[3]), 1])
-#        msg = "/relay %s 1" % item[3]
-#        send_to_osc(item[4], RELAY_PORT, msg)
         delay_with_countdown(DELAY_FOR_TVARCH)
         #then the remainder of the list
         for item in zone_list[2:]:
             time.sleep(DELAY_BETWEEN_RELAYS)
             logger.info("send to " + str(item[1]))
-#            c = OSC.OSCClient()
-#            c.connect((item[4], RELAY_PORT)) 
-#            oscmsg = OSC.OSCMessage()
-#            oscmsg.setAddress("/relay")
-#            oscmsg.append(int(item[3]))
-#            oscmsg.append(1)
-#            c.send(oscmsg)
             send_to_osc_arguments(item[4], RELAY_PORT, "/relay", [int(item[3]), 1])
-#            msg = "/relay %s 1" % item[3]
-#            send_to_osc(item[4], RELAY_PORT, msg)
         return
     
     #if this isn't art city or we're turning art city off, just do each
@@ -907,28 +886,9 @@ def relays_on_off(on_or_off, zone_list, zone):
             time.sleep(DELAY_BETWEEN_RELAYS)
             if (on_or_off == "on"):
                 logger.info("send to " + str(item[1]))
-#                c = OSC.OSCClient()
-#                c.connect((item[4], RELAY_PORT)) 
-#                oscmsg = OSC.OSCMessage()
-#                oscmsg.setAddress("/relay")
-#                oscmsg.append(int(item[3]))
-#                oscmsg.append(1)
-#                c.send(oscmsg)
                 send_to_osc_arguments(item[4], RELAY_PORT, "/relay", [int(item[3]), 1])
-#                msg = "/relay %s 1" % item[3]
-#                send_to_osc(item[4], RELAY_PORT, msg)
             else:
                 logger.info("send to " + str(item[1]))
-#                msg = "/relay %s 0" % item[3]
-#                send_to_osc(item[4], RELAY_PORT, msg)
-#                c = OSC.OSCClient()
-#                c.connect((item[4], RELAY_PORT)) 
-#                oscmsg = OSC.OSCMessage()
-#                oscmsg.setAddress("/relay")
-#                oscmsg.append(int(item[3]))
-#                oscmsg.append(0)
-#                c.send(oscmsg)
-
                 #don't kill matt's fish!
                 if item[1] != "2LB-11":        
                     send_to_osc_arguments(item[4], RELAY_PORT, "/relay", [int(item[3]), 0])
@@ -970,30 +930,10 @@ def on_off_single_relay(on_or_off, relay_name):
 
         if (on_or_off == "on"):
             logger.info("would send to " + str(item[1]))
-#            msg = "/relay %s 1" % item[3]
-#            print msg
-#            send_to_osc(item[4], RELAY_PORT, msg)
             send_to_osc_arguments(item[4], RELAY_PORT, "/relay", [int(item[3]), 1])
-#            c = OSC.OSCClient()
-#            c.connect((item[4], RELAY_PORT)) 
-#            oscmsg = OSC.OSCMessage()
-#            oscmsg.setAddress("/relay")
-#            oscmsg.append(int(item[3]))
-#            oscmsg.append(1)
-#            c.send(oscmsg)
         else:
             logger.info("would send to " + str(item[1]))
-#            msg = "/relay %s 0" % item[3]
-#            print msg
-#            send_to_osc(item[4], RELAY_PORT, msg)
             send_to_osc_arguments(item[4], RELAY_PORT, "/relay", [int(item[3]), 0])
-#            c = OSC.OSCClient()
-#            c.connect((item[4], RELAY_PORT)) 
-#            oscmsg = OSC.OSCMessage()
-#            oscmsg.setAddress("/relay")
-#            oscmsg.append(int(item[3]))
-#            oscmsg.append(0)
-#            c.send(oscmsg)
     else:
         logger.warning( "relay %s not found!" % relay_name)
 
@@ -1202,6 +1142,7 @@ def start_stop_reboot_show(command, limit_to_switch_ip, type):
             
             done_server_delay = 0 #initialize this to 0 so we know when we started
             video_list = []
+            final_reboot_list = []
 
             for item in data:
                 (remote_ip, device_name, mac_address, switch_interface, device_type, boot_order, space, zone, description) = item
@@ -1232,6 +1173,9 @@ def start_stop_reboot_show(command, limit_to_switch_ip, type):
                     if device_name != "" and device_name != "default":
                         print "skipping " + str(device_name)
                     continue
+
+                if remote_ip == dining_ip or remote_ip == laser_harp_controller_ip or remote_ip == mushroom_1_ip or remote_ip == mushroom_2_ip or remote_ip == mushroom_3_ip or remote_ip == mushroom_4_ip:
+                    final_reboot_list.append([remote_ip, switch_ip, switch_interface, device_type, mac_address, device_name, description])
 
  ###### START #######
                 if command is "start":
@@ -1304,7 +1248,7 @@ def start_stop_reboot_show(command, limit_to_switch_ip, type):
                     logger.warning("--no_relays, or --with_relays not found, skipping relays")
                 else:
             #then pause before stopping/starting the relays
-                    logger.warning("Pausing before %s-ing relays (projector startup)" % command)
+                    logger.warning("Pausing before %s-ing relays (for projector startup/shutdown)" % command)
                     delay_with_countdown(DELAY_FOR_PROJECTORS)
 
                     get_relay_pins(relay_pin_list)
@@ -1315,17 +1259,25 @@ def start_stop_reboot_show(command, limit_to_switch_ip, type):
  ###### VIDEO PI REBOOT AND ABLETON/LYCRA START #######
 
                 if command is "start":
+                    logger.warning("Pausing before starting media server programs & rebooting Pis")
+                    delay_with_countdown(DELAY_FOR_MEDIASERVERS)
                     logger.warning("rebooting video Pis")
-                    delay_with_countdown(DELAY_FOR_VIDEO_PIS)
                     for item in video_list:
                         (remote_ip, switch_ip, switch_interface, device_type, mac_address, device_name, description) = item
                         reboot_device(remote_ip, switch_ip, switch_interface, device_type, device_name, description)
-
-                    logger.warning("Pausing before starting media server programs")
-                    delay_with_countdown(DELAY_FOR_MEDIASERVERS)
                     logger.warning("starting post-projector media server programs")
                     start_lycra()
                     play_ableton()
+                    logger.warning("Pausing before rebooting final devices")
+                    delay_with_countdown(DELAY_FOR_MEDIASERVERS)
+                    logger.warning("rebooting final devices")
+                    for item in final_reboot_list:
+                        (remote_ip, switch_ip, switch_interface, device_type, mac_address, device_name, description) = item
+                        reboot_device(remote_ip, switch_ip, switch_interface, device_type, device_name, description)
+
+            #clears concert mode (off or on, both clear concert mode)
+            msg = "/concertmode_off 1"
+            send_to_osc(SHOW_CONTROLLER_IP, SHOW_CONTROLLER_PORT, msg)
 
     except lite.Error, e:
         logger.error(" ERROR: SQL error! %s" % e)   
@@ -1669,8 +1621,6 @@ def wake_nicolae():
 ######################            
 #presses the giant start button on the lycratunnel
 def start_lycra():
-#    msg = "/start_lycra 1"
-#    send_to_osc(SHOW_CONTROLLER_IP, SHOW_CONTROLLER_PORT, msg)
     send_to_osc_arguments(lycra_ip, LYCRA_PORT, "/show", [1])
     time.sleep(.1)
     send_to_osc_arguments(lycra_ip, LYCRA_PORT, "/show", [0])
