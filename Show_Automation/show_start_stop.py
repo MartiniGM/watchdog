@@ -79,6 +79,9 @@ list_of_switches = ["10.42.0.3", "10.42.0.4", "10.42.0.5", "10.42.0.6", "10.42.0
 #list of entry videos to be rebooted simultaneously
 entry_video_list = ["10.42.27.41", "10.42.27.42"]
 
+#list of TV arch relays
+tv_arch_relays = ["2LD-11", "2LD-15", "2LD-13", "2LD-19", "2LD-29"]
+
 #IP address for the Lycratunnel
 lycra_ip = "10.42.22.20"
 nicolae_ip = "10.42.17.20"
@@ -103,7 +106,7 @@ ableton_port = 9000
 ableton_list = ["10.42.18.21", "10.42.20.20", "10.42.20.21", "10.42.21.18", "10.42.22.20", "10.42.24.20", "10.42.24.21", "10.42.25.20", "10.42.25.21"]
 
 #list of Pis with videos to kill/start for concert mode
-concert_mode_video_list = ["10.42.22.42", "10.42.23.45", "10.42.22.54", "10.42.23.44"] #benji's dance videos, lighthouse, lucius narrative
+concert_mode_video_list = ["10.42.22.42", "10.42.23.45", "10.42.22.54", "10.42.23.44", "10.42.23.40"] #benji's dance videos, lighthouse, lucius narrative
 
 #list of Pis with audio to kill/start for concert mode
 concert_mode_looping_audio_list = ["10.42.23.40", "10.42.22.50"] #lighthouse, saloon
@@ -327,6 +330,52 @@ def get_all_relays(relay_pin_items):
         return []
 
 ##################
+# GET TV ARCH RELAYS
+##################
+# gets the list of relay names and pins from the Max files listed in relay_files. Returns matches from the given TV Arch list
+def get_tvarch_relays(relay_pin_items, tv_arch_list):
+    #reads everything from the Circuits and Relays tab                      
+    relay_list = []
+    if len(list_of_lists_relays) == 0:
+        open_googlesheet()
+    
+    try:
+#    print "%d google items loaded" % len(list_of_lists_relays)
+
+        for item in list_of_lists_relays:
+            zone_item = item[circuit_zone_item_id].replace(':','').lower()
+            circuit_on_relay = item[circuit_on_relay_item_id].replace(':','').lower()
+            circuit_space = item[circuit_space_item_id]
+            circuit_name = item[circuit_name_item_id]        
+            
+        #if the zone matches and this circuit is on a relay, get relay info and add it to the list
+            if circuit_on_relay == "yes" and circuit_name in tv_arch_list:
+                pin = -1
+            #grab the pin from the relay map file
+                item = subfinder(relay_pin_items, circuit_name, 0)
+                if item != []:
+                    pin = item[0][1]
+            #grab the IP address for this relay
+                    remote_ip_item = subfinder(relay_ip_list, circuit_name[:3], 0) 
+                    if (remote_ip_item != []):
+                        remote_ip = remote_ip_item[0][1]
+                    else:
+                        remote_ip = ""
+                #and append the zone, relay name, pin, and IP plus extras
+                    item2 = (zone_item, circuit_name, circuit_on_relay, pin, remote_ip, "Relay")
+                    relay_list.append(item2)
+
+        #then return the list
+        return relay_list
+
+    except Exception, e:
+        logger.error( "error in get_all_relays: %s" % e)
+        for frame in traceback.extract_tb(sys.exc_info()[2]):
+            fname,lineno,fn,text = frame
+            logger.error( "     in %s on line %d" % (fname, lineno))
+        return []
+
+##################
 # GET RELAY ZONES
 ##################
 # gets the list of relay names and pins from the Max files listed in relay_files.  Gets every
@@ -521,12 +570,12 @@ def udpsend(message, remote_ip, port):
 def wake_on_lan_mac(ip_address):
     import subprocess
     ok = 1
-    logger.info( " sending WoL to %s" % mac_address )
-    command = [WOL_COMMAND, mac_address, "255.255.255.255",
-               "255.255.255.255", "4343"]
-    p = subprocess.Popen(command, stdout=subprocess.PIPE)
-    for line in p.stdout:
-        logger.info(line)
+#    logger.info( " sending WoL to %s" % mac_address )
+#    command = [WOL_COMMAND, mac_address, "255.255.255.255",
+#               "255.255.255.255", "4343"]
+#    p = subprocess.Popen(command, stdout=subprocess.PIPE)
+#    for line in p.stdout:
+#        logger.info(line)
 
     if not args.disable:
         try:
@@ -539,7 +588,7 @@ def wake_on_lan_mac(ip_address):
                     if ip_address == entertainment_ip:
                         msg = "/wake_entertainment"
                     else:
-                        logger.warning("error: %s not a recognized Mac OS server", ip_address)
+#                        logger.warning("error: %s not a recognized Mac OS server", ip_address)
                         ok = 0
             if ok == 1:
                 send_to_osc(SHOW_CONTROLLER_IP, SHOW_CONTROLLER_PORT, msg)
@@ -1204,7 +1253,7 @@ def start_stop_reboot_show(command, limit_to_switch_ip, type):
                                 #else we'll stop these via PoE on the entire switch
                     else:
                         if boot_order != "" and boot_order is not None:
-                            if "indow" in device_type.lower() or "mac" in device_type.lower() or "berry" in device_type.lower():
+                            if "indow" in device_type.lower() or "mac" in device_type.lower() or "berry" in device_type.lower() or "cubi" in device_type.lower():
                                 stop_device(remote_ip, switch_ip, switch_interface, device_type, device_name, description, NO_POE)
                                 #else we'll stop these via PoE on the entire switch
 
@@ -1221,6 +1270,9 @@ def start_stop_reboot_show(command, limit_to_switch_ip, type):
  ###### POST_DEVICE POE START/STOP #######
 
             if command is "stop":
+                logger.info("")
+                logger.info("***TASK 1/3 DONE [===               ]")
+                logger.info("")
                 # kill every PoE
                 logger.warning("delay %d seconds to make sure Pis halt" % DELAY_STOP_PI_LONG)
                 delay_with_countdown(DELAY_STOP_PI_LONG)
@@ -1229,8 +1281,11 @@ def start_stop_reboot_show(command, limit_to_switch_ip, type):
                     set_PoE_all("never", item) 
 
             if command is "start":
+                logger.info("")
+                logger.info("***TASK 1/5 DONE [===               ]")
+                logger.info("")
                 # start every PoE
-                logger.warning("delay %d seconds to make sure Pis boot completely before being rebooted" % DELAY_AFTER_SERVERS)
+                logger.warning("delay %d seconds to make sure servers boot completely before starting other devices" % DELAY_AFTER_SERVERS)
                 delay_with_countdown(DELAY_AFTER_SERVERS)
                 for item in list_of_switches:
                     set_PoE_all("auto", item) 
@@ -1239,8 +1294,14 @@ def start_stop_reboot_show(command, limit_to_switch_ip, type):
 
             if command is "stop" or command is "start":
                 if command is "stop":
+                    logger.info("")
+                    logger.info("***TASK 2/3 DONE [==========        ]")
+                    logger.info("")
                     on_or_off = "off"
                 else:
+                    logger.info("")
+                    logger.info("***TASK 2/5 DONE [=====             ]")
+                    logger.info("")
                     on_or_off = "on"
                 #then kill or start all relays 
 
@@ -1259,12 +1320,18 @@ def start_stop_reboot_show(command, limit_to_switch_ip, type):
  ###### VIDEO PI REBOOT AND ABLETON/LYCRA START #######
 
                 if command is "start":
+                    logger.info("")
+                    logger.info("***TASK 3/5 DONE [========          ]")
+                    logger.info("")
                     logger.warning("Pausing before starting media server programs & rebooting Pis")
                     delay_with_countdown(DELAY_FOR_MEDIASERVERS)
                     logger.warning("rebooting video Pis")
                     for item in video_list:
                         (remote_ip, switch_ip, switch_interface, device_type, mac_address, device_name, description) = item
                         reboot_device(remote_ip, switch_ip, switch_interface, device_type, device_name, description)
+                    logger.info("")
+                    logger.info("***TASK 4/5 DONE [============       ]")
+                    logger.info("")
                     logger.warning("starting post-projector media server programs")
                     start_lycra()
                     play_ableton()
@@ -1274,9 +1341,17 @@ def start_stop_reboot_show(command, limit_to_switch_ip, type):
                     for item in final_reboot_list:
                         (remote_ip, switch_ip, switch_interface, device_type, mac_address, device_name, description) = item
                         reboot_device(remote_ip, switch_ip, switch_interface, device_type, device_name, description)
-
+                    logger.info("")
+                    logger.info("***TASK 5/5 DONE [===================]")
+                    logger.info("")
+                else:
+                    logger.info("")
+                    logger.info("***TASK 3/3 DONE [===================]")
+                    logger.info("")
             #clears concert mode (off or on, both clear concert mode)
             msg = "/concertmode_off 1"
+            send_to_osc(SHOW_CONTROLLER_IP, SHOW_CONTROLLER_PORT, msg)
+            msg = "/start_stop_finished 1"
             send_to_osc(SHOW_CONTROLLER_IP, SHOW_CONTROLLER_PORT, msg)
 
     except lite.Error, e:
@@ -1312,6 +1387,26 @@ def all_relays_off():
         relay_list = get_all_relays(relay_pin_list)
         
         relays_on_off(on_or_off, relay_list, "")
+
+def tvarch_relays_on():
+    # start all tv arch relays     
+    on_or_off = "on"
+    if (args.no_relays or args.with_relays == 0):
+        logger.warning("--no_relays, or --with_relays not found, skipping relays")
+    else:
+        get_relay_pins(relay_pin_list)
+        tv_arch_returned = get_tvarch_relays(relay_pin_list, tv_arch_relays)
+        relays_on_off(on_or_off, tv_arch_returned, "")
+
+def tvarch_relays_off():
+    #kill all tv arch relays     
+    on_or_off = "off"
+    if (args.no_relays or args.with_relays == 0):
+        logger.warning("--no_relays, or --with_relays not found, skipping relays")
+    else:
+        get_relay_pins(relay_pin_list)
+        tv_arch_returned = get_tvarch_relays(relay_pin_list, tv_arch_relays)
+        relays_on_off(on_or_off, tv_arch_returned, "")
 
 ##############################
 # REBOOT NONRESPONSIVE DEVICES
@@ -2234,6 +2329,15 @@ if __name__ == "__main__":
         parser.add_argument('--no_global',
                             action='store_true',
                             help='Skip global audio devices (devices with "global" in the description)')
+
+
+        group.add_argument('--tv_arch_off',
+                           action='store_true',
+                           help='stops the tv arch')
+        
+        parser.add_argument('--tv_arch_on',
+                            action='store_true',
+                            help='starts the tv arch')
         
         parser.add_argument('--no_delay',
                             action='store_true',
@@ -2357,6 +2461,10 @@ if __name__ == "__main__":
             cmd = cmd + (" all relays off")
             msg = "/stop_show 1"
             send_to_osc(SHOW_CONTROLLER_IP, SHOW_CONTROLLER_PORT, msg)
+        if args.tv_arch_on:
+            cmd = cmd + (" tv arch on")
+        if args.tv_arch_off:
+            cmd = cmd + (" tv arch off")
         if args.volume_up:
             cmd = cmd + (", volume up")
         if args.volume_down:
@@ -2698,6 +2806,20 @@ if __name__ == "__main__":
 
     if args.all_relays_off:
         all_relays_off()
+
+    #################
+    # TV ARCH RELAYS ON
+    #################
+
+    if args.tv_arch_on:
+        tvarch_relays_on()
+
+    #################
+    # TV ARCH RELAYS OFF
+    #################
+
+    if args.tv_arch_off:
+        tvarch_relays_off()
 
     #################
     # PLAY ABLETON
