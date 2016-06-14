@@ -28,6 +28,10 @@ POE_COMMAND = "/Users/Aesir/Documents/watchdog/set_power.exp"
 POE_ALL_COMMAND = "/Users/Aesir/Documents/watchdog/set-poe.py"
 #command to use to send Wake on Lan messages 
 WOL_COMMAND = "/Users/Aesir/Documents/watchdog/wolcmd"
+GLOBAL_ON_COMMAND = "/global/start"
+GLOBAL_OFF_COMMAND = "/global/shutdown"
+GLOBAL_PORT = 9998
+GLOBAL_IP = "10.42.21.18"
 DELAY_AFTER_SERVERS = 60.0 #delays 2 minutes between booting windows servers and pis
 DELAY_STOP_PI = 15.0 #delays 15 seconds between halting Pis and cutting PoE
 DELAY_STOP_PI_LONG = 45.0 #delays 15 seconds between halting Pis and cutting PoE
@@ -89,10 +93,12 @@ global_ip = "10.42.21.18"
 entertainment_ip = "10.42.17.11"
 dining_ip = "10.42.25.20"
 laser_harp_controller_ip = "10.42.20.91"
-mushroom_1_ip = "10.42.21.80"
-mushroom_2_ip = "10.42.21.81"
-mushroom_3_ip = "10.42.21.89"
-mushroom_4_ip = "10.42.21.91"
+charter_clock_fsr_ip = "10.42.22.85"
+#mushroom_1_ip = "10.42.21.80"
+#mushroom_2_ip = "10.42.21.81"
+#mushroom_3_ip = "10.42.21.89"
+#mushroom_4_ip = "10.42.21.91"
+
 
 #IP address for the POD
 POD_ip = "10.42.24.21"
@@ -938,11 +944,12 @@ def relays_on_off(on_or_off, zone_list, zone):
                 send_to_osc_arguments(item[4], RELAY_PORT, "/relay", [int(item[3]), 1])
             else:
                 logger.info("send to " + str(item[1]))
-                #don't kill matt's fish!
-                if item[1] != "2LB-11":        
-                    send_to_osc_arguments(item[4], RELAY_PORT, "/relay", [int(item[3]), 0])
+                #don't kill matt's fish! or the running hamster
+                if item[1] == "2LB-11" or item[1] == "2LC-22" or item[1] == "2LC-7":      
+                    logger.warning("skipping %s, don't kill fish or hamsters (or matt's feelings)" % item[1])
                 else:
-                    logger.warning("skipping %s, don't kill fish (or matt's feelings)" % item[1])
+                    send_to_osc_arguments(item[4], RELAY_PORT, "/relay", [int(item[3]), 0])
+
 
 #on boot order
     #start media server
@@ -1223,7 +1230,7 @@ def start_stop_reboot_show(command, limit_to_switch_ip, type):
                         print "skipping " + str(device_name)
                     continue
 
-                if remote_ip == dining_ip or remote_ip == laser_harp_controller_ip or remote_ip == mushroom_1_ip or remote_ip == mushroom_2_ip or remote_ip == mushroom_3_ip or remote_ip == mushroom_4_ip:
+                if remote_ip == dining_ip or remote_ip == laser_harp_controller_ip or remote_ip == charter_clock_fsr_ip:
                     final_reboot_list.append([remote_ip, switch_ip, switch_interface, device_type, mac_address, device_name, description])
 
  ###### START #######
@@ -1273,6 +1280,9 @@ def start_stop_reboot_show(command, limit_to_switch_ip, type):
                 logger.info("")
                 logger.info("***TASK 1/3 DONE [===               ]")
                 logger.info("")
+                #kill global
+                send_to_osc(GLOBAL_IP, GLOBAL_PORT, GLOBAL_OFF_COMMAND)
+
                 # kill every PoE
                 logger.warning("delay %d seconds to make sure Pis halt" % DELAY_STOP_PI_LONG)
                 delay_with_countdown(DELAY_STOP_PI_LONG)
@@ -1284,6 +1294,8 @@ def start_stop_reboot_show(command, limit_to_switch_ip, type):
                 logger.info("")
                 logger.info("***TASK 1/5 DONE [===               ]")
                 logger.info("")
+                #start global
+                send_to_osc(GLOBAL_IP, GLOBAL_PORT, GLOBAL_ON_COMMAND)
                 # start every PoE
                 logger.warning("delay %d seconds to make sure servers boot completely before starting other devices" % DELAY_AFTER_SERVERS)
                 delay_with_countdown(DELAY_AFTER_SERVERS)
