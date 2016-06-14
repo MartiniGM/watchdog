@@ -9,7 +9,7 @@
 			"modernui" : 1
 		}
 ,
-		"rect" : [ 113.0, 112.0, 1531.0, 816.0 ],
+		"rect" : [ 113.0, 112.0, 1056.0, 816.0 ],
 		"bglocked" : 0,
 		"openinpresentation" : 1,
 		"default_fontsize" : 12.0,
@@ -787,13 +787,14 @@
 									"fontname" : "Arial",
 									"fontsize" : 12.0,
 									"id" : "obj-4",
+									"linecount" : 2,
 									"maxclass" : "message",
 									"numinlets" : 2,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 400.0, 240.0, 139.0, 22.0 ],
+									"patching_rect" : [ 400.0, 240.0, 139.0, 35.0 ],
 									"style" : "",
-									"text" : "sendbox bgcolor 0. 0. 0."
+									"text" : "sendbox bgfillcolor 0. 0. 0. 0.8"
 								}
 
 							}
@@ -879,13 +880,14 @@
 									"fontname" : "Arial",
 									"fontsize" : 12.0,
 									"id" : "obj-56",
+									"linecount" : 2,
 									"maxclass" : "message",
 									"numinlets" : 2,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 249.0, 240.0, 139.0, 22.0 ],
+									"patching_rect" : [ 249.0, 240.0, 139.0, 35.0 ],
 									"style" : "",
-									"text" : "sendbox bgcolor 1. 0. 0."
+									"text" : "sendbox bgfillcolor 1. 0. 0. 0.8"
 								}
 
 							}
@@ -894,13 +896,14 @@
 									"fontname" : "Arial",
 									"fontsize" : 12.0,
 									"id" : "obj-57",
+									"linecount" : 2,
 									"maxclass" : "message",
 									"numinlets" : 2,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 108.0, 240.0, 139.0, 22.0 ],
+									"patching_rect" : [ 108.0, 240.0, 139.0, 35.0 ],
 									"style" : "",
-									"text" : "sendbox bgcolor 0. 1. 0."
+									"text" : "sendbox bgfillcolor 0. 1. 0. 0.8"
 								}
 
 							}
@@ -1117,15 +1120,15 @@
 			}
 , 			{
 				"box" : 				{
-					"bgcolor" : [ 1.0, 0.0, 0.0 ],
-					"bgcolor2" : [ 0.290196, 0.309804, 0.301961, 1.0 ],
+					"bgcolor" : [ 1.0, 0.0, 0.0, 1.0 ],
+					"bgcolor2" : [ 1.0, 0.0, 0.0, 1.0 ],
 					"bgfillcolor_angle" : 270.0,
 					"bgfillcolor_autogradient" : 0.0,
 					"bgfillcolor_color" : [ 0.290196, 0.309804, 0.301961, 1.0 ],
-					"bgfillcolor_color1" : [ 1.0, 0.0, 0.0 ],
+					"bgfillcolor_color1" : [ 1.0, 0.0, 0.0, 1.0 ],
 					"bgfillcolor_color2" : [ 0.290196, 0.309804, 0.301961, 1.0 ],
 					"bgfillcolor_proportion" : 0.39,
-					"bgfillcolor_type" : "gradient",
+					"bgfillcolor_type" : "color",
 					"gradient" : 1,
 					"id" : "obj-164",
 					"maxclass" : "message",
@@ -1136,7 +1139,8 @@
 					"presentation" : 1,
 					"presentation_rect" : [ 592.5, 0.0, 120.0, 22.0 ],
 					"style" : "",
-					"text" : "ERRPI_ACKCLEAR"
+					"text" : "ERRPI_ACKCLEAR",
+					"textcolor" : [ 0.0, 0.0, 0.0, 1.0 ]
 				}
 
 			}

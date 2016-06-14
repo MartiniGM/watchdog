@@ -9,7 +9,7 @@
 			"modernui" : 1
 		}
 ,
-		"rect" : [ 34.0, 179.0, 1347.0, 705.0 ],
+		"rect" : [ 260.0, 94.0, 909.0, 705.0 ],
 		"bglocked" : 0,
 		"openinpresentation" : 1,
 		"default_fontsize" : 12.0,
@@ -38,6 +38,18 @@
 		"subpatcher_template" : "",
 		"boxes" : [ 			{
 				"box" : 				{
+					"id" : "obj-29",
+					"maxclass" : "comment",
+					"numinlets" : 1,
+					"numoutlets" : 0,
+					"patching_rect" : [ 214.5, 213.0, 630.0, 20.0 ],
+					"style" : "",
+					"text" : "child:  -- 0 May 22, 2016 13:40:45 NONRESPONSIVE 83796 May 23, 2016 12:57:20 0 10.42.96.56/GV_VMS.exe\r"
+				}
+
+			}
+, 			{
+				"box" : 				{
 					"id" : "obj-11",
 					"maxclass" : "newobj",
 					"numinlets" : 1,
@@ -51,7 +63,17 @@
 			}
 , 			{
 				"box" : 				{
+					"bgcolor" : [ 0.376471, 0.384314, 0.4, 1.0 ],
+					"bgcolor2" : [ 0.376471, 0.384314, 0.4, 1.0 ],
+					"bgfillcolor_angle" : 270.0,
+					"bgfillcolor_autogradient" : 0.0,
+					"bgfillcolor_color" : [ 0.290196, 0.309804, 0.301961, 1.0 ],
+					"bgfillcolor_color1" : [ 0.376471, 0.384314, 0.4, 1.0 ],
+					"bgfillcolor_color2" : [ 0.290196, 0.309804, 0.301961, 1.0 ],
+					"bgfillcolor_proportion" : 0.39,
+					"bgfillcolor_type" : "color",
 					"fontsize" : 10.0,
+					"gradient" : 1,
 					"id" : "obj-10",
 					"maxclass" : "message",
 					"numinlets" : 2,
@@ -61,7 +83,7 @@
 					"presentation" : 1,
 					"presentation_rect" : [ 1088.5, 0.0, 191.0, 20.0 ],
 					"style" : "",
-					"text" : "0"
+					"text" : "alarm"
 				}
 
 			}
@@ -119,7 +141,17 @@
 			}
 , 			{
 				"box" : 				{
+					"bgcolor" : [ 0.376471, 0.384314, 0.4, 1.0 ],
+					"bgcolor2" : [ 0.376471, 0.384314, 0.4, 1.0 ],
+					"bgfillcolor_angle" : 270.0,
+					"bgfillcolor_autogradient" : 0.0,
+					"bgfillcolor_color" : [ 0.290196, 0.309804, 0.301961, 1.0 ],
+					"bgfillcolor_color1" : [ 0.376471, 0.384314, 0.4, 1.0 ],
+					"bgfillcolor_color2" : [ 0.290196, 0.309804, 0.301961, 1.0 ],
+					"bgfillcolor_proportion" : 0.39,
+					"bgfillcolor_type" : "color",
 					"fontsize" : 10.0,
+					"gradient" : 1,
 					"id" : "obj-18",
 					"maxclass" : "message",
 					"numinlets" : 2,
@@ -135,7 +167,17 @@
 			}
 , 			{
 				"box" : 				{
+					"bgcolor" : [ 0.376471, 0.384314, 0.4, 1.0 ],
+					"bgcolor2" : [ 0.376471, 0.384314, 0.4, 1.0 ],
+					"bgfillcolor_angle" : 270.0,
+					"bgfillcolor_autogradient" : 0.0,
+					"bgfillcolor_color" : [ 0.290196, 0.309804, 0.301961, 1.0 ],
+					"bgfillcolor_color1" : [ 0.376471, 0.384314, 0.4, 1.0 ],
+					"bgfillcolor_color2" : [ 0.290196, 0.309804, 0.301961, 1.0 ],
+					"bgfillcolor_proportion" : 0.39,
+					"bgfillcolor_type" : "color",
 					"fontsize" : 10.0,
+					"gradient" : 1,
 					"id" : "obj-17",
 					"maxclass" : "message",
 					"numinlets" : 2,
@@ -145,13 +187,23 @@
 					"presentation" : 1,
 					"presentation_rect" : [ 997.5, 0.0, 89.0, 20.0 ],
 					"style" : "",
-					"text" : "0"
+					"text" : "type"
 				}
 
 			}
 , 			{
 				"box" : 				{
+					"bgcolor" : [ 0.376471, 0.384314, 0.4, 1.0 ],
+					"bgcolor2" : [ 0.376471, 0.384314, 0.4, 1.0 ],
+					"bgfillcolor_angle" : 270.0,
+					"bgfillcolor_autogradient" : 0.0,
+					"bgfillcolor_color" : [ 0.290196, 0.309804, 0.301961, 1.0 ],
+					"bgfillcolor_color1" : [ 0.376471, 0.384314, 0.4, 1.0 ],
+					"bgfillcolor_color2" : [ 0.290196, 0.309804, 0.301961, 1.0 ],
+					"bgfillcolor_proportion" : 0.39,
+					"bgfillcolor_type" : "color",
 					"fontsize" : 10.0,
+					"gradient" : 1,
 					"id" : "obj-15",
 					"maxclass" : "message",
 					"numinlets" : 2,
@@ -162,18 +214,6 @@
 					"presentation_rect" : [ 784.5, 0.0, 83.0, 20.0 ],
 					"style" : "",
 					"text" : "uptime_sec"
-				}
-
-			}
-, 			{
-				"box" : 				{
-					"id" : "obj-14",
-					"maxclass" : "comment",
-					"numinlets" : 1,
-					"numoutlets" : 0,
-					"patching_rect" : [ 203.5, 198.0, 769.0, 20.0 ],
-					"style" : "",
-					"text" : "eee: Software Jan 20, 2016 16:22:42 OKAY 246145 Jan 23, 2016 12:45:07 Piezo arduino 10.42.16.53/home/pi/RUNNING/builds/piezo\r"
 				}
 
 			}
@@ -356,7 +396,7 @@
 									"outlettype" : [ "" ],
 									"patching_rect" : [ 453.0, 200.0, 166.0, 22.0 ],
 									"style" : "",
-									"text" : "sendbox bgcolor 0. 1. 1."
+									"text" : "sendbox bgfillcolor 0. 1. 1."
 								}
 
 							}
@@ -430,13 +470,14 @@
 									"fontname" : "Arial",
 									"fontsize" : 12.0,
 									"id" : "obj-56",
+									"linecount" : 2,
 									"maxclass" : "message",
 									"numinlets" : 2,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 280.0, 200.0, 139.0, 22.0 ],
+									"patching_rect" : [ 280.0, 200.0, 139.0, 35.0 ],
 									"style" : "",
-									"text" : "sendbox bgcolor 1. 0. 0."
+									"text" : "sendbox bgfillcolor 1. 0. 0."
 								}
 
 							}
@@ -445,13 +486,14 @@
 									"fontname" : "Arial",
 									"fontsize" : 12.0,
 									"id" : "obj-57",
+									"linecount" : 2,
 									"maxclass" : "message",
 									"numinlets" : 2,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 133.75, 200.0, 139.0, 22.0 ],
+									"patching_rect" : [ 133.75, 200.0, 139.0, 35.0 ],
 									"style" : "",
-									"text" : "sendbox bgcolor 0. 1. 0."
+									"text" : "sendbox bgfillcolor 0. 1. 0."
 								}
 
 							}
@@ -665,7 +707,17 @@
 			}
 , 			{
 				"box" : 				{
+					"bgcolor" : [ 0.376471, 0.384314, 0.4, 1.0 ],
+					"bgcolor2" : [ 0.376471, 0.384314, 0.4, 1.0 ],
+					"bgfillcolor_angle" : 270.0,
+					"bgfillcolor_autogradient" : 0.0,
+					"bgfillcolor_color" : [ 0.290196, 0.309804, 0.301961, 1.0 ],
+					"bgfillcolor_color1" : [ 0.376471, 0.384314, 0.4, 1.0 ],
+					"bgfillcolor_color2" : [ 0.290196, 0.309804, 0.301961, 1.0 ],
+					"bgfillcolor_proportion" : 0.39,
+					"bgfillcolor_type" : "color",
 					"fontsize" : 10.0,
+					"gradient" : 1,
 					"id" : "obj-2",
 					"maxclass" : "message",
 					"numinlets" : 2,
@@ -681,15 +733,15 @@
 			}
 , 			{
 				"box" : 				{
-					"bgcolor" : [ 0.0, 1.0, 1.0 ],
-					"bgcolor2" : [ 0.290196, 0.309804, 0.301961, 1.0 ],
+					"bgcolor" : [ 0.0, 1.0, 1.0, 1.0 ],
+					"bgcolor2" : [ 0.0, 1.0, 1.0, 1.0 ],
 					"bgfillcolor_angle" : 270.0,
 					"bgfillcolor_autogradient" : 0.0,
 					"bgfillcolor_color" : [ 0.290196, 0.309804, 0.301961, 1.0 ],
-					"bgfillcolor_color1" : [ 0.0, 1.0, 1.0 ],
+					"bgfillcolor_color1" : [ 0.0, 1.0, 1.0, 1.0 ],
 					"bgfillcolor_color2" : [ 0.290196, 0.309804, 0.301961, 1.0 ],
 					"bgfillcolor_proportion" : 0.39,
-					"bgfillcolor_type" : "gradient",
+					"bgfillcolor_type" : "color",
 					"fontsize" : 10.0,
 					"gradient" : 1,
 					"id" : "obj-164",
@@ -707,7 +759,19 @@
 			}
 , 			{
 				"box" : 				{
+					"bgcolor" : [ 0.439216, 0.74902, 0.254902, 1.0 ],
+					"bgcolor2" : [ 0.439216, 0.74902, 0.254902, 1.0 ],
+					"bgfillcolor_angle" : 90.0,
+					"bgfillcolor_autogradient" : 0.0,
+					"bgfillcolor_color" : [ 0.290196, 0.309804, 0.301961, 1.0 ],
+					"bgfillcolor_color1" : [ 0.439216, 0.74902, 0.254902, 1.0 ],
+					"bgfillcolor_color2" : [ 0.290196, 0.309804, 0.301961, 1.0 ],
+					"bgfillcolor_proportion" : 0.4,
+					"bgfillcolor_pt1" : [ 0.5, 1.130435 ],
+					"bgfillcolor_pt2" : [ 0.5, -0.06087 ],
+					"bgfillcolor_type" : "color",
 					"fontsize" : 10.0,
+					"gradient" : 1,
 					"id" : "obj-163",
 					"maxclass" : "message",
 					"numinlets" : 2,
@@ -717,21 +781,22 @@
 					"presentation" : 1,
 					"presentation_rect" : [ 557.5, 0.0, 106.0, 20.0 ],
 					"style" : "",
-					"text" : "status"
+					"text" : "status",
+					"textcolor" : [ 0.0, 0.0, 0.0, 1.0 ]
 				}
 
 			}
 , 			{
 				"box" : 				{
-					"bgcolor" : [ 0.0, 1.0, 1.0 ],
-					"bgcolor2" : [ 0.290196, 0.309804, 0.301961, 1.0 ],
+					"bgcolor" : [ 0.0, 1.0, 1.0, 1.0 ],
+					"bgcolor2" : [ 0.0, 1.0, 1.0, 1.0 ],
 					"bgfillcolor_angle" : 270.0,
 					"bgfillcolor_autogradient" : 0.0,
 					"bgfillcolor_color" : [ 0.290196, 0.309804, 0.301961, 1.0 ],
-					"bgfillcolor_color1" : [ 0.0, 1.0, 1.0 ],
+					"bgfillcolor_color1" : [ 0.0, 1.0, 1.0, 1.0 ],
 					"bgfillcolor_color2" : [ 0.290196, 0.309804, 0.301961, 1.0 ],
 					"bgfillcolor_proportion" : 0.39,
-					"bgfillcolor_type" : "gradient",
+					"bgfillcolor_type" : "color",
 					"fontsize" : 10.0,
 					"gradient" : 1,
 					"id" : "obj-162",
@@ -752,11 +817,11 @@
 					"id" : "obj-158",
 					"maxclass" : "newobj",
 					"numinlets" : 1,
-					"numoutlets" : 8,
-					"outlettype" : [ "", "", "", "", "", "", "", "" ],
-					"patching_rect" : [ 45.5, 253.0, 1019.5, 22.0 ],
+					"numoutlets" : 9,
+					"outlettype" : [ "", "", "", "", "", "", "", "", "" ],
+					"patching_rect" : [ 45.5, 250.0, 1019.5, 22.0 ],
 					"style" : "",
-					"text" : "unjoin 7"
+					"text" : "unjoin 8"
 				}
 
 			}
@@ -793,7 +858,7 @@
 					"destination" : [ "obj-11", 0 ],
 					"disabled" : 0,
 					"hidden" : 0,
-					"source" : [ "obj-158", 0 ]
+					"source" : [ "obj-158", 1 ]
 				}
 
 			}
@@ -802,7 +867,7 @@
 					"destination" : [ "obj-13", 0 ],
 					"disabled" : 0,
 					"hidden" : 0,
-					"source" : [ "obj-158", 5 ]
+					"source" : [ "obj-158", 6 ]
 				}
 
 			}
@@ -811,22 +876,22 @@
 					"destination" : [ "obj-15", 1 ],
 					"disabled" : 0,
 					"hidden" : 0,
-					"source" : [ "obj-158", 4 ]
-				}
-
-			}
-, 			{
-				"patchline" : 				{
-					"destination" : [ "obj-16", 0 ],
-					"disabled" : 0,
-					"hidden" : 0,
-					"source" : [ "obj-158", 6 ]
+					"source" : [ "obj-158", 5 ]
 				}
 
 			}
 , 			{
 				"patchline" : 				{
 					"destination" : [ "obj-162", 1 ],
+					"disabled" : 0,
+					"hidden" : 0,
+					"source" : [ "obj-158", 8 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-164", 1 ],
 					"disabled" : 0,
 					"hidden" : 0,
 					"source" : [ "obj-158", 7 ]
@@ -838,7 +903,7 @@
 					"destination" : [ "obj-3", 0 ],
 					"disabled" : 0,
 					"hidden" : 0,
-					"source" : [ "obj-158", 3 ]
+					"source" : [ "obj-158", 4 ]
 				}
 
 			}
@@ -847,7 +912,7 @@
 					"destination" : [ "obj-7", 1 ],
 					"disabled" : 0,
 					"hidden" : 0,
-					"source" : [ "obj-158", 7 ]
+					"source" : [ "obj-158", 8 ]
 				}
 
 			}
@@ -856,7 +921,7 @@
 					"destination" : [ "obj-8", 0 ],
 					"disabled" : 0,
 					"hidden" : 0,
-					"source" : [ "obj-158", 1 ]
+					"source" : [ "obj-158", 2 ]
 				}
 
 			}
@@ -865,7 +930,7 @@
 					"destination" : [ "obj-9", 0 ],
 					"disabled" : 0,
 					"hidden" : 0,
-					"source" : [ "obj-158", 2 ]
+					"source" : [ "obj-158", 3 ]
 				}
 
 			}
